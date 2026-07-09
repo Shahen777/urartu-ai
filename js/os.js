@@ -915,6 +915,8 @@
 
     var iosCC = document.getElementById('iosCC');
     if (iosCC) iosCC.addEventListener('click', toggle);
+    var ccFab = document.getElementById('ccFab');
+    if (ccFab) ccFab.addEventListener('click', toggle);
 
     /* --- тема --- */
     var tTheme = document.getElementById('ccxTheme');

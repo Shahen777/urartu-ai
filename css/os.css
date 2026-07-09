@@ -46,6 +46,14 @@
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --ease:cubic-bezier(.22,.61,.36,1);
   --ios-ease:cubic-bezier(.32,.72,0,1);
+  /* подписи иконок и стекло iOS — своё на каждую тему */
+  --sb-label:#fff;
+  --sb-label-shadow:0 1px 3px rgba(0,0,0,.6);
+  --ios-glass:rgba(255,255,255,.16);
+  --ios-glass-ring:rgba(255,255,255,.18);
+  --ios-pill:rgba(0,0,0,.26);
+  --ios-pill-text:#fff;
+  --ios-bar:#fff;
 }
 
 /* ---------- СВЕТЛАЯ ТЕМА ---------- */
@@ -70,6 +78,13 @@
   --sh-deep:0 0 0 1px var(--ring),0 12px 40px rgba(0,0,0,.18);
   --wall-overlay:radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.20), rgba(255,255,255,0) 55%);
   --wall-img:url(../wallpapers/light.svg);
+  --sb-label:#20222A;
+  --sb-label-shadow:0 1px 2px rgba(255,255,255,.85),0 0 6px rgba(255,255,255,.6);
+  --ios-glass:rgba(255,255,255,.5);
+  --ios-glass-ring:rgba(0,0,0,.07);
+  --ios-pill:rgba(255,255,255,.62);
+  --ios-pill-text:#20222A;
+  --ios-bar:#20222A;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -714,8 +729,10 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
     transition:transform .12s var(--ease),opacity .12s var(--ease)}
   .sb-icon img{width:60px;height:60px;display:block;pointer-events:none;
     filter:drop-shadow(0 3px 8px rgba(0,0,0,.35))}
-  .sb-icon span{font-size:12px;line-height:1.15;color:#fff;text-align:center;font-weight:400;
-    text-shadow:0 1px 3px rgba(0,0,0,.55);width:74px;
+  /* Подпись читается на любых обоях: в тёмной теме — белая с тёмной тенью,
+     в светлой — тёмная со светлым ореолом (белым по белому не видно). */
+  .sb-icon span{font-size:12px;line-height:1.15;text-align:center;font-weight:500;
+    color:var(--sb-label);text-shadow:var(--sb-label-shadow);width:74px;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sb-icon:active{transform:scale(.9);opacity:.75}
   .sb-icon:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:14px}
@@ -726,21 +743,21 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
     bottom:calc(110px + env(safe-area-inset-bottom));
     display:inline-flex;align-items:center;gap:6px;
     height:36px;padding:0 16px;border-radius:999px;
-    background:rgba(0,0,0,.24);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
-    color:#fff;font-size:14px;font-weight:400;
-    box-shadow:inset 0 0 0 .5px rgba(255,255,255,.16);
+    background:var(--ios-pill);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    color:var(--ios-pill-text);font-size:14px;font-weight:500;
+    box-shadow:inset 0 0 0 .5px var(--ios-glass-ring);
   }
   .ios-search svg{display:block;opacity:.9}
-  .ios-search:active{background:rgba(0,0,0,.34)}
-  .ios-search:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  .ios-search:active{filter:brightness(.94)}
+  .ios-search:focus-visible{outline:2px solid var(--ios-bar);outline-offset:3px}
 
   /* iOS-док */
   .dock{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:8px;right:8px;
     transform:none;height:auto;
     border-radius:34px;width:auto;
-    background:rgba(255,255,255,.16);
+    background:var(--ios-glass);
     -webkit-backdrop-filter:blur(28px) saturate(1.6);backdrop-filter:blur(28px) saturate(1.6);
-    box-shadow:inset 0 0 0 .5px rgba(255,255,255,.18);
+    box-shadow:inset 0 0 0 .5px var(--ios-glass-ring);
     justify-content:space-around;align-items:center;
     padding:12px 14px;gap:0}
   .dock__mobhide{display:none}
@@ -750,13 +767,35 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
   .dock__app img{width:60px;height:60px}
   .dock__app:active{transform:scale(.9)}
 
-  /* индикатор «домой» */
-  .ios-home{
-    position:fixed;left:50%;transform:translateX(-50%);z-index:8700;
-    bottom:calc(6px + env(safe-area-inset-bottom));
-    width:140px;height:5px;border-radius:3px;background:rgba(255,255,255,.55);
-    pointer-events:none;
+  /* Свой статус-бар и полоска «домой» имеют смысл только когда сайт открыт
+     как приложение (с экрана «Домой»). В обычном браузере они дублируют
+     системные — двое часов и две полоски. Поэтому по умолчанию скрыты. */
+  .ios-statusbar,.ios-home{display:none}
+  /* сверху оставляем воздух под кнопку Пункта управления */
+  .page{padding-top:calc(env(safe-area-inset-top) + 58px)}
+
+  @media (display-mode:standalone),(display-mode:fullscreen){
+    .ios-statusbar{display:flex}
+    .ios-home{
+      display:block;position:fixed;left:50%;transform:translateX(-50%);z-index:8700;
+      bottom:calc(6px + env(safe-area-inset-bottom));
+      width:140px;height:5px;border-radius:3px;background:var(--ios-bar);opacity:.5;
+      pointer-events:none;
+    }
+    .page{padding-top:calc(env(safe-area-inset-top) + 52px)}
   }
+
+  /* Кнопка Пункта управления в браузере (когда своего статус-бара нет) */
+  .cc-fab{
+    position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:12px;z-index:9200;
+    width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+    background:var(--ios-pill);color:var(--ios-pill-text);
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    box-shadow:inset 0 0 0 .5px var(--ios-glass-ring),0 2px 10px rgba(0,0,0,.14);
+  }
+  .cc-fab:active{filter:brightness(.94)}
+  .cc-fab:focus-visible{outline:2px solid var(--ios-bar);outline-offset:3px}
+  @media (display-mode:standalone),(display-mode:fullscreen){ .cc-fab{display:none} }
   /* ровно 4 иконки в порядке: Ассистент · ИИ-агенты · Тарифы · Почта */
   .dock__app[data-win="win-assistant"]{order:1}
   .dock__app[data-win="win-agents"]{order:2}
@@ -887,6 +926,9 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 
 /* зона перехвата свайпа: правый верхний угол, как на iPhone */
 .cc-grab{display:none}
+/* на десктопе кнопка не нужна — там меню-бар. Прячем через медиа-запрос,
+   иначе это правило перебило бы мобильное (оно ниже по файлу). */
+@media (min-width:1024px){ .cc-fab{display:none} }
 @media (max-width:1023px){
   .cc-grab{
     display:block;position:fixed;top:0;right:0;z-index:9100;
