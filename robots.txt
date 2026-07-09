@@ -1,0 +1,5 @@
+# TODO: замените https://shahen777.github.io/urartu-ai/ на реальный домен
+User-agent: *
+Allow: /
+
+Sitemap: https://shahen777.github.io/urartu-ai/sitemap.xml

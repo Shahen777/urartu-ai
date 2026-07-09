@@ -1,0 +1,770 @@
+/* ============================================================
+   Urartu AI — «Рабочий стол» / OS-симуляция
+   ДНК эталона displace.agency (macOS, стекло) · V3.1
+   Тёмная и светлая темы, РУ/EN, iOS-режим
+   ============================================================ */
+
+:root{
+  /* базовые (ТЁМНАЯ тема) */
+  --wall-base:#05070C;
+  --glass:rgba(24,24,28,0.55);
+  --glass-window:rgba(24,24,28,0.85);
+  --glass-bar:rgba(24,24,28,0.62);
+  --ring:rgba(255,255,255,0.10);
+  --ring-strong:rgba(255,255,255,0.16);
+  --text:#F5F5F7;
+  --text-dim:rgba(255,255,255,0.60);
+  --text-mid:rgba(255,255,255,0.72);
+  /* красный для кнопок (AA: белый текст ≥4.5:1); --red остаётся для акцентных штрихов */
+  --red-btn:#D42E00;
+  --red-btn-hover:#B32600;
+  /* поверхности внутри окон/виджетов */
+  --surface:rgba(255,255,255,0.06);
+  --surface-soft:rgba(255,255,255,0.05);
+  --surface-hover:rgba(255,255,255,0.12);
+  --surface-btn:rgba(255,255,255,0.08);
+  --surface-btn-hover:rgba(255,255,255,0.14);
+  --bar-tint:rgba(255,255,255,0.03);
+  --menu-hover:rgba(255,255,255,0.12);
+  /* акценты */
+  --red:#F3350C;
+  --yellow:#FFD60A;
+  --green:#32D74B;
+  --tl-red:#FF5F57;
+  --tl-yellow:#FEBC2E;
+  --tl-green:#28C840;
+  --r-widget:18px;
+  --r-window:16px;
+  --r-8:8px;
+  --r-6:6px;
+  --r-4:4px;
+  --sh-widget:0 0 0 1px var(--ring),0 20px 25px -5px rgba(0,0,0,.10),0 8px 10px -6px rgba(0,0,0,.10);
+  --sh-deep:0 0 0 1px var(--ring),0 12px 40px rgba(0,0,0,.35);
+  --wall-overlay:radial-gradient(120% 100% at 50% 0%, rgba(0,0,0,.30), rgba(0,0,0,0) 55%);
+  --wall-img:url(../wallpapers/dark.svg);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ios-ease:cubic-bezier(.32,.72,0,1);
+}
+
+/* ---------- СВЕТЛАЯ ТЕМА ---------- */
+:root.theme-light{
+  --wall-base:#cfe3f5;
+  --glass:rgba(255,255,255,0.62);
+  --glass-window:rgba(245,245,247,0.85);
+  --glass-bar:rgba(255,255,255,0.68);
+  --ring:rgba(0,0,0,0.08);
+  --ring-strong:rgba(0,0,0,0.16);
+  --text:#1D1D1F;
+  --text-dim:rgba(0,0,0,0.62);
+  --text-mid:rgba(0,0,0,0.72);
+  --surface:rgba(0,0,0,0.045);
+  --surface-soft:rgba(0,0,0,0.035);
+  --surface-hover:rgba(0,0,0,0.07);
+  --surface-btn:rgba(0,0,0,0.06);
+  --surface-btn-hover:rgba(0,0,0,0.10);
+  --bar-tint:rgba(0,0,0,0.02);
+  --menu-hover:rgba(0,0,0,0.06);
+  --sh-widget:0 0 0 1px var(--ring),0 20px 25px -5px rgba(0,0,0,.08),0 8px 10px -6px rgba(0,0,0,.08);
+  --sh-deep:0 0 0 1px var(--ring),0 12px 40px rgba(0,0,0,.18);
+  --wall-overlay:radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.20), rgba(255,255,255,0) 55%);
+  --wall-img:url(../wallpapers/light.svg);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font);
+  font-size:16px;
+  line-height:1.45;
+  color:var(--text);
+  background:var(--wall-base);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow:hidden;
+  transition:color .3s var(--ease),background-color .3s var(--ease);
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+/* <picture> оборачивает иконки (WebP + PNG-фолбэк); display:contents убирает
+   его собственный бокс, поэтому существующие правила `.dock__app img` и др.
+   и магнификация дока работают так же, как с голым <img> */
+picture{display:contents}
+::selection{background:rgba(243,53,12,.35);color:#fff}
+
+/* ---------- Обои (SVG, меняются вместе с темой) ---------- */
+.desktop{
+  position:fixed;inset:0;
+  background-color:var(--wall-base);
+  background-image:var(--wall-overlay),var(--wall-img);
+  background-size:cover,cover;
+  background-position:center,center;
+  background-repeat:no-repeat,no-repeat;
+  overflow:hidden;
+  transition:background-color .3s var(--ease);
+}
+
+/* каскадное появление рабочего стола (только при JS) */
+html.js .reveal{opacity:0}
+html.js .reveal.in{opacity:1;transition:opacity .25s var(--ease)}
+
+/* ================= iOS СТАТУС-БАР ================= */
+.ios-statusbar{display:none}
+
+/* ================= МЕНЮ-БАР ================= */
+.menubar{
+  position:fixed;top:0;left:0;right:0;height:28px;z-index:9000;
+  display:flex;align-items:center;gap:2px;
+  padding:0 12px;
+  background:var(--glass-bar);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 -1px 0 var(--ring);
+  font-size:13px;
+  transition:background-color .3s var(--ease);
+}
+.menubar__logo{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:0 10px 0 2px;font-weight:600;letter-spacing:.02em;
+}
+.menubar__logo svg{display:block}
+.menu-item{
+  padding:2px 10px;border-radius:var(--r-6);font-size:13px;color:var(--text);
+  transition:background .15s var(--ease);
+}
+.menu-item:hover,.menu-item:focus-visible{background:var(--menu-hover);outline:none}
+.menubar__right{margin-left:auto;display:flex;align-items:center;gap:12px;color:var(--text-mid)}
+.menubar__status{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(50,215,75,.7)}
+.menubar__wifi{position:relative;display:inline-flex;color:var(--text-mid)}
+.menubar__wifi svg{display:block}
+.menubar__clock{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--text);min-width:96px;text-align:right}
+
+/* переключатели в меню-баре */
+.menubar__toggle{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:20px;padding:0 6px;border-radius:var(--r-6);
+  color:var(--text-mid);font-size:12px;font-weight:600;letter-spacing:.02em;
+  transition:background .15s var(--ease),color .15s var(--ease);
+}
+.menubar__toggle:hover,.menubar__toggle:focus-visible{background:var(--menu-hover);color:var(--text);outline:none}
+.menubar__toggle svg{display:block}
+.menubar__theme .ico-sun{display:none}
+:root.theme-light .menubar__theme .ico-sun{display:block}
+:root.theme-light .menubar__theme .ico-moon{display:none}
+
+/* постоянная красная CTA в меню-баре (десктоп) */
+.menubar__cta{
+  display:inline-flex;align-items:center;height:20px;padding:0 11px;
+  border-radius:var(--r-6);background:var(--red-btn);color:#fff;
+  font-size:12px;font-weight:600;letter-spacing:.01em;white-space:nowrap;
+  transition:background .15s var(--ease),transform .15s var(--ease);
+}
+.menubar__cta:hover{background:var(--red-btn-hover);transform:translateY(-1px)}
+.menubar__cta:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+
+/* tooltip (wifi + dock) */
+.tip{position:relative}
+.tip::after{
+  content:attr(data-tip);
+  position:absolute;top:calc(100% + 8px);right:0;
+  white-space:nowrap;padding:5px 9px;border-radius:var(--r-8);
+  background:var(--glass-window);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  box-shadow:var(--sh-deep);font-size:12px;color:var(--text);font-family:var(--font);
+  opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .15s,transform .15s;
+}
+.tip:hover::after,.tip:focus-visible::after{opacity:1;transform:translateY(0)}
+
+/* ================= ПУНКТ УПРАВЛЕНИЯ ================= */
+.cc{
+  position:fixed;top:34px;right:10px;z-index:9500;width:272px;
+  padding:14px;border-radius:20px;
+  background:var(--glass);-webkit-backdrop-filter:blur(30px) saturate(1.5);
+  backdrop-filter:blur(30px) saturate(1.5);box-shadow:var(--sh-deep);
+  display:flex;flex-direction:column;gap:12px;
+  transform-origin:top right;opacity:0;transform:scale(.94) translateY(-6px);
+  transition:opacity .18s var(--ease),transform .18s var(--ease);
+}
+.cc.is-open{opacity:1;transform:scale(1) translateY(0)}
+/* [hidden] должен реально прятать панель: display:flex перебивал бы [hidden],
+   оставляя кнопку «Записаться на демо» в tab-порядке закрытой панели */
+.cc[hidden]{display:none}
+.cc__grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cc__tile{
+  display:flex;flex-direction:column;gap:4px;text-align:left;
+  padding:12px;border-radius:var(--r-widget);background:var(--surface);
+  box-shadow:inset 0 0 0 1px var(--ring);color:var(--text);
+  transition:background .15s var(--ease),transform .15s var(--ease);
+}
+.cc__tile:hover{background:var(--surface-hover);transform:translateY(-1px)}
+.cc__ic{color:var(--red)}
+.cc__ic svg{display:block}
+.cc__t{font-size:13px;font-weight:600;margin-top:2px}
+.cc__v{font-size:11.5px;color:var(--text-dim)}
+.cc__wifi{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--text-mid);
+  padding:4px 4px 0}
+.cc__wifi-ic{color:var(--text-mid)}
+.cc__wifi-ic svg{display:block}
+.cc__demo{
+  padding:11px 14px;border-radius:var(--r-8);background:var(--red-btn);color:#fff;
+  font-size:14px;font-weight:600;text-align:center;
+  transition:background .15s var(--ease),transform .15s var(--ease);
+}
+.cc__demo:hover{background:var(--red-btn-hover);transform:translateY(-1px)}
+.cc__demo:focus-visible,.cc__tile:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+
+/* ================= РАБОЧАЯ ОБЛАСТЬ ================= */
+.stage{position:absolute;inset:28px 0 0 0;overflow:hidden}
+
+/* сетка виджетов слева */
+.widgets{
+  position:absolute;top:24px;left:24px;
+  display:grid;grid-template-columns:150px 150px;
+  grid-auto-rows:min-content;gap:12px;
+  /* колонка не должна уезжать под док на невысоких экранах */
+  max-height:calc(100vh - 28px - 24px - 110px);
+  overflow-y:auto;overflow-x:hidden;
+  padding-right:4px;scrollbar-width:none;
+}
+.widgets::-webkit-scrollbar{width:0;height:0}
+.widget{
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(24px) saturate(1.3);
+  backdrop-filter:blur(24px) saturate(1.3);
+  border-radius:var(--r-widget);
+  box-shadow:var(--sh-widget);
+  padding:14px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  color:var(--text);height:150px;
+  transition:background-color .3s var(--ease),box-shadow .3s var(--ease);
+}
+.widget--wide{grid-column:span 2;width:312px}
+.widget--assistant{grid-column:span 2;height:200px;width:312px}
+.sticky{height:104px}
+.eyebrow{
+  font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--text-dim);
+}
+.widget__value{font-size:48px;font-weight:600;line-height:1;letter-spacing:-.02em;margin-top:auto}
+.widget__value--sm{font-size:34px}
+.widget__cap{font-size:12px;color:var(--text-dim);margin-top:6px;line-height:1.3}
+.widget__value--red{color:var(--red)}
+
+button.widget{cursor:pointer;text-align:left;transition:transform .2s var(--ease),background-color .3s var(--ease)}
+button.widget:hover{transform:translateY(-2px)}
+button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+
+/* Виджет ассистента (мини-чат) */
+.aw__head{display:flex;align-items:center;justify-content:space-between}
+/* «online» больше не выводится зелёным-текстом (проваливал контраст) —
+   статус несёт зелёная точка, сам текст читаемым --text-mid */
+.aw__badge{font-size:11px;color:var(--text-mid);font-family:var(--mono);letter-spacing:.02em}
+.aw__body{margin-top:8px;display:flex;flex-direction:column;gap:7px;flex:1;justify-content:flex-end;min-height:0}
+.aw__q{font-size:12.5px;color:var(--text-mid);line-height:1.3}
+.aw__a{
+  font-size:13px;line-height:1.35;color:var(--text);
+  background:var(--surface);border-radius:10px;padding:8px 10px;
+  align-self:flex-start;max-width:100%;min-height:1.35em;
+}
+.caret{display:inline-block;width:2px;height:1em;background:var(--text);vertical-align:-2px;margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* Календарь-виджет */
+.cal{align-items:flex-start;text-align:left}
+.cal__mark{color:var(--red);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.cal__date{font-size:52px;font-weight:600;line-height:.95;margin-top:2px}
+.cal__month{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em}
+.cal__cta{margin-top:auto;font-size:12px;color:var(--text);border-top:1px solid var(--ring);padding-top:8px;width:100%}
+.cal__cta .cta-sub{color:var(--text-dim)}
+
+/* Жёлтый стикер */
+.sticky{
+  background:var(--yellow);color:#1c1400;
+  box-shadow:var(--sh-widget);border-radius:var(--r-widget);
+  padding:15px 16px;font-size:14px;line-height:1.45;font-weight:500;
+  display:block;text-align:left;
+  transform:rotate(-2deg);
+}
+.sticky strong{font-weight:700}
+
+/* иконки рабочего стола справа (десктоп) */
+.desk-icons{
+  position:absolute;top:24px;right:24px;
+  display:flex;flex-direction:column;gap:18px;align-items:center;
+}
+.desk-icon{
+  width:64px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:transform .2s var(--ease);
+}
+.desk-icon img{width:52px;height:52px;display:block;pointer-events:none;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+.desk-icon span{font-size:13px;color:var(--text);text-align:center;
+  text-shadow:0 1px 3px rgba(0,0,0,.8);line-height:1.15}
+.desk-icon:hover{transform:scale(1.05)}
+.desk-icon:focus-visible{outline:2px solid var(--ring-strong);outline-offset:3px;border-radius:var(--r-8)}
+:root.theme-light .desk-icon span,
+:root.theme-light .sb-icon span{text-shadow:0 1px 2px rgba(255,255,255,.7)}
+
+/* SPRINGBOARD (мобильный лаунчер) */
+.springboard{display:none}
+
+/* Пейджер приложения↔виджеты — только мобильный (на десктопе обёртки прозрачны:
+   без position/transform, чтобы .widgets позиционировался относительно .stage) */
+.pager-dots{display:none}
+
+/* ================= ДОК ================= */
+.dock{
+  position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  /* как у эталона: зазор 6px, иконки прижаты к низу, высота дока не скачет
+     при магнификации — растущая иконка выходит за верхний край, как в macOS */
+  z-index:8500;display:flex;align-items:flex-end;gap:6px;
+  height:70px;padding:0 10px 6px;border-radius:22px;
+  background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  backdrop-filter:blur(24px) saturate(1.4);box-shadow:var(--sh-deep);
+  transition:background-color .3s var(--ease);
+}
+/* ---------- Ручки изменения размера окна (8 краёв, только десктоп) ---------- */
+.win__rs{position:absolute;z-index:5;touch-action:none}
+.win__rs--n{top:-4px;left:10px;right:10px;height:8px;cursor:ns-resize}
+.win__rs--s{bottom:-4px;left:10px;right:10px;height:8px;cursor:ns-resize}
+.win__rs--w{left:-4px;top:10px;bottom:10px;width:8px;cursor:ew-resize}
+.win__rs--e{right:-4px;top:10px;bottom:10px;width:8px;cursor:ew-resize}
+.win__rs--nw{top:-4px;left:-4px;width:16px;height:16px;cursor:nwse-resize}
+.win__rs--ne{top:-4px;right:-4px;width:16px;height:16px;cursor:nesw-resize}
+.win__rs--sw{bottom:-4px;left:-4px;width:16px;height:16px;cursor:nesw-resize}
+.win__rs--se{bottom:-4px;right:-4px;width:16px;height:16px;cursor:nwse-resize}
+.win.is-resizing{transition:none}
+.win.is-resizing .win__body{user-select:none}
+@media (max-width:1023px){ .win__rs{display:none} }
+
+/* Магнификация как в macOS: иконка растёт РАЗМЕРОМ (--size), поэтому соседи
+   расступаются, а док плавно расширяется. Размер интерполирует JS (rAF-lerp),
+   поэтому CSS-переходов по ширине здесь нет — они бы дёргались. */
+.dock__app{position:relative;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;
+  width:var(--size,52px);height:var(--size,52px);
+  flex:0 0 auto;
+  transition:filter .15s var(--ease)}
+.dock__app img{width:100%;height:100%;display:block;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
+.dock__app:active img{transform:scale(.92);transition:transform .12s var(--ease)}
+.dock__app:focus-visible{outline:2px solid var(--ring-strong);outline-offset:3px;border-radius:14px}
+.dock__app:focus-visible img{filter:drop-shadow(0 3px 6px rgba(0,0,0,.35)) brightness(1.15)}
+.dock__app::after{
+  content:attr(data-name);
+  position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);
+  white-space:nowrap;padding:4px 9px;border-radius:var(--r-8);
+  background:var(--glass-window);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  box-shadow:var(--sh-deep);font-size:12px;color:var(--text);
+  opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;
+}
+.dock__app:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+.dock__dot{width:4px;height:4px;border-radius:50%;background:var(--text);
+  margin-top:3px;opacity:0;transition:opacity .15s}
+.dock__app.is-open .dock__dot{opacity:.8}
+.dock__sep{width:1px;height:44px;background:var(--ring);margin:0 2px;align-self:center}
+
+/* ================= ОКНА ================= */
+.win{
+  position:absolute;z-index:100;
+  min-width:320px;max-width:min(680px,92vw);
+  /* окно никогда не накрывает док: 28px меню-бар + 100px зона дока */
+  max-height:calc(100vh - 28px - 100px);
+  background:var(--glass-window);
+  -webkit-backdrop-filter:blur(28px) saturate(1.4);
+  backdrop-filter:blur(28px) saturate(1.4);
+  border-radius:var(--r-window);
+  box-shadow:var(--sh-deep);
+  display:flex;flex-direction:column;overflow:hidden;
+  opacity:0;visibility:hidden;transform:scale(.96);
+  transition:opacity .2s var(--ease),transform .2s var(--ease),visibility 0s .2s;
+  pointer-events:none;
+}
+.win.is-open{opacity:1;visibility:visible;transform:scale(1);pointer-events:auto;transition:opacity .2s var(--ease),transform .2s var(--ease),visibility 0s 0s}
+.win.is-closing{opacity:0;transform:scale(.97);transition:opacity .15s var(--ease),transform .15s var(--ease)}
+
+/* граббер листа (только мобильный) */
+.win__grab{display:none}
+
+.win__bar{
+  height:40px;flex:0 0 auto;display:flex;align-items:center;gap:8px;
+  padding:0 14px;cursor:grab;user-select:none;
+  background:var(--bar-tint);box-shadow:inset 0 -1px 0 var(--ring);
+  touch-action:none;
+}
+.win__bar:active{cursor:grabbing}
+.tl{display:flex;gap:8px;align-items:center}
+.tl button{width:12px;height:12px;border-radius:50%;position:relative;
+  box-shadow:inset 0 0 0 .5px rgba(0,0,0,.25)}
+.tl__close{background:var(--tl-red)}
+.tl__min{background:var(--tl-yellow)}
+.tl__max{background:var(--tl-green)}
+.win__title{font-size:13px;font-weight:500;color:var(--text-mid);margin-left:6px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* тело окна занимает всю высоту и прокручивается — чтобы при ресайзе
+   содержимое подстраивалось, а не распирало окно */
+.win__body{padding:26px 30px 30px;overflow-y:auto;flex:1 1 auto;min-height:0;
+  max-height:calc(100vh - 120px)}
+.win.is-resizing .win__body,
+.win[style*="height"] .win__body{max-height:none}
+
+/* контент окон — семантика.
+   Один H1 на страницу (README-hero); заголовок каждого окна — H2 того же
+   размера, подзаголовки — H3, карточки — H4 (иерархия для скринридера/SEO). */
+.win__body h1,.win__body h2{font-size:26px;font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:14px}
+.win__body h3{font-size:18px;font-weight:600;margin:22px 0 8px}
+.win__body h4{font-size:15px;font-weight:600;margin-bottom:4px}
+.win__body p{font-size:15px;color:var(--text-mid);line-height:1.5;margin-bottom:10px}
+.win__body h1+p.lead,.win__body h2+p.lead{font-size:16px;color:var(--text);margin-bottom:18px}
+.win__body a.link{color:var(--text);border-bottom:1px solid var(--ring-strong)}
+.win--narrow{max-width:440px}
+.win--wide{max-width:880px}
+
+/* ================= ЗВОНОК (в духе FaceTime) ================= */
+.win--call{max-width:520px}
+.win--call.is-live{max-width:900px}
+.win__body--call{padding:0;display:flex;flex-direction:column;overflow:hidden}
+
+/* тёмная «сцена» звонка — независимо от темы сайта, как в FaceTime */
+.call{padding:34px 30px 30px;background:linear-gradient(180deg,#20232B 0%,#101218 100%);color:#F5F5F7}
+.call__card{display:flex;flex-direction:column;align-items:center;text-align:center}
+.call__avatar{
+  width:104px;height:104px;border-radius:50%;
+  display:grid;place-items:center;
+  font-size:36px;font-weight:500;color:#fff;
+  background:linear-gradient(180deg,#6E7481 0%,#41454F 100%);
+  box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.18);
+  margin-bottom:16px;
+}
+.call__name{font-size:24px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px;color:#fff}
+.call__role{font-size:14px;color:rgba(255,255,255,.55);margin:0 0 26px}
+
+.call__actions{display:flex;gap:34px;margin-bottom:24px}
+.call__btn{display:flex;flex-direction:column;align-items:center;gap:9px;
+  color:rgba(255,255,255,.85);font-size:13px;background:none;border:0;cursor:pointer}
+.call__ic{
+  width:64px;height:64px;border-radius:50%;
+  display:grid;place-items:center;color:#fff;
+  box-shadow:0 8px 22px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.22);
+  transition:transform .16s var(--ease),filter .16s var(--ease);
+}
+.call__btn--audio .call__ic{background:linear-gradient(180deg,#4CD964 0%,#22A73C 100%)}
+.call__btn--video .call__ic{background:linear-gradient(180deg,#3AA0FF 0%,#0A6ED8 100%)}
+.call__btn:active .call__ic{transform:scale(.94)}
+.call__btn:focus-visible{outline:none}
+.call__btn:focus-visible .call__ic{outline:2px solid #fff;outline-offset:3px}
+@media (hover:hover) and (pointer:fine){
+  .call__btn:hover .call__ic{transform:translateY(-2px);filter:brightness(1.06)}
+}
+
+.call__hint{font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.52);max-width:34em;margin:0 0 20px}
+.call__alt{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.call__alt-btn{
+  padding:9px 16px;border-radius:999px;font-size:13px;font-weight:500;
+  background:rgba(255,255,255,.10);color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
+  transition:background .15s var(--ease);
+}
+.call__alt-btn:hover{background:rgba(255,255,255,.17)}
+.call__alt-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+/* Экран разговора */
+.call-live{display:flex;flex-direction:column;background:#0B0C10;min-height:420px}
+.call-live__stage{position:relative;flex:1 1 auto;min-height:360px;background:#0B0C10}
+.call-live__stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.call-live__bar{display:flex;align-items:center;gap:12px;padding:12px 16px;
+  background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.call-live__status{font-size:12.5px;color:rgba(255,255,255,.6);margin-right:auto}
+.call-live__copy,.call-live__end{padding:8px 15px;border-radius:999px;font-size:13px;
+  font-weight:500;color:#fff;transition:background .15s var(--ease)}
+.call-live__copy{background:rgba(255,255,255,.12)}
+.call-live__copy:hover{background:rgba(255,255,255,.2)}
+.call-live__end{background:#E0301E}
+.call-live__end:hover{background:#C42718}
+.call-live__copy:focus-visible,.call-live__end:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+@media (max-width:1023px){
+  .call{padding:28px 20px 24px}
+  .call__actions{gap:26px}
+  .call-live__stage{min-height:58vh}
+}
+
+/* ИИ-агенты: 3D-офис */
+.agents{
+  position:relative;margin:14px 0 10px;
+  aspect-ratio:16/10;width:100%;
+  border-radius:var(--r-8);overflow:hidden;
+  background:var(--glass-2,rgba(0,0,0,.28));
+  border:1px solid var(--ring);
+}
+.agents iframe{width:100%;height:100%;border:0;display:block}
+.agents__credit{margin-top:6px;font-size:11px}
+.agents__credit a{color:var(--text-mid);border-bottom:1px solid var(--ring)}
+/* окно ИИ-агентов — крупнее, 16:10 (см. .agents) */
+#win-agents{max-width:1040px}
+
+.mono{font-family:var(--mono)}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text-dim);border:1px solid var(--ring);
+  border-radius:999px;padding:3px 10px;margin-bottom:14px}
+.tag--red{color:var(--red);border-color:rgba(243,53,12,.4)}
+
+/* кнопки-строки в README */
+.win-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.wbtn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 16px;border-radius:var(--r-8);font-size:14px;
+  background:var(--surface-btn);box-shadow:inset 0 0 0 1px var(--ring);
+  transition:background .15s var(--ease),transform .15s var(--ease);
+}
+.wbtn:hover{background:var(--surface-btn-hover);transform:translateY(-1px)}
+.wbtn--primary{background:var(--red-btn);box-shadow:none;color:#fff;font-weight:600}
+.wbtn--primary:hover{background:var(--red-btn-hover)}
+.wbtn:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+
+/* proof-бейдж под кнопками героя: возражение №1 «ИИ соврёт» — снят сразу */
+.hero-proof{
+  margin-top:16px;font-size:13px;color:var(--text);line-height:1.4;
+  background:rgba(243,53,12,.08);border:1px solid rgba(243,53,12,.35);
+  border-radius:var(--r-8);padding:9px 12px;
+}
+
+/* плашка */
+.plaque{background:var(--surface-soft);border-radius:var(--r-8);
+  box-shadow:inset 0 0 0 1px var(--ring);padding:14px 16px;margin-top:16px}
+.plaque p{margin:0;font-size:14px;color:var(--text)}
+
+/* схема «как работает» */
+.pipe{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
+.pipe__row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pipe__block{background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring);
+  border-radius:var(--r-8);padding:12px 14px;font-size:14px;flex:1;min-width:120px;text-align:center}
+.pipe__block--main{box-shadow:inset 0 0 0 1px rgba(243,53,12,.35);background:rgba(243,53,12,.08)}
+.pipe__arrow{color:var(--text-dim);font-size:16px}
+.points{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.points li{font-size:14px;color:var(--text-mid);padding-left:20px;position:relative;line-height:1.45}
+.points li::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;
+  border-radius:2px;background:var(--text-dim)}
+
+/* отрасли / тарифы — карточки */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.mini{background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
+  border-radius:var(--r-8);padding:14px}
+.mini p{margin:6px 0 0}
+.mini__q{font-family:var(--mono);font-size:12.5px;color:var(--text);
+  border-left:2px solid var(--red);padding-left:8px;margin-top:10px}
+
+.plans{display:grid;grid-template-columns:1fr;gap:12px;margin-top:8px}
+.plan{background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
+  border-radius:var(--r-8);padding:16px;position:relative}
+.plan--feat{box-shadow:inset 0 0 0 1px rgba(243,53,12,.4);background:rgba(243,53,12,.06)}
+.plan__stamp{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--red)}
+.plan__price{font-size:22px;font-weight:600;margin:6px 0 4px}
+.plan__sub{font-size:13px;color:var(--text-dim);margin:0}
+.plan ul{list-style:none;margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.plan ul li{font-size:12.5px;color:var(--text-mid);background:var(--surface-soft);
+  border-radius:6px;padding:3px 8px}
+.note{font-size:13px;color:var(--text-dim);margin-top:14px;line-height:1.45}
+.note--budget{color:var(--text);font-weight:500;
+  background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
+  border-radius:var(--r-8);padding:10px 12px}
+
+/* блок доверия «О нас · Гарантии» */
+.about-block{margin-top:20px}
+.about-block>.eyebrow{display:block;margin-bottom:9px}
+.about-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.about-list li{font-size:14px;color:var(--text);font-family:var(--mono);letter-spacing:.01em;
+  padding:9px 12px;border-radius:var(--r-6);background:var(--surface-soft);
+  box-shadow:inset 0 0 0 1px var(--ring)}
+
+/* FAQ */
+.faq details{border-bottom:1px solid var(--ring);padding:2px 0}
+.faq summary{cursor:pointer;list-style:none;padding:12px 24px 12px 2px;font-size:15px;
+  position:relative;color:var(--text)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:4px;top:11px;color:var(--text-dim);
+  font-size:18px;transition:transform .2s var(--ease)}
+.faq details[open] summary::after{content:"–"}
+.faq details p{font-size:14px;padding:0 2px 14px;margin:0;color:var(--text-mid)}
+
+/* контакты (почта) */
+.contacts{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.contact{
+  display:flex;flex-direction:column;gap:2px;padding:14px 16px;border-radius:var(--r-8);
+  background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring);
+  transition:background .15s var(--ease),transform .15s var(--ease);
+}
+.contact:hover{background:var(--surface-hover);transform:translateY(-1px)}
+.contact__label{font-family:var(--mono);font-size:11px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--text-dim)}
+.contact__value{font-size:17px;font-weight:500}
+.contact--primary{background:var(--red-btn);box-shadow:none}
+.contact--primary:hover{background:var(--red-btn-hover)}
+.contact--primary,.contact--primary .contact__value{color:#fff}
+.contact--primary .contact__label{color:rgba(255,255,255,.85)}
+
+/* терминал (всегда тёмный — он терминал) */
+.term{background:#050505;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);border-radius:var(--r-8);
+  padding:18px;font-family:var(--mono);font-size:13.5px;line-height:1.7;color:#3ddc7f;
+  min-height:180px;white-space:pre-wrap}
+.term .muted{color:rgba(61,220,127,.55)}
+.term .ok{color:#7dffb0}
+
+/* finder (папки, Finder-вид) */
+.finder{margin-top:8px}
+.finder__bar{display:flex;justify-content:space-between;font-family:var(--mono);
+  font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);
+  padding:0 10px 6px;border-bottom:1px solid var(--ring)}
+.finder__list{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;margin-top:4px}
+.finder__row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-6);
+  font-size:13.5px;cursor:default;color:var(--text);min-width:0}
+.finder__row:hover{background:var(--surface-soft)}
+.finder__ic{width:20px;height:24px;flex:0 0 auto;object-fit:contain;pointer-events:none;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+.finder__name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.finder__meta{font-family:var(--mono);font-size:11px;color:var(--text-dim);flex:0 0 auto}
+.finder__date{font-family:var(--mono);font-size:11px;color:var(--text-dim);flex:0 0 auto;
+  min-width:78px;text-align:right}
+
+/* корзина-пасхалка */
+.trash-egg{display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:16px;padding:20px 10px}
+.trash-egg svg{opacity:.7}
+.trash-egg p{max-width:300px}
+:root.theme-light .trash-egg svg g{stroke:rgba(0,0,0,.45)}
+
+/* политика */
+.policy h1{margin-bottom:6px}
+.policy ul{margin:6px 0 12px 20px}
+.policy li{font-size:14px;color:var(--text-mid);margin-bottom:4px}
+.policy__date{font-family:var(--mono);font-size:12px;color:var(--text-dim);display:block;margin-bottom:14px}
+
+/* ================= МОБИЛЬНАЯ ВЕРСИЯ «как айфон» ================= */
+@media (max-width:1023px){
+  body{overflow:hidden}
+  .desktop{position:fixed}
+
+  /* ---------- ПЕЙДЖЕР: экран приложений ↔ экран виджетов ---------- */
+  .pager{
+    position:fixed;left:0;right:0;top:0;bottom:0;z-index:1;
+    overflow:hidden;touch-action:pan-y;
+  }
+  .pager__track{display:flex;height:100%;will-change:transform;
+    transition:transform .32s var(--ios-ease)}
+  .page{flex:0 0 100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:calc(env(safe-area-inset-top) + 54px) 16px calc(150px + env(safe-area-inset-bottom))}
+
+  /* точки-индикаторы над доком */
+  .pager-dots{
+    display:flex;position:fixed;left:0;right:0;z-index:8600;
+    bottom:calc(96px + env(safe-area-inset-bottom));
+    justify-content:center;gap:9px;pointer-events:auto;
+  }
+  .pager-dots button{
+    width:7px;height:7px;padding:0;border-radius:50%;background:var(--text);
+    opacity:.32;transition:opacity .2s var(--ease),transform .2s var(--ease);
+    box-shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  .pager-dots button.is-active{opacity:.95;transform:scale(1.25)}
+  .pager-dots button:focus-visible{outline:2px solid var(--ring-strong);outline-offset:3px}
+
+  /* меню-бар прячем, показываем iOS статус-бар */
+  .menubar{display:none}
+  .ios-statusbar{
+    display:flex;align-items:center;justify-content:space-between;
+    position:fixed;top:0;left:0;right:0;z-index:9000;
+    height:calc(env(safe-area-inset-top) + 40px);
+    padding:env(safe-area-inset-top) 20px 0;
+    color:var(--text);font-size:15px;pointer-events:none;
+  }
+  .ios-time{font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .ios-glyphs{display:flex;align-items:center;gap:7px;color:var(--text);pointer-events:auto}
+  .ios-glyphs svg{display:block}
+  .ios-cc{display:inline-flex;align-items:center;justify-content:center;padding:2px 4px;color:var(--text)}
+
+  /* stage больше не скроллится: контент живёт в фиксированном пейджере */
+  .stage{position:static;inset:auto;min-height:0;padding:0}
+  .widgets{position:static;top:auto;left:auto;display:flex;flex-direction:column;gap:14px;width:100%;grid-template-columns:none}
+  .widget,.widget--wide,.widget--assistant,.sticky{width:100%;max-width:none;border-radius:22px}
+  .widget--assistant{height:auto;min-height:170px}
+  .widget{min-height:132px}
+
+  /* десктоп-иконки прячем — вместо них springboard */
+  .desk-icons{display:none}
+  .springboard{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:22px 10px;
+    margin-top:8px;padding:0 4px;
+  }
+  .sb-icon{display:flex;flex-direction:column;align-items:center;gap:6px;
+    transition:transform .15s var(--ease)}
+  .sb-icon img{width:60px;height:60px;display:block;pointer-events:none;
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
+  .sb-icon span{font-size:11px;line-height:1.1;color:var(--text);text-align:center;
+    text-shadow:0 1px 3px rgba(0,0,0,.75);max-width:72px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sb-icon:active{transform:scale(.92)}
+  .sb-icon:focus-visible{outline:2px solid var(--ring-strong);outline-offset:3px;border-radius:var(--r-8)}
+
+  /* iOS-док: скруглённая плашка со safe-area */
+  .dock{position:fixed;bottom:0;left:8px;right:8px;transform:none;
+    border-radius:32px 32px 22px 22px;width:auto;
+    justify-content:space-around;padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    gap:6px}
+  .dock__mobhide{display:none}
+  .dock__sep{display:none}
+  .dock__app::after{display:none}
+  .dock__app img{width:56px;height:56px}
+  /* ровно 4 иконки в порядке: Ассистент · ИИ-агенты · Тарифы · Почта */
+  .dock__app[data-win="win-assistant"]{order:1}
+  .dock__app[data-win="win-agents"]{order:2}
+  .dock__app[data-win="win-pricing"]{order:3}
+  .dock__app[data-win="win-call"]{order:4}
+
+  /* окна = листы iOS */
+  .win{
+    position:fixed;inset:0;top:calc(env(safe-area-inset-top) + 12px);
+    max-width:none;width:100%;min-width:0;
+    border-radius:20px 20px 0 0;transform:translateY(100%);opacity:1;visibility:visible;
+    max-height:none;z-index:8000;
+    transition:transform .25s var(--ios-ease),visibility 0s .25s;
+  }
+  .win.is-open{transform:translateY(0);transition:transform .25s var(--ios-ease),visibility 0s 0s}
+  .win.is-closing{transform:translateY(100%);transition:transform .2s var(--ios-ease)}
+  .win__grab{display:block;height:20px;position:relative;flex:0 0 auto;
+    touch-action:none;cursor:grab}
+  .win__grab::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    width:38px;height:5px;border-radius:3px;background:var(--text-dim);opacity:.55}
+  .win__bar{cursor:default;touch-action:none}
+  .win__body{max-height:none;padding:20px 18px 40px}
+  .win__body h1,.win__body h2{font-size:23px}
+  .win-back{display:inline-flex;align-items:center;gap:6px;margin-left:auto;
+    font-size:14px;color:var(--text);padding:4px 8px}
+  .grid2{grid-template-columns:1fr}
+  .finder__list{grid-template-columns:1fr}
+
+  /* README — обычный лист iOS (открывается по иконке README.txt), H1/питч в DOM для SEO */
+
+  /* пункт управления по центру под статус-баром */
+  .cc{top:calc(env(safe-area-inset-top) + 46px);right:12px;left:auto;
+    width:min(300px,calc(100vw - 24px))}
+}
+@media (min-width:1024px){.win-back{display:none}}
+
+/* тач-цели */
+@media (pointer:coarse){
+  .menu-item,.wbtn,.contact,.faq summary{min-height:44px;display:flex;align-items:center}
+  /* кружок трафиклайта остаётся 12px, но прозрачный ::after расширяет
+     область нажатия до ~24px (2.5.5) */
+  .tl button::after{content:"";position:absolute;inset:-6px}
+}
+
+/* ================= REDUCED MOTION ================= */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important;
+    animation-iteration-count:1!important}
+  .caret{animation:none;opacity:1}
+  html.js .reveal{opacity:1}
+}

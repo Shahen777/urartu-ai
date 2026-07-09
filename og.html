@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>OG — Urartu AI OS</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--text:#F5F5F7;--dim:rgba(255,255,255,.45);--ring:rgba(255,255,255,.10);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+  html,body{width:1200px;height:630px;overflow:hidden}
+  body{font-family:var(--font);color:var(--text);
+    background:
+      radial-gradient(120% 100% at 50% 0%, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 55%),
+      url(wallpapers/dark.svg) center/cover no-repeat,
+      #05070C;position:relative}
+  .menubar{position:absolute;top:0;left:0;right:0;height:40px;display:flex;align-items:center;
+    gap:22px;padding:0 26px;background:rgba(24,24,28,.6);box-shadow:inset 0 -1px 0 var(--ring);
+    font-size:17px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:600}
+  .mi{color:var(--text);opacity:.92;font-size:16px}
+  .right{margin-left:auto;display:flex;align-items:center;gap:20px;color:rgba(255,255,255,.62)}
+  .stat{font-family:var(--mono);font-size:15px;display:flex;align-items:center;gap:8px}
+  .dot{width:9px;height:9px;border-radius:50%;background:#32D74B;box-shadow:0 0 8px rgba(50,215,75,.7)}
+  /* виджет ассистента */
+  .aw{position:absolute;left:64px;top:118px;width:520px;height:300px;border-radius:24px;
+    background:rgba(24,24,28,.55);box-shadow:0 0 0 1px var(--ring),0 30px 40px -8px rgba(0,0,0,.5);
+    padding:28px 30px;display:flex;flex-direction:column}
+  .eb{font-size:15px;font-weight:500;text-transform:uppercase;letter-spacing:.14em;color:var(--dim)}
+  .awh{display:flex;justify-content:space-between;align-items:center}
+  .online{font-family:var(--mono);color:#32D74B;font-size:15px;display:flex;align-items:center;gap:6px}
+  .q{margin-top:24px;font-size:21px;color:rgba(255,255,255,.62);line-height:1.35}
+  .a{margin-top:16px;font-size:21px;line-height:1.4;background:rgba(255,255,255,.07);
+    border-radius:14px;padding:16px 18px}
+  .caret{display:inline-block;width:3px;height:.95em;background:var(--text);vertical-align:-2px;margin-left:2px}
+  /* правая колонка виджетов */
+  .col{position:absolute;right:64px;top:118px;display:flex;flex-direction:column;gap:18px}
+  .card{width:300px;border-radius:24px;background:rgba(24,24,28,.55);
+    box-shadow:0 0 0 1px var(--ring),0 30px 40px -8px rgba(0,0,0,.5);padding:24px 26px}
+  .card .v{font-size:64px;font-weight:600;line-height:1;letter-spacing:-.02em}
+  .card .v.sm{font-size:44px}
+  .card .v.red{color:#F3350C}
+  .card .cap{font-size:16px;color:var(--dim);margin-top:10px}
+  /* центральный слоган-строка */
+  .tagline{position:absolute;left:64px;bottom:150px;font-size:30px;font-weight:600;
+    letter-spacing:-.01em;max-width:640px;line-height:1.25}
+  .tagline b{color:#F5F5F7}
+  /* док */
+  .dock{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);display:flex;gap:14px;
+    padding:12px 16px;border-radius:30px;background:rgba(24,24,28,.55);
+    box-shadow:0 0 0 1px var(--ring),0 20px 40px rgba(0,0,0,.4)}
+  .app{width:60px;height:60px;border-radius:15px}
+  .ic{width:60px;height:60px;display:block}
+</style>
+</head>
+<body>
+  <div class="menubar">
+    <span class="logo">
+      <svg width="20" height="20" viewBox="0 0 18 18"><rect x="1.5" y="1.5" width="15" height="15" fill="none" stroke="#F5F5F7" stroke-width="1.6" stroke-dasharray="3 2.5"/><circle cx="9" cy="9" r="2.5" fill="#32D74B"/></svg>
+      Urartu&nbsp;AI
+    </span>
+    <span class="mi">Ассистент</span><span class="mi">Как работает</span><span class="mi">Тарифы</span><span class="mi">Вопросы</span>
+    <span class="right"><span class="stat"><span class="dot"></span>ЛОКАЛЬНО · 152-ФЗ</span><span class="stat">14:32</span></span>
+  </div>
+
+  <div class="aw">
+    <div class="awh"><span class="eb">Ассистент · Локально</span><span class="online"><span class="dot" style="width:7px;height:7px"></span>online</span></div>
+    <div class="q">Какой срок согласования договора на 300 тыс. ₽?</div>
+    <div class="a">2 рабочих дня + 1 день (новый контрагент). Основание: Регламент, п. 2.1, 2.3<span class="caret"></span></div>
+  </div>
+
+  <div class="col">
+    <div class="card"><span class="eb">Контур</span><div class="v" style="margin-top:14px">0</div><div class="cap">данных ушло наружу</div></div>
+    <div class="card"><span class="eb">Штрафы · 152-ФЗ</span><div class="v sm red" style="margin-top:14px">до 500 млн ₽</div><div class="cap">оборотный штраф за утечку ПДн</div></div>
+  </div>
+
+  <div class="tagline">Свой ИИ. На вашем сервере.<br><b>Данные не покидают компанию.</b></div>
+
+  <div class="dock">
+    <img class="ic" src="icons/assistant.svg"><img class="ic" src="icons/how.svg"><img class="ic" src="icons/who.svg"><img class="ic" src="icons/pricing.svg"><img class="ic" src="icons/faq.svg"><img class="ic" src="icons/terminal.svg"><img class="ic" src="icons/mail.svg"><img class="ic" src="icons/trash.svg">
+  </div>
+</body>
+</html>

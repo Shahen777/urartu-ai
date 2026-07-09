@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
+
+  <title>Внедрение локального ИИ для бизнеса — ИИ-ассистент на вашем сервере | 152-ФЗ | Urartu AI</title>
+  <meta name="description" content="Внедряем локального ИИ-ассистента: отвечает по вашим регламентам и договорам, работает на сервере компании, данные не уходят в облако. Соответствие 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.">
+
+  <!-- Ранняя загрузка темы/языка — без вспышки -->
+  <script>
+  (function(){
+    var d=document.documentElement;
+    d.className=(d.className+' js').trim();
+    try{
+      var t=localStorage.getItem('theme');
+      if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
+      if(t==='light')d.classList.add('theme-light');
+      var p=new URLSearchParams(location.search);
+      var l=p.get('lang')||localStorage.getItem('lang')||(navigator.language||'ru').slice(0,2).toLowerCase();
+      l=(l==='en')?'en':'ru';
+      d.lang=l;window.__lang=l;
+    }catch(e){}
+  })();
+  </script>
+
+  <!-- Адрес публикации. При переезде на свой домен заменить во всех файлах. -->
+  <link rel="canonical" href="https://shahen777.github.io/urartu-ai/">
+  <link rel="alternate" hreflang="ru" href="https://shahen777.github.io/urartu-ai/">
+  <link rel="alternate" hreflang="en" href="https://shahen777.github.io/urartu-ai/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://shahen777.github.io/urartu-ai/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:url" content="https://shahen777.github.io/urartu-ai/">
+  <meta property="og:title" content="Внедрение локального ИИ для бизнеса — ИИ-ассистент на вашем сервере | 152-ФЗ | Urartu AI">
+  <meta property="og:description" content="Внедряем локального ИИ-ассистента: отвечает по вашим регламентам и договорам, работает на сервере компании, данные не уходят в облако. Соответствие 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.">
+  <meta property="og:image" content="https://shahen777.github.io/urartu-ai/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="css/os.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://shahen777.github.io/urartu-ai/#organization",
+    "name": "ООО «Урарту»",
+    "url": "https://shahen777.github.io/urartu-ai/",
+    "email": "mos-city@bk.ru",
+    "telephone": "+7 926 333-78-47",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Москва",
+      "addressCountry": "RU"
+    },
+    "sameAs": ["https://t.me/Shahen_kazaryan"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Внедрение локального ИИ-ассистента",
+    "serviceType": "Внедрение локального ИИ-ассистента",
+    "description": "Внедрение ИИ-ассистента, который отвечает по регламентам, договорам и базе знаний компании — внутри её инфраструктуры, без облаков и внешних API. Соответствие 152-ФЗ.",
+    "provider": { "@id": "https://shahen777.github.io/urartu-ai/#organization" },
+    "areaServed": { "@type": "Country", "name": "RU" },
+    "offers": {
+      "@type": "Offer",
+      "price": "150000",
+      "priceCurrency": "RUB",
+      "description": "Внедрение — от 150 000 ₽"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Чем это отличается от ChatGPT?",
+        "acceptedAnswer": { "@type": "Answer", "text": "ChatGPT работает на серверах в США, и передавать туда данные клиентов юрлицу нельзя. Наш ассистент работает на вашем сервере, отвечает по вашим документам и показывает источник ответа. Интернет ему не нужен." }
+      },
+      {
+        "@type": "Question",
+        "name": "Наши данные точно никуда не уходят?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Да. Модель и база знаний физически находятся на вашем оборудовании. Наружу не уходит ничего — это проверяется на приёмке (можно отключить интернет и убедиться)." }
+      },
+      {
+        "@type": "Question",
+        "name": "Какое железо нужно?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Для команды до 10–20 человек достаточно одной машины с современной видеокартой (порядка 300–400 тыс. ₽, если покупать новую). Часто подходит уже имеющийся сервер. Подбор — часть проекта." }
+      },
+      {
+        "@type": "Question",
+        "name": "А если ассистент ошибётся?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Ассистент отвечает только по вашей базе и всегда даёт ссылку на пункт документа — ответ легко проверить. Сдача проекта проходит по тестовому набору ваших вопросов с зафиксированной в договоре точностью." }
+      },
+      {
+        "@type": "Question",
+        "name": "Сколько длится внедрение?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Пилот — 2 недели, полное внедрение — 3–6 недель в зависимости от объёма документов и интеграций." }
+      },
+      {
+        "@type": "Question",
+        "name": "Это законно? Какие модели вы используете?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Полностью. Используем открытые модели (Qwen, DeepSeek, GLM), которые легально разворачиваются локально. Никакого параллельного импорта: железо — только официально доступное в РФ, с документами." }
+      },
+      {
+        "@type": "Question",
+        "name": "Что входит в поддержку и обязательна ли она?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Обновление базы знаний, мониторинг качества, консультации и ежемесячный отчёт. Первые месяцы поддержки входят в внедрение; дальше — по желанию." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<div class="desktop" aria-hidden="true"></div>
+
+<!-- ================= iOS СТАТУС-БАР (мобильный) ================= -->
+<div class="ios-statusbar" aria-hidden="true">
+  <span class="ios-time" id="ios-clock">--:--</span>
+  <span class="ios-glyphs">
+    <!-- сигнал -->
+    <svg class="ios-signal" width="18" height="12" viewBox="0 0 18 12" aria-hidden="true">
+      <rect x="0"  y="8"  width="3" height="4"  rx="1" fill="currentColor"/>
+      <rect x="5"  y="6"  width="3" height="6"  rx="1" fill="currentColor"/>
+      <rect x="10" y="3.5" width="3" height="8.5" rx="1" fill="currentColor"/>
+      <rect x="15" y="1"  width="3" height="11" rx="1" fill="currentColor" opacity=".4"/>
+    </svg>
+    <!-- wi-fi (перечёркнутый) -->
+    <svg class="ios-wifi" width="17" height="13" viewBox="0 0 17 13" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+        <path d="M1.5 4A10 10 0 0 1 15.5 4" opacity=".85"/>
+        <path d="M4 6.4a6.4 6.4 0 0 1 9 0" opacity=".85"/>
+        <path d="M6.4 8.8a3 3 0 0 1 4.2 0" opacity=".85"/>
+      </g>
+      <circle cx="8.5" cy="11.2" r="1" fill="currentColor"/>
+      <line x1="1.5" y1="1.5" x2="15.5" y2="12" stroke="#F3350C" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <!-- батарея -->
+    <svg class="ios-batt" width="26" height="13" viewBox="0 0 26 13" aria-hidden="true">
+      <rect x="0.5" y="0.5" width="22" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1" opacity=".5"/>
+      <rect x="2" y="2" width="17" height="9" rx="1.5" fill="currentColor"/>
+      <rect x="24" y="4" width="1.6" height="5" rx=".8" fill="currentColor" opacity=".5"/>
+    </svg>
+    <button class="ios-cc" id="iosCC" aria-label="Пункт управления">
+      <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true">
+        <rect x="2.5" y="3.5" width="15" height="4" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <circle cx="6.5" cy="5.5" r="1.4" fill="currentColor"/>
+        <rect x="2.5" y="12.5" width="15" height="4" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <circle cx="13.5" cy="14.5" r="1.4" fill="currentColor"/>
+      </svg>
+    </button>
+  </span>
+</div>
+
+<!-- ================= МЕНЮ-БАР ================= -->
+<div class="menubar" aria-label="Меню системы">
+  <span class="menubar__logo">
+    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="15" height="15" fill="none" stroke="#F5F5F7" stroke-width="1.6" stroke-dasharray="3 2.5"></rect>
+      <circle cx="9" cy="9" r="2.5" fill="#32D74B"></circle>
+    </svg>
+    Urartu&nbsp;AI
+  </span>
+  <button class="menu-item" data-win="win-assistant" data-i18n="menu.assistant">Ассистент</button>
+  <button class="menu-item" data-win="win-how" data-i18n="menu.how">Как работает</button>
+  <button class="menu-item" data-win="win-who" data-i18n="menu.who">Кому</button>
+  <button class="menu-item" data-win="win-pricing" data-i18n="menu.pricing">Тарифы</button>
+  <button class="menu-item" data-win="win-faq" data-i18n="menu.faq">Вопросы</button>
+  <button class="menu-item" data-win="win-about" data-i18n="menu.about">О нас</button>
+  <button class="menu-item" data-win="win-mail" data-i18n="menu.mail">Контакты</button>
+
+  <div class="menubar__right">
+    <span class="menubar__status"><span class="status-dot"></span><span data-i18n="status.local">ЛОКАЛЬНО · 152-ФЗ</span></span>
+    <span class="menubar__wifi tip" data-tip="интернет ассистенту не нужен" data-tip-i18n="wifi.tip" tabindex="0" aria-label="Интернет отключён — ассистенту он не нужен">
+      <svg width="17" height="14" viewBox="0 0 17 14" aria-hidden="true">
+        <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+          <path d="M1.5 4.2A10 10 0 0 1 15.5 4.2" opacity=".9"/>
+          <path d="M4 6.6a6.4 6.4 0 0 1 9 0" opacity=".9"/>
+          <path d="M6.4 9a3 3 0 0 1 4.2 0" opacity=".9"/>
+        </g>
+        <circle cx="8.5" cy="11.6" r="1.1" fill="currentColor"/>
+        <line x1="1.5" y1="1.5" x2="15.5" y2="12.5" stroke="#F3350C" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <button class="menubar__toggle" id="langToggle" aria-label="Сменить язык" title="РУ / EN"><span id="langLabel">РУ</span></button>
+    <button class="menubar__toggle menubar__theme" id="themeToggle" aria-label="Сменить тему">
+      <svg class="ico-moon" width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M16 12.6A7 7 0 0 1 7.4 4 7 7 0 1 0 16 12.6z" fill="currentColor"/></svg>
+      <svg class="ico-sun" width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="10" y1="1.5" x2="10" y2="3.6"/><line x1="10" y1="16.4" x2="10" y2="18.5"/><line x1="1.5" y1="10" x2="3.6" y2="10"/><line x1="16.4" y1="10" x2="18.5" y2="10"/><line x1="3.9" y1="3.9" x2="5.4" y2="5.4"/><line x1="14.6" y1="14.6" x2="16.1" y2="16.1"/><line x1="16.1" y1="3.9" x2="14.6" y2="5.4"/><line x1="5.4" y1="14.6" x2="3.9" y2="16.1"/></g></svg>
+    </button>
+    <button class="menubar__toggle" id="ccToggle" aria-label="Пункт управления" aria-haspopup="true" aria-expanded="false">
+      <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true">
+        <rect x="2.5" y="3.5" width="15" height="4" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <circle cx="6.5" cy="5.5" r="1.4" fill="currentColor"/>
+        <rect x="2.5" y="12.5" width="15" height="4" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <circle cx="13.5" cy="14.5" r="1.4" fill="currentColor"/>
+      </svg>
+    </button>
+    <span class="menubar__clock" id="clock" aria-label="Дата и время в Москве">--:--</span>
+  </div>
+</div>
+
+<!-- ================= ПУНКТ УПРАВЛЕНИЯ ================= -->
+<div class="cc" id="cc" role="dialog" aria-label="Пункт управления" hidden>
+  <div class="cc__grid">
+    <button class="cc__tile" id="ccTheme">
+      <span class="cc__ic" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 20 20"><path d="M16 12.6A7 7 0 0 1 7.4 4 7 7 0 1 0 16 12.6z" fill="currentColor"/></svg>
+      </span>
+      <span class="cc__t" data-i18n="cc.theme">Тема</span>
+      <span class="cc__v" id="ccThemeVal" data-i18n="cc.theme.dark">Тёмная</span>
+    </button>
+    <button class="cc__tile" id="ccLang">
+      <span class="cc__ic" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="8"/><path d="M2 10h16M10 2c2.5 2.2 2.5 13.8 0 16M10 2c-2.5 2.2-2.5 13.8 0 16"/></svg>
+      </span>
+      <span class="cc__t" data-i18n="cc.lang">Язык</span>
+      <span class="cc__v" id="ccLangVal">Русский</span>
+    </button>
+  </div>
+  <div class="cc__wifi">
+    <span class="cc__wifi-ic" aria-hidden="true">
+      <svg width="16" height="13" viewBox="0 0 17 13"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1.5 4A10 10 0 0 1 15.5 4"/><path d="M4 6.4a6.4 6.4 0 0 1 9 0"/><path d="M6.4 8.8a3 3 0 0 1 4.2 0"/></g><circle cx="8.5" cy="11.2" r="1" fill="currentColor"/><line x1="1.5" y1="1.5" x2="15.5" y2="12" stroke="#F3350C" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </span>
+    <span data-i18n="cc.wifi">Wi-Fi: не нужен ассистенту</span>
+  </div>
+  <button class="cc__demo" data-win="win-mail" data-i18n="cc.demo">Записаться на демо</button>
+</div>
+
+<!-- ================= РАБОЧАЯ ОБЛАСТЬ ================= -->
+<div class="stage" id="stage">
+
+  <!-- ================= ОКНА (main для SEO; README = hero, первым в DOM) ================= -->
+  <main id="windows">
+
+    <!-- README / HERO -->
+    <article class="win win--narrow" id="win-readme" role="dialog" aria-label="README.txt">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title">README.txt</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <span class="tag" data-i18n="readme.tag">Локальное развёртывание · 152-ФЗ</span>
+        <h1 data-i18n="readme.h1">Свой ИИ. На вашем сервере. Данные не покидают компанию.</h1>
+        <p class="lead" data-i18n="readme.lead">Внедряем ИИ-ассистента, который отвечает по вашим регламентам, договорам и базе знаний — внутри вашей инфраструктуры. Без облаков, без подписок на чужие API, без риска утечки.</p>
+        <p data-i18n="readme.p">Пилот на вашем процессе — 2 недели · Москва и вся РФ. Это не описание продукта, а сам продукт: перед вами рабочий стол компании, на котором ассистент уже отвечает.</p>
+        <div class="win-actions">
+          <button class="wbtn wbtn--primary" data-win="win-mail" data-i18n="readme.btnDemo">Показать демо →</button>
+          <button class="wbtn" data-win="win-how" data-i18n="readme.btnHow">Как это устроено</button>
+        </div>
+        <p class="hero-proof" data-i18n="readme.badge">Каждый ответ — со ссылкой на пункт документа. Можно проверить.</p>
+      </div>
+    </article>
+
+    <!-- Ассистент -->
+    <article class="win" id="win-assistant" role="dialog" aria-label="Ассистент">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="assistant.title">Ассистент · Локально</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="assistant.h1">ИИ-ассистент, который знает ваши документы наизусть</h2>
+        <div class="plaque"><p data-i18n="assistant.plaque">Ассистент отвечает только по вашей базе знаний и всегда показывает источник — пункт и документ. Если ответа в документах нет, он так и говорит. Это фиксируется в договоре критериями приёмки.</p></div>
+        <h3 data-i18n="assistant.h2">Что он умеет</h3>
+        <div class="grid2">
+          <div class="mini"><h4 data-i18n="assistant.m1.h">Ответы по регламентам за 10 секунд</h4><p data-i18n="assistant.m1.p">«Какой срок согласования договора на 300 тысяч?» Ассистент отвечает со ссылкой на пункт документа — вместо 10 минут поиска по папкам.</p></div>
+          <div class="mini"><h4 data-i18n="assistant.m2.h">Проверка документов</h4><p data-i18n="assistant.m2.p">Загрузите договор — ассистент проверит его по вашему чек-листу и покажет, что не так, с цитатами.</p></div>
+          <div class="mini"><h4 data-i18n="assistant.m3.h">Суммаризация и черновики</h4><p data-i18n="assistant.m3.p">Протоколы встреч, ответы на претензии, письма клиентам — черновик за минуту, по вашим шаблонам.</p></div>
+          <div class="mini"><h4 data-i18n="assistant.m4.h">Всегда с источником</h4><p data-i18n="assistant.m4.p">Каждый ответ — с указанием пункта и документа. Ответ легко проверить.</p></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Как работает -->
+    <article class="win" id="win-how" role="dialog" aria-label="Как это работает">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="how.title">Как это работает</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="how.h1">Открытая модель на вашем железе. Честная архитектура.</h2>
+        <div class="pipe" role="img" aria-label="Схема: ваши документы превращаются в базу знаний, с ней работает открытая ИИ-модель, а сотрудники получают ответы в чате">
+          <div class="pipe__row">
+            <div class="pipe__block" data-i18n="how.b1">Ваши документы</div>
+            <span class="pipe__arrow" aria-hidden="true">→</span>
+            <div class="pipe__block" data-i18n-html="how.b2">База знаний<br>(векторный индекс)</div>
+          </div>
+          <div class="pipe__row">
+            <div class="pipe__block pipe__block--main" data-i18n-html="how.b3">Открытая ИИ-модель<br>(Qwen / DeepSeek)</div>
+            <span class="pipe__arrow" aria-hidden="true">→</span>
+            <div class="pipe__block" data-i18n="how.b4">Чат для сотрудников</div>
+          </div>
+        </div>
+        <ul class="points">
+          <li data-i18n="how.p1">Модель работает на сервере компании или отдельной машине в офисе. Интернет ей не нужен.</li>
+          <li data-i18n="how.p2">Используем открытые модели (Qwen, DeepSeek, GLM) — без лицензионных платежей и чужих API.</li>
+          <li data-i18n="how.p3">Доступы по ролям: каждый сотрудник видит ответы только по документам своего уровня.</li>
+          <li data-i18n="how.p4">Железо подбираем под задачу: от одной рабочей станции до сервера. Поставляем легально, с документами и гарантией — только под проект.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- Кому -->
+    <article class="win" id="win-who" role="dialog" aria-label="Кому подходит">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="who.title">Кому</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="who.h1">Сделано для тех, кому нельзя в облако</h2>
+        <div class="grid2">
+          <div class="mini"><h4 data-i18n="who.m1.h">Юристам и бухгалтерии</h4><p data-i18n="who.m1.p">Договоры, регламенты, практика — ассистент по внутренней базе и проверка договоров.</p><p class="mini__q" data-i18n="who.m1.q">«Какая неустойка в нашем типовом договоре поставки?»</p></div>
+          <div class="mini"><h4 data-i18n="who.m2.h">Клиникам</h4><p data-i18n="who.m2.p">Протоколы, стандарты, ПДн пациентов не покидают клинику.</p><p class="mini__q" data-i18n="who.m2.q">«Что входит в осмотр перед вакцинацией по стандарту?»</p></div>
+          <div class="mini"><h4 data-i18n="who.m3.h">Производству</h4><p data-i18n="who.m3.p">Техдокументация и нормативка — ответы для инженеров и рабочих.</p><p class="mini__q" data-i18n="who.m3.q">«Какой момент затяжки для узла М12 по техкарте?»</p></div>
+          <div class="mini"><h4 data-i18n="who.m4.h">Логистике и ВЭД</h4><p data-i18n="who.m4.p">Обработка заявок, документов, переписки.</p><p class="mini__q" data-i18n="who.m4.q">«Какие документы нужны для растаможки груза из Китая?»</p></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Тарифы -->
+    <article class="win" id="win-pricing" role="dialog" aria-label="Тарифы">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="pricing.title">Тарифы.txt</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="pricing.h1">Прозрачные условия</h2>
+        <div class="plans">
+          <div class="plan">
+            <h4 data-i18n="pricing.pilot.h">Пилот</h4>
+            <p class="plan__sub" data-i18n="pricing.pilot.sub">На одном процессе, 2 недели</p>
+            <p class="plan__price" data-i18n="pricing.pilot.price">0 ₽ · бесплатно</p>
+            <p class="note" style="margin-top:8px" data-i18n="pricing.pilot.note">Бесплатный пилот для первых клиентов, без обязательств, 30 минут</p>
+          </div>
+          <div class="plan plan--feat">
+            <span class="plan__stamp" data-i18n="pricing.impl.stamp">Основной формат</span>
+            <h4 data-i18n="pricing.impl.h">Внедрение</h4>
+            <p class="plan__sub" data-i18n="pricing.impl.sub">Полный проект под ключ</p>
+            <p class="plan__price" data-i18n="pricing.impl.price">от 150 000 ₽</p>
+            <ul><li data-i18n="pricing.impl.l1">Ассистент под процесс</li><li data-i18n="pricing.impl.l2">База знаний</li><li data-i18n="pricing.impl.l3">Интерфейс</li><li data-i18n="pricing.impl.l4">Доступы</li><li data-i18n="pricing.impl.l5">Обучение сотрудников</li><li data-i18n="pricing.impl.l6">Документация</li><li data-i18n="pricing.impl.l7">Критерии приёмки</li></ul>
+          </div>
+          <div class="plan">
+            <h4 data-i18n="pricing.sup.h">Поддержка</h4>
+            <p class="plan__sub" data-i18n="pricing.sup.sub">После внедрения</p>
+            <p class="plan__price" data-i18n="pricing.sup.price">от 15 000 ₽/мес</p>
+            <ul><li data-i18n="pricing.sup.l1">Обновления базы</li><li data-i18n="pricing.sup.l2">Мониторинг</li><li data-i18n="pricing.sup.l3">Консультации</li><li data-i18n="pricing.sup.l4">Отчёт ежемесячно</li></ul>
+          </div>
+        </div>
+        <p class="note note--budget" data-i18n="pricing.budget">Ориентир полного бюджета: внедрение от 150 000 ₽ + железо 300–400 000 ₽ (разово, остаётся у вас).</p>
+        <p class="note" data-i18n="pricing.note">Железо — по закупочной цене с прозрачной наценкой, только под проект. Точная смета — после демо-встречи: зависит от объёма документов и числа пользователей.</p>
+      </div>
+    </article>
+
+    <!-- Вопросы -->
+    <article class="win" id="win-faq" role="dialog" aria-label="Вопросы">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="faq.title">Вопросы</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="faq.h1">Вопросы, которые задают до демо</h2>
+        <div class="faq">
+          <details><summary data-i18n="faq.q1">Чем это отличается от ChatGPT?</summary><p data-i18n="faq.a1">ChatGPT работает на серверах в США, и передавать туда данные клиентов юрлицу нельзя. Наш ассистент работает на вашем сервере, отвечает по вашим документам и показывает источник ответа. Интернет ему не нужен.</p></details>
+          <details><summary data-i18n="faq.q2">Наши данные точно никуда не уходят?</summary><p data-i18n="faq.a2">Да. Модель и база знаний физически находятся на вашем оборудовании. Наружу не уходит ничего — это проверяется на приёмке (можно отключить интернет и убедиться).</p></details>
+          <details><summary data-i18n="faq.q3">Какое железо нужно?</summary><p data-i18n="faq.a3">Для команды до 10–20 человек достаточно одной машины с современной видеокартой (порядка 300–400 тыс. ₽, если покупать новую). Часто подходит уже имеющийся сервер. Подбор — часть проекта.</p></details>
+          <details><summary data-i18n="faq.q4">А если ассистент ошибётся?</summary><p data-i18n="faq.a4">Ассистент отвечает только по вашей базе и всегда даёт ссылку на пункт документа — ответ легко проверить. Сдача проекта проходит по тестовому набору ваших вопросов с зафиксированной в договоре точностью.</p></details>
+          <details><summary data-i18n="faq.q5">Сколько длится внедрение?</summary><p data-i18n="faq.a5">Пилот — 2 недели, полное внедрение — 3–6 недель в зависимости от объёма документов и интеграций.</p></details>
+          <details><summary data-i18n="faq.q6">Это законно? Какие модели вы используете?</summary><p data-i18n="faq.a6">Полностью. Используем открытые модели (Qwen, DeepSeek, GLM), которые легально разворачиваются локально. Никакого параллельного импорта: железо — только официально доступное в РФ, с документами.</p></details>
+          <details><summary data-i18n="faq.q7">Что входит в поддержку и обязательна ли она?</summary><p data-i18n="faq.a7">Обновление базы знаний, мониторинг качества, консультации и ежемесячный отчёт. Первые месяцы поддержки входят в внедрение; дальше — по желанию.</p></details>
+        </div>
+      </div>
+    </article>
+
+    <!-- Терминал -->
+    <article class="win" id="win-terminal" role="dialog" aria-label="Терминал">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="term.title">Терминал — bash</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <p style="font-size:15px;color:var(--text-dim);font-weight:400;margin-bottom:12px" class="mono" data-i18n="term.head">// доказательство: всё локально</p>
+        <div class="term" id="term"
+          data-lines="$ ollama run qwen2.5||модель загружена локально ✔||интернет: не требуется ✔||данные наружу: 0 байт||контур компании: замкнут"
+          data-lines-en="$ ollama run qwen2.5||model loaded locally ✔||internet: not required ✔||data sent outside: 0 bytes||company perimeter: closed"></div>
+      </div>
+    </article>
+
+    <!-- Почта / Контакты -->
+    <article class="win win--narrow" id="win-mail" role="dialog" aria-label="Контакты">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="mail.title">Почта — Новое сообщение</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="mail.h1">Посмотрите на своего будущего ассистента</h2>
+        <p data-i18n="mail.p">30 минут онлайн: покажем работающего ассистента, разберём ваш процесс и честно скажем, поможет ли вам локальный ИИ — и что для этого нужно.</p>
+        <div class="contacts">
+          <a class="contact contact--primary" href="https://t.me/Shahen_kazaryan"><span class="contact__label">Telegram</span><span class="contact__value">@Shahen_kazaryan</span></a>
+          <a class="contact" href="tel:+79263337847"><span class="contact__label" data-i18n="mail.phone">Телефон</span><span class="contact__value">+7 926 333-78-47</span></a>
+          <a class="contact" href="mailto:mos-city@bk.ru?subject=%D0%94%D0%B5%D0%BC%D0%BE%20%D0%BB%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%98%D0%98"><span class="contact__label" data-i18n="mail.email">Почта</span><span class="contact__value">mos-city@bk.ru</span></a>
+        </div>
+        <p class="note mono" data-i18n="mail.note">Отвечаем в течение рабочего дня</p>
+      </div>
+    </article>
+
+    <!-- Звонок: аудио/видео прямо из браузера (FaceTime-подобный) -->
+    <article class="win win--call" id="win-call" role="dialog" aria-label="Звонок">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="call.title">Звонок</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body win__body--call">
+
+        <!-- Экран вызова -->
+        <div class="call" id="callHome">
+          <div class="call__card">
+            <div class="call__avatar" aria-hidden="true">ШК</div>
+            <h2 class="call__name">Шаген Казарян</h2>
+            <p class="call__role" data-i18n="call.role">Urartu AI · внедрение локального ИИ</p>
+
+            <div class="call__actions">
+              <button class="call__btn call__btn--audio" id="callAudio" data-i18n-aria="call.audioAria" aria-label="Позвонить голосом">
+                <span class="call__ic" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1z"/></svg>
+                </span>
+                <span class="call__btn-label" data-i18n="call.audio">Аудиозвонок</span>
+              </button>
+
+              <button class="call__btn call__btn--video" id="callVideo" data-i18n-aria="call.videoAria" aria-label="Позвонить с видео">
+                <span class="call__ic" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M17 10.5V7c0-.8-.7-1.5-1.5-1.5h-11C3.7 5.5 3 6.2 3 7v10c0 .8.7 1.5 1.5 1.5h11c.8 0 1.5-.7 1.5-1.5v-3.5l4 4v-11l-4 4z"/></svg>
+                </span>
+                <span class="call__btn-label" data-i18n="call.video">Видеозвонок</span>
+              </button>
+            </div>
+
+            <p class="call__hint" data-i18n="call.hint">Звонок идёт через браузер — устанавливать ничего не нужно. Если я не отвечу сразу, нажмите «Позвать в Telegram»: увижу и подключусь.</p>
+
+            <div class="call__alt">
+              <a class="call__alt-btn" id="callTg" href="https://t.me/Shahen_kazaryan" target="_blank" rel="noopener" data-i18n="call.tg">Позвать в Telegram</a>
+              <a class="call__alt-btn" href="tel:+79263337847" data-i18n="call.phone">Позвонить по телефону</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Экран разговора -->
+        <div class="call-live" id="callLive" hidden>
+          <div class="call-live__stage" id="callStage"></div>
+          <div class="call-live__bar">
+            <span class="call-live__status" id="callStatus" data-i18n="call.connecting">Соединение…</span>
+            <button class="call-live__copy" id="callCopy" data-i18n="call.copy">Скопировать ссылку</button>
+            <button class="call-live__end" id="callEnd" data-i18n="call.end">Завершить</button>
+          </div>
+        </div>
+
+      </div>
+    </article>
+
+    <!-- О нас · Гарантии (блок доверия) -->
+    <article class="win win--narrow" id="win-about" role="dialog" aria-label="О нас · Гарантии">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="about.title">О нас · Гарантии</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="about.h">О компании и гарантиях</h2>
+        <p class="lead" data-i18n="about.lead">Мы — ООО «Урарту», российская команда внедрения из Москвы. Работаем по договору, готовы к NDA и проверке до передачи любых данных. Ниже — реквизиты и обязательства, которые фиксируются в договоре.</p>
+
+        <!-- Реквизиты: ИНН/ОГРН/юр. адрес подставить, когда будут под рукой.
+             Пустые прочерки на публичном сайте подрывают доверие сильнее,
+             чем аккуратная формулировка «по запросу». -->
+        <div class="about-block">
+          <span class="eyebrow" data-i18n="about.req.eb">Реквизиты</span>
+          <ul class="about-list">
+            <li data-i18n="about.req.company">ООО «Урарту», Москва</li>
+            <li data-i18n="about.req.resp">Ответственный: Казарян Шаген, директор</li>
+            <li data-i18n="about.req.docs">Полные реквизиты (ИНН, ОГРН, юридический адрес) — в договоре и по запросу.</li>
+          </ul>
+        </div>
+
+        <div class="about-block">
+          <span class="eyebrow" data-i18n="about.g.eb">Гарантии</span>
+          <ul class="points">
+            <li data-i18n="about.g1">Готовы подписать NDA до демонстрации и договор — до начала работ.</li>
+            <li data-i18n="about.g2">Точность ассистента — критерий приёмки, зафиксированный в договоре.</li>
+            <li data-i18n="about.g3">Работаем по 152-ФЗ: данные остаются в вашем контуре, наружу не уходит ничего.</li>
+            <li data-i18n="about.g4">Оборудование поставляем легально, с документами и гарантией.</li>
+          </ul>
+        </div>
+
+        <div class="about-block">
+          <span class="eyebrow" data-i18n="about.cases.eb">Мини-кейсы</span>
+          <div class="grid2">
+            <div class="mini"><p data-i18n="about.case1">Юрфирма, 12 юристов: поиск по практике и регламентам — с 10 минут до 15 секунд, всё на своём сервере.</p></div>
+            <div class="mini"><p data-i18n="about.case2">Производство, отдел качества: ответы по техкартам и стандартам без выхода в интернет, пилот за 2 недели.</p></div>
+          </div>
+        </div>
+
+        <p class="note" data-i18n="about.note">Реквизиты, договор и рекомендации предоставляем по первому запросу.</p>
+      </div>
+    </article>
+
+    <!-- ИИ-агенты: 3D-офис (The Delegation, MIT) -->
+    <article class="win win--wide" id="win-agents" role="dialog" aria-label="ИИ-агенты">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="agents.title">ИИ-агенты — 3D-офис</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="agents.h1">Команда ИИ-агентов за работой</h2>
+        <p data-i18n="agents.p">Так устроена многоагентная система: у каждого агента своя роль, они передают задачи друг другу и согласуют результат. Тот же принцип работает во внедрении: один агент ищет ответ в регламентах, второй проверяет договор по чек-листу, третий готовит черновик письма.</p>
+        <div class="agents" id="agentsStage"></div>
+        <p class="note mono agents__credit"><span data-i18n="agents.credit">Симуляция: открытый проект The Delegation, лицензия MIT</span> · <a href="https://github.com/arturitu/the-delegation" target="_blank" rel="noopener">github.com/arturitu/the-delegation</a></p>
+      </div>
+    </article>
+
+    <!-- Корзина -->
+    <article class="win win--narrow" id="win-trash" role="dialog" aria-label="Корзина">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="trash.title">Корзина</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <div class="trash-egg">
+          <svg width="88" height="60" viewBox="0 0 88 60" aria-hidden="true">
+            <g fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M24 44a13 13 0 0 1 1-26 18 18 0 0 1 34-4 12 12 0 0 1 5 30z"/>
+            </g>
+            <line x1="14" y1="10" x2="74" y2="52" stroke="#F3350C" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <h2 style="font-size:18px" data-i18n="trash.h1">Пусто — и хорошо</h2>
+          <p data-i18n="trash.p">Сюда отправляются идеи выгрузить ваши документы в чужое облако.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Регламенты (папка) -->
+    <article class="win" id="win-reg" role="dialog" aria-label="Регламенты">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="reg.title">Регламенты</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 style="font-size:20px" data-i18n="reg.title">Регламенты</h2>
+        <div class="finder">
+          <div class="finder__bar"><span data-i18n="finder.name">Имя</span><span data-i18n="finder.meta">Размер · Дата</span></div>
+          <div class="finder__list">
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f1">Регламент договорной работы.pdf</span><span class="finder__meta">240&nbsp;КБ</span><span class="finder__date">12.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f2">Положение о персональных данных.pdf</span><span class="finder__meta">180&nbsp;КБ</span><span class="finder__date">03.04.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f3">Регламент согласования закупок.pdf</span><span class="finder__meta">96&nbsp;КБ</span><span class="finder__date">28.03.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f4">Инструкция по документообороту.pdf</span><span class="finder__meta">312&nbsp;КБ</span><span class="finder__date">19.02.2026</span></div>
+          </div>
+        </div>
+        <p class="note" data-i18n="reg.note">На пилоте здесь будут ваши документы — ассистент отвечает только по ним.</p>
+      </div>
+    </article>
+
+    <!-- База знаний (папка) -->
+    <article class="win" id="win-kb" role="dialog" aria-label="База знаний">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="kb.title">База знаний</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 style="font-size:20px" data-i18n="kb.title">База знаний</h2>
+        <div class="finder">
+          <div class="finder__bar"><span data-i18n="finder.name">Имя</span><span data-i18n="finder.meta">Размер · Дата</span></div>
+          <div class="finder__list">
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f1">Типовые договоры.pdf</span><span class="finder__meta">1.2&nbsp;МБ</span><span class="finder__date">07.06.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f2">Чек-листы проверки.pdf</span><span class="finder__meta">88&nbsp;КБ</span><span class="finder__date">21.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f3">Шаблоны писем и претензий.pdf</span><span class="finder__meta">54&nbsp;КБ</span><span class="finder__date">14.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f4">Внутренние стандарты.pdf</span><span class="finder__meta">420&nbsp;КБ</span><span class="finder__date">30.04.2026</span></div>
+          </div>
+        </div>
+        <p class="note" data-i18n="kb.note">На пилоте здесь будут ваши документы — векторный индекс строится локально.</p>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- ============ МОБИЛЬНЫЙ ПЕЙДЖЕР ============ -->
+  <!-- Экран 1 = приложения (springboard), Экран 2 = виджеты. На десктопе обёртки прозрачны. -->
+  <div class="pager" id="pager">
+    <div class="pager__track" id="pagerTrack">
+
+    <!-- ЭКРАН 1: SPRINGBOARD (мобильный лаунчер) -->
+    <section class="page page--apps">
+  <nav class="springboard" aria-label="Приложения">
+    <button class="sb-icon" data-win="win-assistant"><picture><source srcset="icons/assistant.webp" type="image/webp"><img src="icons/assistant.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.assistant">Ассистент</span></button>
+    <button class="sb-icon" data-win="win-how"><picture><source srcset="icons/how.webp" type="image/webp"><img src="icons/how.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.how">Как работает</span></button>
+    <button class="sb-icon" data-win="win-who"><picture><source srcset="icons/who.webp" type="image/webp"><img src="icons/who.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.who">Кому</span></button>
+    <button class="sb-icon" data-win="win-pricing"><picture><source srcset="icons/pricing.webp" type="image/webp"><img src="icons/pricing.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="menu.pricing">Тарифы</span></button>
+    <button class="sb-icon" data-win="win-faq"><picture><source srcset="icons/faq.webp" type="image/webp"><img src="icons/faq.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="menu.faq">Вопросы</span></button>
+    <button class="sb-icon" data-win="win-agents"><picture><source srcset="icons/agents.webp" type="image/webp"><img src="icons/agents.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="agents.short">ИИ-агенты</span></button>
+    <button class="sb-icon" data-win="win-terminal"><picture><source srcset="icons/terminal.webp" type="image/webp"><img src="icons/terminal.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.terminal">Терминал</span></button>
+    <button class="sb-icon" data-win="win-call"><picture><source srcset="icons/call.webp" type="image/webp"><img src="icons/call.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="call.short">Позвонить</span></button>
+    <button class="sb-icon" data-win="win-mail"><picture><source srcset="icons/mail.webp" type="image/webp"><img src="icons/mail.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.mail">Почта</span></button>
+    <button class="sb-icon" data-win="win-about"><picture><source srcset="icons/file-txt.webp" type="image/webp"><img src="icons/file-txt.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="menu.about">О нас</span></button>
+    <button class="sb-icon" data-win="win-trash"><picture><source srcset="icons/trash.webp" type="image/webp"><img src="icons/trash.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="trash.title">Корзина</span></button>
+    <button class="sb-icon" data-win="win-reg"><picture><source srcset="icons/folder.webp" type="image/webp"><img src="icons/folder.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="reg.title">Регламенты</span></button>
+    <button class="sb-icon" data-win="win-kb"><picture><source srcset="icons/folder.webp" type="image/webp"><img src="icons/folder.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="kb.title">База знаний</span></button>
+    <button class="sb-icon" data-win="win-readme"><picture><source srcset="icons/file-txt.webp" type="image/webp"><img src="icons/file-txt.png" alt="" width="128" height="128" decoding="async"></picture><span>README.txt</span></button>
+    <button class="sb-icon" data-win="win-pricing"><picture><source srcset="icons/file-txt.webp" type="image/webp"><img src="icons/file-txt.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="pricing.file">Тарифы.txt</span></button>
+  </nav>
+    </section>
+
+    <!-- ЭКРАН 2: ВИДЖЕТЫ -->
+    <section class="page page--widgets">
+  <section class="widgets" aria-label="Виджеты рабочего стола">
+    <!-- 1. Ассистент -->
+    <button class="widget widget--assistant reveal" data-win="win-assistant" aria-label="Открыть ассистента">
+      <div class="aw__head">
+        <span class="eyebrow" data-i18n="assistant.title">Ассистент · Локально</span>
+        <span class="aw__badge"><span class="status-dot" style="width:6px;height:6px;display:inline-block;vertical-align:middle;margin-right:4px"></span>online</span>
+      </div>
+      <div class="aw__body">
+        <div class="aw__q" id="aw-q" data-i18n="chat.q1">Какой срок согласования договора на 300 тыс. ₽?</div>
+        <div class="aw__a" id="aw-a" data-i18n="chat.a1">2 рабочих дня + 1 день (новый контрагент). Основание: Регламент, п. 2.1, 2.3</div>
+      </div>
+    </button>
+
+    <!-- 2. Контур -->
+    <div class="widget reveal" aria-label="Данных ушло наружу: 0">
+      <span class="eyebrow" data-i18n="w.contour.eb">Контур</span>
+      <div class="widget__value">0</div>
+      <div class="widget__cap" data-i18n="w.contour.cap">данных ушло наружу</div>
+    </div>
+
+    <!-- 3. Скорость -->
+    <div class="widget reveal" aria-label="Ответ по регламентам за 10 секунд">
+      <span class="eyebrow" data-i18n="w.speed.eb">Скорость</span>
+      <div class="widget__value widget__value--sm" data-i18n="w.speed.val">10&nbsp;сек</div>
+      <div class="widget__cap" data-i18n="w.speed.cap">ответ по регламентам вместо 10 минут</div>
+    </div>
+
+    <!-- 4. Календарь / демо -->
+    <button class="widget cal reveal" data-win="win-mail" aria-label="Записаться на демо">
+      <span class="cal__mark" data-i18n="w.cal.mark">● Демо</span>
+      <div class="cal__date" id="cal-date">--</div>
+      <div class="cal__month" id="cal-month"></div>
+      <div class="cal__cta"><span data-i18n="w.cal.cta">Записаться</span> <span class="cta-sub" data-i18n="w.cal.ctaSub">на 30 минут →</span></div>
+    </button>
+
+    <!-- 5. Штрафы -->
+    <div class="widget widget--wide reveal" aria-label="Оборотный штраф до 500 млн рублей">
+      <span class="eyebrow" data-i18n="w.fines.eb">Штрафы · 152-ФЗ</span>
+      <div class="widget__value widget__value--red widget__value--sm" data-i18n="w.fines.val">до&nbsp;500&nbsp;млн&nbsp;₽</div>
+      <div class="widget__cap" data-i18n="w.fines.cap">оборотный штраф за повторную утечку персональных данных</div>
+    </div>
+
+    <!-- 6. Стикер -->
+    <div class="widget sticky widget--wide reveal" role="note" data-i18n-html="w.sticky">
+      Пилот за&nbsp;2&nbsp;недели на&nbsp;ваших документах. <strong>Бесплатно для&nbsp;первых клиентов, без&nbsp;обязательств.</strong>
+    </div>
+  </section>
+    </section>
+    <!-- /ЭКРАН 2 -->
+
+    </div><!-- /.pager__track -->
+  </div><!-- /.pager -->
+
+  <!-- иконки рабочего стола (десктоп) -->
+  <nav class="desk-icons" aria-label="Файлы рабочего стола">
+    <button class="desk-icon reveal" data-win="win-reg" aria-label="Открыть папку Регламенты"><picture><source srcset="icons/folder.webp" type="image/webp"><img src="icons/folder.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="reg.title">Регламенты</span></button>
+    <button class="desk-icon reveal" data-win="win-kb" aria-label="Открыть папку База знаний"><picture><source srcset="icons/folder.webp" type="image/webp"><img src="icons/folder.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="kb.title">База знаний</span></button>
+    <button class="desk-icon reveal" data-win="win-readme" aria-label="Открыть README.txt"><picture><source srcset="icons/file-txt.webp" type="image/webp"><img src="icons/file-txt.png" alt="" width="128" height="128" decoding="async"></picture><span>README.txt</span></button>
+    <button class="desk-icon reveal" data-win="win-pricing" aria-label="Открыть Тарифы.txt"><picture><source srcset="icons/file-txt.webp" type="image/webp"><img src="icons/file-txt.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="pricing.file">Тарифы.txt</span></button>
+  </nav>
+</div>
+
+<!-- индикатор страниц (мобильный, над доком) -->
+<div class="pager-dots" id="pagerDots" role="tablist" aria-label="Страницы">
+  <button class="is-active" data-page="0" type="button" aria-label="Приложения"></button>
+  <button data-page="1" type="button" aria-label="Виджеты"></button>
+</div>
+
+<!-- ================= ДОК ================= -->
+<nav class="dock reveal" aria-label="Панель приложений">
+  <button class="dock__app" data-win="win-assistant" data-name="Ассистент" data-name-i18n="sb.assistant" aria-label="Ассистент"><picture><source srcset="icons/assistant.webp" type="image/webp"><img src="icons/assistant.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-how" data-name="Как работает" data-name-i18n="sb.how" aria-label="Как работает"><picture><source srcset="icons/how.webp" type="image/webp"><img src="icons/how.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-who" data-name="Кому" data-name-i18n="who.title" aria-label="Кому"><picture><source srcset="icons/who.webp" type="image/webp"><img src="icons/who.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app" data-win="win-pricing" data-name="Тарифы" data-name-i18n="menu.pricing" aria-label="Тарифы"><picture><source srcset="icons/pricing.webp" type="image/webp"><img src="icons/pricing.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-faq" data-name="Вопросы" data-name-i18n="menu.faq" aria-label="Вопросы"><picture><source srcset="icons/faq.webp" type="image/webp"><img src="icons/faq.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <span class="dock__sep" aria-hidden="true"></span>
+  <button class="dock__app" data-win="win-agents" data-name="ИИ-агенты" data-name-i18n="agents.short" aria-label="ИИ-агенты — 3D-офис"><picture><source srcset="icons/agents.webp" type="image/webp"><img src="icons/agents.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-terminal" data-name="Терминал" data-name-i18n="sb.terminal" aria-label="Терминал"><picture><source srcset="icons/terminal.webp" type="image/webp"><img src="icons/terminal.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app" data-win="win-call" data-name="Позвонить" data-name-i18n="call.short" aria-label="Позвонить — аудио или видео"><picture><source srcset="icons/call.webp" type="image/webp"><img src="icons/call.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-mail" data-name="Записаться на демо" data-name-i18n="cta.demo" aria-label="Записаться на демо"><picture><source srcset="icons/mail.webp" type="image/webp"><img src="icons/mail.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-trash" data-name="Корзина" data-name-i18n="trash.title" aria-label="Корзина"><picture><source srcset="icons/trash.webp" type="image/webp"><img src="icons/trash.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+</nav>
+
+<script src="js/i18n.js" defer></script>
+<script src="js/os.js" defer></script>
+</body>
+</html>
