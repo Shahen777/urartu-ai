@@ -183,7 +183,6 @@
       'case.zhemchuzhina.name': '«Жемчужина Мыса», Геленджик', 'case.zhemchuzhina.res': 'Рейтинг ★9.6 · промо-сайт под прямое бронирование',
       'case.pushka.name': 'Мини-отель «Пушка», Ялта', 'case.pushka.res': 'Морской стиль, 2 минуты до набережной',
       'case.akva.name': 'Аква вилла, Краснодар', 'case.akva.res': 'Банно-гостиничный комплекс, рейтинг 5.0 · онлайн-заявка',
-      'case.bidconf.name': 'BIDCONF 2026', 'case.bidconf.res': 'QR-билеты и веб-сканер чек-ина — обслужено 300+ гостей',
       'case.orderbot.name': 'Бот мониторинга заказов', 'case.orderbot.res': 'Отслеживает биржи и фильтрует подходящие заказы через ИИ',
 
       /* iOS-оболочка */
@@ -447,7 +446,6 @@
       'case.zhemchuzhina.name': 'Zhemchuzhina Mysa, Gelendzhik', 'case.zhemchuzhina.res': 'Rating ★9.6 · a promo site built for direct booking',
       'case.pushka.name': 'Pushka mini-hotel, Yalta', 'case.pushka.res': 'Nautical style, 2 minutes to the seafront',
       'case.akva.name': 'Akva Villa, Krasnodar', 'case.akva.res': 'Bath-and-hotel complex, rating 5.0 · online booking',
-      'case.bidconf.name': 'BIDCONF 2026', 'case.bidconf.res': 'QR tickets and a web check-in scanner — 300+ guests served',
       'case.orderbot.name': 'Order-monitoring bot', 'case.orderbot.res': 'Watches order boards and filters a good fit with AI',
 
       /* iOS shell */
