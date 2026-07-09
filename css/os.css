@@ -6,15 +6,17 @@
 
 :root{
   /* базовые (ТЁМНАЯ тема) */
-  --wall-base:#05070C;
-  --glass:rgba(24,24,28,0.55);
+  --wall-base:#060B1C;
+  /* glass плотнее (.66) и text-dim ярче (.70): на просвечивающих обоях
+     подписи 11–12px иначе проваливались ниже 4.5:1 */
+  --glass:rgba(24,24,28,0.66);
   --glass-window:rgba(24,24,28,0.85);
   --glass-bar:rgba(24,24,28,0.62);
   --ring:rgba(255,255,255,0.10);
   --ring-strong:rgba(255,255,255,0.16);
   --text:#F5F5F7;
-  --text-dim:rgba(255,255,255,0.60);
-  --text-mid:rgba(255,255,255,0.72);
+  --text-dim:rgba(255,255,255,0.70);
+  --text-mid:rgba(255,255,255,0.80);
   /* красный для кнопок (AA: белый текст ≥4.5:1); --red остаётся для акцентных штрихов */
   --red-btn:#D42E00;
   --red-btn-hover:#B32600;
@@ -51,22 +53,23 @@
   --sb-label-shadow:0 1px 3px rgba(0,0,0,.6);
   --ios-glass:rgba(255,255,255,.16);
   --ios-glass-ring:rgba(255,255,255,.18);
-  --ios-pill:rgba(0,0,0,.26);
+  /* строка «Поиск»: у Apple она серо-полупрозрачная с blur */
+  --ios-pill:rgba(64,64,74,.5);
   --ios-pill-text:#fff;
   --ios-bar:#fff;
 }
 
 /* ---------- СВЕТЛАЯ ТЕМА ---------- */
 :root.theme-light{
-  --wall-base:#cfe3f5;
-  --glass:rgba(255,255,255,0.62);
+  --wall-base:#b8dcf5;
+  --glass:rgba(255,255,255,0.68);
   --glass-window:rgba(245,245,247,0.85);
   --glass-bar:rgba(255,255,255,0.68);
   --ring:rgba(0,0,0,0.08);
   --ring-strong:rgba(0,0,0,0.16);
   --text:#1D1D1F;
-  --text-dim:rgba(0,0,0,0.62);
-  --text-mid:rgba(0,0,0,0.72);
+  --text-dim:rgba(0,0,0,0.66);
+  --text-mid:rgba(0,0,0,0.76);
   --surface:rgba(0,0,0,0.045);
   --surface-soft:rgba(0,0,0,0.035);
   --surface-hover:rgba(0,0,0,0.07);
@@ -264,6 +267,10 @@ html.js .reveal.in{opacity:1;transition:opacity .25s var(--ease)}
 .widget__value{font-size:48px;font-weight:600;line-height:1;letter-spacing:-.02em;margin-top:auto}
 .widget__value--sm{font-size:34px}
 .widget__cap{font-size:12px;color:var(--text-dim);margin-top:6px;line-height:1.3}
+.widget__sub{font-size:11px;font-weight:600;color:var(--green,#32D74B);margin-top:4px;
+  display:inline-flex;align-items:center;gap:5px;line-height:1.2}
+.widget__sub::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--green,#32D74B);flex:0 0 auto}
 .widget__value--red{color:var(--red)}
 
 button.widget{cursor:pointer;text-align:left;transition:transform .2s var(--ease),background-color .3s var(--ease)}
@@ -520,6 +527,50 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 /* окно ИИ-агентов — крупнее, 16:10 (см. .agents) */
 #win-agents{max-width:1040px}
 
+/* Сплэш «Строим офис…» поверх iframe */
+.agents__splash{
+  position:absolute;inset:0;z-index:3;display:grid;place-items:center;
+  background:linear-gradient(160deg,#0f1524,#0a0d16 70%);color:#eaf0ff;
+  text-align:center;padding:20px;
+  transition:opacity .4s var(--ease);
+}
+.agents__splash.is-gone{opacity:0;pointer-events:none}
+.agents__splash-in{display:flex;flex-direction:column;align-items:center;gap:2px;max-width:280px}
+.agents__bot{color:#8fa6ff;margin-bottom:10px}
+.agents__splash-t{display:flex;align-items:center;justify-content:center;gap:3px;
+  font-size:15px;font-weight:600;color:#eaf0ff;margin:0}
+.agents__dots{display:inline-flex;gap:4px;margin-left:4px}
+.agents__dots i{width:5px;height:5px;border-radius:50%;background:#8fa6ff;display:block;
+  animation:agdot 1.2s var(--ease) infinite}
+.agents__dots i:nth-child(2){animation-delay:.18s}
+.agents__dots i:nth-child(3){animation-delay:.36s}
+@keyframes agdot{0%,60%,100%{opacity:.28;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.agents__splash-sub{font-size:11.5px;color:rgba(234,240,255,.6);margin:8px 0 0;display:none}
+.agents__retry{margin-top:14px;font-size:13px;font-weight:600;color:#0a0d16;
+  background:#8fa6ff;border-radius:999px;padding:8px 18px;cursor:pointer;
+  transition:filter .2s var(--ease)}
+.agents__retry:hover{filter:brightness(1.06)}
+.agents__retry:focus-visible{outline:2px solid #eaf0ff;outline-offset:2px}
+
+/* кнопка «На весь экран» в тулбаре окна */
+.win-fs{display:inline-flex;align-items:center;gap:6px;margin-left:auto;
+  font-size:12.5px;font-weight:500;color:var(--text-mid);
+  padding:4px 10px;border-radius:7px;cursor:pointer;
+  box-shadow:inset 0 0 0 1px var(--ring);
+  transition:background-color .2s var(--ease),color .2s var(--ease)}
+.win-fs:hover{background:var(--surface-hover);color:var(--text)}
+.win-fs:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+/* запасной полноэкранный режим там, где нет Fullscreen API (iOS) */
+#win-agents.is-cover{position:fixed!important;inset:0!important;left:0!important;top:0!important;
+  z-index:9500!important;max-width:none!important;width:100%!important;height:100%!important;
+  border-radius:0!important;transform:none!important}
+#win-agents.is-cover .agents{aspect-ratio:auto;flex:1 1 auto;height:100%;margin:10px 0 0}
+#win-agents.is-cover .win__body{display:flex;flex-direction:column;max-height:none}
+
+/* нативный fullscreen: контейнер занимает весь экран */
+.agents:fullscreen{aspect-ratio:auto;width:100%;height:100%;margin:0;border:0;border-radius:0}
+.agents:-webkit-full-screen{aspect-ratio:auto;width:100%;height:100%;margin:0;border:0;border-radius:0}
+
 .mono{font-family:var(--mono)}
 .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--text-dim);border:1px solid var(--ring);
@@ -625,7 +676,8 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 .term{background:#050505;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);border-radius:var(--r-8);
   padding:18px;font-family:var(--mono);font-size:13.5px;line-height:1.7;color:#3ddc7f;
   min-height:180px;white-space:pre-wrap}
-.term .muted{color:rgba(61,220,127,.55)}
+/* .55 давало 3.8:1 на #050505 — подняли до 4.5+ */
+.term .muted{color:rgba(61,220,127,.72)}
 .term .ok{color:#7dffb0}
 
 /* finder (папки, Finder-вид) */
@@ -657,6 +709,92 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 .policy li{font-size:14px;color:var(--text-mid);margin-bottom:4px}
 .policy__date{font-family:var(--mono);font-size:12px;color:var(--text-dim);display:block;margin-bottom:14px}
 
+/* ================= УСЛУГИ (win-services) ================= */
+.svc-flag{display:block;width:100%;text-align:left;margin-top:14px;
+  border-radius:var(--r-8);padding:18px 20px;
+  background:rgba(243,53,12,.08);box-shadow:inset 0 0 0 1px rgba(243,53,12,.35);
+  transition:background .15s var(--ease),transform .15s var(--ease)}
+.svc-flag:hover{background:rgba(243,53,12,.13);transform:translateY(-1px)}
+.svc-flag:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+.svc-flag__eb{display:block;color:var(--red);margin-bottom:6px}
+.svc-flag__h{font-size:20px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+.svc-flag__p{font-size:14px;color:var(--text-mid);margin:0 0 10px;line-height:1.5}
+.svc-flag__price{font-size:16px;font-weight:600;color:var(--text);margin:0 0 8px}
+.svc-flag__more{font-size:13px;font-weight:600;color:var(--red);font-family:var(--mono)}
+.svc-h3{font-size:15px;font-weight:600;margin:24px 0 10px;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim)}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.svc-card{background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
+  border-radius:var(--r-8);padding:14px 16px;display:flex;flex-direction:column}
+.svc-card h4{font-size:15px;font-weight:600;margin:0 0 3px}
+.svc-card p{font-size:13px;color:var(--text-dim);margin:0 0 10px;line-height:1.4}
+.svc-card__price{margin-top:auto;font-size:15px;font-weight:600;color:var(--text)}
+.svc-fmt{display:flex;flex-direction:column;gap:2px}
+.svc-fmt__row{display:flex;align-items:baseline;gap:12px;padding:12px 14px;
+  border-radius:var(--r-6);background:var(--surface-soft);
+  box-shadow:inset 0 0 0 1px var(--ring)}
+.svc-fmt__name{font-size:15px;font-weight:600;min-width:74px;flex:0 0 auto}
+.svc-fmt__note{font-size:13px;color:var(--text-dim);flex:1;min-width:0;line-height:1.4}
+.svc-fmt__price{font-size:15px;font-weight:600;flex:0 0 auto;text-align:right;white-space:nowrap}
+
+/* ================= УСТРОЙСТВА (win-devices) ================= */
+.dev-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.dev-card{display:flex;gap:14px;padding:16px;background:var(--surface-soft);
+  box-shadow:inset 0 0 0 1px var(--ring);border-radius:var(--r-8)}
+.dev-card--wide{grid-column:1 / -1}
+.dev-card__ic{flex:0 0 auto;width:48px;height:48px;border-radius:12px;
+  display:grid;place-items:center;color:var(--text);
+  background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring)}
+.dev-card__body{min-width:0;flex:1}
+.dev-card__name{font-size:16px;font-weight:600;margin:0 0 2px;letter-spacing:-.01em}
+.dev-card__spec{font-family:var(--mono);font-size:12.5px;color:var(--text-dim);margin:0 0 8px}
+.dev-card__meta{list-style:none;margin:0 0 10px;display:flex;flex-direction:column;gap:4px}
+.dev-card__meta li{font-size:13px;color:var(--text-mid);padding-left:16px;position:relative;line-height:1.35}
+.dev-card__meta li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;
+  border-radius:2px;background:var(--text-dim)}
+.dev-card__price{font-size:16px;font-weight:600;color:var(--text);margin:0}
+
+/* ================= ИИ-СОТРУДНИКИ (win-staff) ================= */
+.staff-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.staff-card{display:flex;gap:14px;padding:16px;background:var(--surface-soft);
+  box-shadow:inset 0 0 0 1px var(--ring);border-radius:var(--r-8)}
+.staff-card--wide{grid-column:1 / -1}
+.staff-card__ava{flex:0 0 auto;width:46px;height:46px;border-radius:50%;
+  display:grid;place-items:center;color:var(--text);
+  background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring)}
+.staff-card__body{min-width:0;flex:1;display:flex;flex-direction:column}
+.staff-card__role{font-size:16px;font-weight:600;margin:0 0 3px;letter-spacing:-.01em}
+.staff-card__do{font-size:13.5px;color:var(--text-mid);margin:0 0 12px;line-height:1.4}
+.staff-card__foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;flex-wrap:wrap}
+.staff-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+  color:var(--text-mid);padding:4px 10px;border-radius:999px;
+  background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring)}
+.staff-chip__dot{width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 6px rgba(50,215,75,.7);flex:0 0 auto}
+.staff-card__pay{display:flex;flex-direction:column;align-items:flex-end;text-align:right;min-width:0}
+.staff-card__pay-eb{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text-dim)}
+.staff-card__pay b{font-size:14.5px;font-weight:600;color:var(--text);white-space:nowrap}
+.staff-cta{margin-top:16px}
+
+/* ================= ПОРТФОЛИО (win-portfolio) ================= */
+.port-sec{font-size:15px;font-weight:600;margin:24px 0 10px;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim)}
+.port-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.case-card{display:flex;flex-direction:column;border-radius:var(--r-8);overflow:hidden;
+  background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
+  transition:transform .15s var(--ease),background .15s var(--ease)}
+a.case-card:hover{transform:translateY(-2px);background:var(--surface-hover)}
+a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+.case-card__shot{display:block;aspect-ratio:16/10;overflow:hidden;background:var(--surface);
+  border-bottom:1px solid var(--ring)}
+.case-card__shot img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.case-card__shot--icon{display:grid;place-items:center;color:var(--text-dim)}
+.case-card__name{font-size:14.5px;font-weight:600;margin:12px 14px 4px;letter-spacing:-.01em;line-height:1.25}
+.case-card__res{font-size:12.5px;color:var(--text-dim);margin:0 14px 14px;line-height:1.4;flex:1}
+.case-card--nolink{opacity:.9}
+
 /* ================= МОБИЛЬНАЯ ВЕРСИЯ «как айфон» ================= */
 @media (max-width:1023px){
   /* Браузер не должен перехватывать горизонтальный свайп как «Назад» —
@@ -685,25 +823,26 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
   }
   .pager-dots button{
     width:7px;height:7px;padding:0;border-radius:50%;background:var(--text);
-    opacity:.32;transition:opacity .2s var(--ease),transform .2s var(--ease);
+    opacity:.42;transition:opacity .2s var(--ease),transform .2s var(--ease);
     box-shadow:0 1px 2px rgba(0,0,0,.4);
   }
+  :root.theme-light .pager-dots button{box-shadow:0 0 3px rgba(255,255,255,.8)}
   .pager-dots button.is-active{opacity:.95;transform:scale(1.25)}
   .pager-dots button:focus-visible{outline:2px solid var(--ring-strong);outline-offset:3px}
 
   /* меню-бар прячем, показываем iOS статус-бар.
-     На домашнем экране статус-бар всегда светлый — как на настоящем iPhone. */
+     Цвет — по теме (белый на тёмных обоях, тёмный на светлых). */
   .menubar{display:none}
   .ios-statusbar{
     display:flex;align-items:center;justify-content:space-between;
     position:fixed;top:0;left:0;right:0;z-index:9000;
     height:calc(env(safe-area-inset-top) + 44px);
     padding:env(safe-area-inset-top) 22px 0 30px;
-    color:#fff;font-size:16px;pointer-events:none;
-    text-shadow:0 1px 3px rgba(0,0,0,.35);
+    color:var(--ios-bar);font-size:16px;pointer-events:none;
+    text-shadow:var(--sb-label-shadow);
   }
   .ios-time{font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.01em;font-size:16px}
-  .ios-glyphs{display:flex;align-items:center;gap:6px;color:#fff;pointer-events:auto}
+  .ios-glyphs{display:flex;align-items:center;gap:6px;color:var(--ios-bar);pointer-events:auto}
   .ios-glyphs svg{display:block}
   .ios-batt-wrap{display:inline-flex;align-items:center;gap:3px}
   .ios-batt-pct{font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
@@ -711,10 +850,22 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 
   /* stage больше не скроллится: контент живёт в фиксированном пейджере */
   .stage{position:static;inset:auto;min-height:0;padding:0}
-  .widgets{position:static;top:auto;left:auto;display:flex;flex-direction:column;gap:14px;width:100%;grid-template-columns:none}
+
+  /* Виджеты — iOS-сетка 2×N: малые квадратные (как small-виджет iPhone),
+     широкие на два столбца. Порядок задаёт order (ассистент → пара
+     Контур/Скорость → пара Демо/стикер → Штрафы). */
+  .widgets{position:static;top:auto;left:auto;display:grid;
+    grid-template-columns:1fr 1fr;gap:14px;width:100%;max-height:none;overflow:visible;padding-right:0}
   .widget,.widget--wide,.widget--assistant,.sticky{width:100%;max-width:none;border-radius:22px}
-  .widget--assistant{height:auto;min-height:170px}
-  .widget{min-height:132px}
+  .widget{order:2;height:auto;min-height:0;aspect-ratio:1/1}
+  .cal{order:3}
+  .widget--wide{order:5;grid-column:span 2;aspect-ratio:auto;min-height:132px}
+  .widget--assistant{order:1;grid-column:span 2;aspect-ratio:auto;height:auto;min-height:176px}
+  /* стикер — малый квадрат в паре с «Демо» (правило после .widget--wide:
+     у стикера есть оба класса, побеждать должно это) */
+  .sticky{order:4;grid-column:span 1;aspect-ratio:auto;height:auto;min-height:0;font-size:13px;padding:13px 14px}
+  .widget__value{font-size:44px}
+  .cal__date{font-size:46px}
 
   /* десктоп-иконки прячем — вместо них springboard.
      Размеры сняты с iPhone: иконка 60px, шаг ряда ~26px, подпись 12px белая. */
@@ -735,7 +886,7 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
     color:var(--sb-label);text-shadow:var(--sb-label-shadow);width:74px;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sb-icon:active{transform:scale(.9);opacity:.75}
-  .sb-icon:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:14px}
+  .sb-icon:focus-visible{outline:2px solid var(--ios-bar);outline-offset:3px;border-radius:14px}
 
   /* Строка поиска над доком — как на домашнем экране iPhone */
   .ios-search{
@@ -798,20 +949,44 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
   @media (display-mode:standalone),(display-mode:fullscreen){ .cc-fab{display:none} }
   /* ровно 4 иконки в порядке: Ассистент · ИИ-агенты · Тарифы · Почта */
   .dock__app[data-win="win-assistant"]{order:1}
-  .dock__app[data-win="win-agents"]{order:2}
-  .dock__app[data-win="win-pricing"]{order:3}
+  .dock__app[data-win="win-services"]{order:2}
+  .dock__app[data-win="win-agents"]{order:3}
   .dock__app[data-win="win-call"]{order:4}
 
-  /* окна = листы iOS */
+  /* окна = листы iOS: выезжают с пружинной кривой,
+     springboard позади отъезжает назад (scale .96) и темнеет */
   .win{
     position:fixed;inset:0;top:calc(env(safe-area-inset-top) + 12px);
     max-width:none;width:100%;min-width:0;
-    border-radius:20px 20px 0 0;transform:translateY(100%);opacity:1;visibility:visible;
+    border-radius:20px 20px 0 0;transform:translateY(100%);opacity:1;visibility:hidden;
     max-height:none;z-index:8000;
-    transition:transform .25s var(--ios-ease),visibility 0s .25s;
+    transition:transform .45s var(--ios-ease),visibility 0s .45s;
   }
-  .win.is-open{transform:translateY(0);transition:transform .25s var(--ios-ease),visibility 0s 0s}
-  .win.is-closing{transform:translateY(100%);transition:transform .2s var(--ios-ease)}
+  .win.is-open{transform:translateY(0);visibility:visible;transition:transform .45s var(--ios-ease),visibility 0s 0s}
+  .win.is-closing{transform:translateY(100%);visibility:visible;transition:transform .3s var(--ios-ease),visibility 0s .3s}
+  /* закрытые листы стоят на translateY(100%) прямо под экраном — их тени
+     (15 штук друг на друге) просвечивали тёмной полосой у нижней кромки;
+     visibility:hidden убирает и тени, и лишнюю отрисовку */
+  .win:not(.is-open):not(.is-closing){box-shadow:none}
+
+  /* iOS app-переход: фон (пейджер) слегка отъезжает и темнеет */
+  .pager{transition:transform .45s var(--ios-ease)}
+  .pager::after{
+    content:"";position:absolute;inset:0;z-index:5;background:#000;
+    opacity:0;pointer-events:none;transition:opacity .45s var(--ios-ease);
+  }
+  html.app-open .pager{transform:scale(.96)}
+  html.app-open .pager::after{opacity:.38}
+  /* как на iPhone: пока открыто приложение, док и поиск скрыты */
+  .dock,.ios-search,.pager-dots,.cc-fab{
+    transition:opacity .3s var(--ios-ease),background-color .3s var(--ease);
+  }
+  /* html.js.app-open — специфичность выше, чем у html.js .reveal.in,
+     иначе то правило возвращало доку opacity:1 */
+  html.js.app-open .dock,html.app-open .dock,
+  html.app-open .ios-search,
+  html.app-open .pager-dots,
+  html.app-open .cc-fab{opacity:0;pointer-events:none}
   .win__grab{display:block;height:20px;position:relative;flex:0 0 auto;
     touch-action:none;cursor:grab}
   .win__grab::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);
@@ -821,8 +996,19 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
   .win__body h1,.win__body h2{font-size:23px}
   .win-back{display:inline-flex;align-items:center;gap:6px;margin-left:auto;
     font-size:14px;color:var(--text);padding:4px 8px}
+  /* в мобильной шапке кнопка «На весь экран» стоит слева от «Назад» */
+  .win-fs{margin-left:auto;font-size:13px}
+  .win-fs+.win-back{margin-left:8px}
+  /* подсказка про вес — только на телефоне */
+  .agents__splash-sub{display:block}
   .grid2{grid-template-columns:1fr}
   .finder__list{grid-template-columns:1fr}
+  .svc-grid{grid-template-columns:1fr 1fr}
+  .dev-grid{grid-template-columns:1fr}
+  .staff-grid{grid-template-columns:1fr}
+  .port-grid{grid-template-columns:1fr 1fr}
+  .svc-fmt__row{flex-wrap:wrap}
+  .svc-fmt__note{flex-basis:100%;order:3}
 
   /* README — обычный лист iOS (открывается по иконке README.txt), H1/питч в DOM для SEO */
 
@@ -836,7 +1022,7 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 @media (max-width:1023px){
   .ccx{
     display:block;position:fixed;inset:0;z-index:9600;
-    background:rgba(0,0,0,.28);
+    background:rgba(0,0,0,.4);
     -webkit-backdrop-filter:blur(26px) saturate(1.3);backdrop-filter:blur(26px) saturate(1.3);
     opacity:0;visibility:hidden;
     transition:opacity .22s var(--ios-ease),visibility 0s .22s;
@@ -913,8 +1099,9 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
   }
   .ccx__tile-txt{display:flex;flex-direction:column;line-height:1.25}
   .ccx__tile-t{font-size:15px;font-weight:600}
-  .ccx__tile-v{font-size:12.5px;color:rgba(255,255,255,.6)}
-  .ccx__tile-val{margin-left:auto;font-size:14px;font-weight:600;color:rgba(255,255,255,.85)}
+  /* .6 на светлых участках обоев давало ~4:1 — подняли */
+  .ccx__tile-v{font-size:12.5px;color:rgba(255,255,255,.72)}
+  .ccx__tile-val{margin-left:auto;font-size:14px;font-weight:600;color:rgba(255,255,255,.9)}
 
   /* затемнение «яркости» поверх всего сайта */
   .screen-dim{
@@ -922,6 +1109,39 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
     background:#000;opacity:var(--dim,0);
     transition:opacity .12s linear;
   }
+
+  /* Пункт управления в СВЕТЛОЙ теме — светлые плитки и тёмный текст, как в iOS:
+     белый текст на светлом блюре не читался (1.7:1) */
+  :root.theme-light .ccx{background:rgba(150,160,170,.30)}
+  :root.theme-light .ccx__sheet{color:#1D1D1F}
+  :root.theme-light .ccx__grabber{background:rgba(0,0,0,.35)}
+  :root.theme-light .ccx__group,
+  :root.theme-light .ccx__tile{background:rgba(255,255,255,.66);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.06);color:#1D1D1F}
+  :root.theme-light .ccx__tile:active{background:rgba(255,255,255,.8)}
+  :root.theme-light .ccx__toggle{background:rgba(0,0,0,.10);color:#1D1D1F}
+  :root.theme-light .ccx__toggle.is-on{background:#0A84FF;color:#fff}
+  :root.theme-light .ccx__toggle.is-off{background:rgba(0,0,0,.07);color:rgba(0,0,0,.48)}
+  :root.theme-light .ccx__slider{background:rgba(120,120,128,.28)}
+  :root.theme-light .ccx__tile-ic{background:rgba(0,0,0,.08)}
+  :root.theme-light .ccx__tile-v{color:rgba(0,0,0,.62)}
+  :root.theme-light .ccx__tile-val{color:rgba(0,0,0,.78)}
+  :root.theme-light .ccx__toggle:focus-visible,
+  :root.theme-light .ccx__tile:focus-visible,
+  :root.theme-light .ccx__slider:focus-visible{outline-color:#1D1D1F}
+}
+
+/* Landscape на телефоне: лишние фикс-элементы прячем, иконки в 6 колонок —
+   раскладка остаётся портретной по духу, но без наложений */
+@media (max-width:1023px) and (orientation:landscape) and (max-height:500px){
+  .ios-search,.pager-dots{display:none}
+  .page{
+    padding-top:calc(env(safe-area-inset-top) + 46px);
+    padding-left:calc(24px + env(safe-area-inset-left));
+    padding-right:calc(24px + env(safe-area-inset-right));
+    padding-bottom:calc(108px + env(safe-area-inset-bottom));
+  }
+  /* 7 колонок → 2 ряда из 13 иконок, третий ряд не подлезает под док */
+  .springboard{grid-template-columns:repeat(7,60px);row-gap:18px}
 }
 
 /* зона перехвата свайпа: правый верхний угол, как на iPhone */

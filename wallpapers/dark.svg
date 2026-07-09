@@ -1,44 +1,54 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#04070F"/>
-      <stop offset="0.45" stop-color="#071120"/>
-      <stop offset="0.78" stop-color="#0A1B2E"/>
-      <stop offset="1" stop-color="#0C2136"/>
+      <stop offset="0" stop-color="#091228"/>
+      <stop offset="0.38" stop-color="#0D1E42"/>
+      <stop offset="0.68" stop-color="#0F2B56"/>
+      <stop offset="1" stop-color="#10355E"/>
     </linearGradient>
     <radialGradient id="teal" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#16C7B4" stop-opacity="0.85"/>
-      <stop offset="1" stop-color="#16C7B4" stop-opacity="0"/>
+      <stop offset="0" stop-color="#15C9B2" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#15C9B2" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blue" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#2E86D9" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#2E86D9" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="cyan" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#1F7FC8" stop-opacity="0.8"/>
-      <stop offset="1" stop-color="#1F7FC8" stop-opacity="0"/>
+      <stop offset="0" stop-color="#22A7C9" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#22A7C9" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="amber" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#E79A3C" stop-opacity="0.7"/>
-      <stop offset="1" stop-color="#E79A3C" stop-opacity="0"/>
+      <stop offset="0" stop-color="#F09A38" stop-opacity="0.68"/>
+      <stop offset="1" stop-color="#F09A38" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="coral" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#E1673A" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#E1673A" stop-opacity="0"/>
+    <radialGradient id="ember" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#E06A2E" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#E06A2E" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#04070F" stop-opacity="0.55"/>
-      <stop offset="0.4" stop-color="#04070F" stop-opacity="0.1"/>
-      <stop offset="1" stop-color="#04070F" stop-opacity="0.35"/>
+      <stop offset="0" stop-color="#04070F" stop-opacity="0.50"/>
+      <stop offset="0.35" stop-color="#04070F" stop-opacity="0.08"/>
+      <stop offset="0.72" stop-color="#04070F" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#04070F" stop-opacity="0.50"/>
     </linearGradient>
     <filter id="blur" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="80"/>
+      <feGaussianBlur stdDeviation="90"/>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
     </filter>
   </defs>
   <rect width="1600" height="1000" fill="url(#sky)"/>
   <g filter="url(#blur)">
-    <ellipse cx="470" cy="760" rx="520" ry="300" fill="url(#teal)"/>
-    <ellipse cx="1180" cy="700" rx="560" ry="320" fill="url(#cyan)"/>
-    <ellipse cx="900" cy="880" rx="640" ry="300" fill="url(#amber)"/>
-    <ellipse cx="1360" cy="900" rx="420" ry="260" fill="url(#coral)"/>
-    <ellipse cx="180" cy="920" rx="380" ry="240" fill="url(#cyan)"/>
-    <path d="M-100 720 C 300 640 560 780 900 720 S 1500 620 1720 700 L 1720 1000 L -100 1000 Z" fill="#0F8FA0" opacity="0.35"/>
+    <ellipse cx="430" cy="620" rx="540" ry="320" fill="url(#teal)"/>
+    <ellipse cx="1160" cy="500" rx="580" ry="330" fill="url(#blue)"/>
+    <ellipse cx="160" cy="880" rx="400" ry="250" fill="url(#cyan)"/>
+    <ellipse cx="980" cy="930" rx="640" ry="250" fill="url(#amber)"/>
+    <ellipse cx="1430" cy="960" rx="400" ry="210" fill="url(#ember)"/>
+    <path d="M-100 730 C 300 650 580 790 920 730 S 1520 630 1720 710 L 1720 1000 L -100 1000 Z" fill="#12A08F" opacity="0.30"/>
   </g>
   <rect width="1600" height="1000" fill="url(#shade)"/>
+  <rect width="1600" height="1000" filter="url(#grain)" opacity="0.035"/>
 </svg>

@@ -1,44 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#DCEEFF"/>
-      <stop offset="0.42" stop-color="#E4F4F0"/>
-      <stop offset="0.72" stop-color="#F3F3E4"/>
-      <stop offset="1" stop-color="#FCE6D4"/>
+      <stop offset="0" stop-color="#9ED2FF"/>
+      <stop offset="0.42" stop-color="#BCEBDE"/>
+      <stop offset="0.74" stop-color="#FDE9C8"/>
+      <stop offset="1" stop-color="#FFD9B0"/>
     </linearGradient>
-    <radialGradient id="sky2" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#BFDFFB" stop-opacity="0.9"/>
-      <stop offset="1" stop-color="#BFDFFB" stop-opacity="0"/>
+    <radialGradient id="skyb" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#5FB7FF" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#5FB7FF" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="mint" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#B9E9D2" stop-opacity="0.9"/>
-      <stop offset="1" stop-color="#B9E9D2" stop-opacity="0"/>
+      <stop offset="0" stop-color="#7CE4B6" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#7CE4B6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aqua" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7FD8EE" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#7FD8EE" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="peach" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FAD3B4" stop-opacity="0.95"/>
-      <stop offset="1" stop-color="#FAD3B4" stop-opacity="0"/>
+      <stop offset="0" stop-color="#FFBE85" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#FFBE85" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="rose" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FBD0C6" stop-opacity="0.8"/>
-      <stop offset="1" stop-color="#FBD0C6" stop-opacity="0"/>
+      <stop offset="0" stop-color="#FFB3A0" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#FFB3A0" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="lift" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.35"/>
-      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/>
-      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.22"/>
     </linearGradient>
     <filter id="blur" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="80"/>
+      <feGaussianBlur stdDeviation="90"/>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
     </filter>
   </defs>
   <rect width="1600" height="1000" fill="url(#sky)"/>
   <g filter="url(#blur)">
-    <ellipse cx="360" cy="230" rx="560" ry="300" fill="url(#sky2)"/>
-    <ellipse cx="520" cy="760" rx="560" ry="320" fill="url(#mint)"/>
-    <ellipse cx="1240" cy="820" rx="600" ry="340" fill="url(#peach)"/>
-    <ellipse cx="1320" cy="300" rx="480" ry="300" fill="url(#rose)"/>
-    <ellipse cx="900" cy="560" rx="520" ry="280" fill="url(#mint)"/>
-    <path d="M-100 700 C 320 620 560 760 900 700 S 1500 600 1720 680 L 1720 1000 L -100 1000 Z" fill="#F6C9A6" opacity="0.4"/>
+    <ellipse cx="380" cy="220" rx="580" ry="320" fill="url(#skyb)"/>
+    <ellipse cx="520" cy="740" rx="580" ry="330" fill="url(#mint)"/>
+    <ellipse cx="920" cy="520" rx="540" ry="290" fill="url(#aqua)"/>
+    <ellipse cx="1260" cy="840" rx="620" ry="340" fill="url(#peach)"/>
+    <ellipse cx="1330" cy="270" rx="500" ry="300" fill="url(#rose)"/>
+    <path d="M-100 700 C 320 620 580 770 920 700 S 1520 610 1720 690 L 1720 1000 L -100 1000 Z" fill="#FFB877" opacity="0.5"/>
   </g>
   <rect width="1600" height="1000" fill="url(#lift)"/>
+  <rect width="1600" height="1000" filter="url(#grain)" opacity="0.035"/>
 </svg>

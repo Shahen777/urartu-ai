@@ -8,12 +8,13 @@
   var DICT = {
     ru: {
       /* meta */
-      'meta.title': 'Внедрение локального ИИ для бизнеса — ИИ-ассистент на вашем сервере | 152-ФЗ | Urartu AI',
-      'meta.desc': 'Внедряем локального ИИ-ассистента: отвечает по вашим регламентам и договорам, работает на сервере компании, данные не уходят в облако. Соответствие 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.',
+      'meta.title': 'Локальные ИИ-сотрудники 24/7 для бизнеса — свой ИИ на вашем сервере | 152-ФЗ | Urartu AI',
+      'meta.desc': 'Внедряем локальных ИИ-сотрудников 24/7: цифровые агенты на сервере компании — отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Данные не уходят в облако. Локальный ИИ, 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.',
 
       /* меню / статус */
       'menu.assistant': 'Ассистент', 'menu.how': 'Как работает', 'menu.who': 'Кому',
       'menu.pricing': 'Тарифы', 'menu.faq': 'Вопросы', 'menu.about': 'О нас', 'menu.mail': 'Контакты',
+      'menu.services': 'Услуги', 'menu.portfolio': 'Портфолио', 'menu.staff': 'Сотрудники',
       'status.local': 'ЛОКАЛЬНО · 152-ФЗ',
       'wifi.tip': 'интернет ассистенту не нужен',
       'ui.back': '‹ Назад',
@@ -26,8 +27,8 @@
 
       /* README */
       'readme.tag': 'Локальное развёртывание · 152-ФЗ',
-      'readme.h1': 'Свой ИИ. На вашем сервере. Данные не покидают компанию.',
-      'readme.lead': 'Внедряем ИИ-ассистента, который отвечает по вашим регламентам, договорам и базе знаний — внутри вашей инфраструктуры. Без облаков, без подписок на чужие API, без риска утечки.',
+      'readme.h1': 'Локальные ИИ-сотрудники. Работают 24/7. Данные не покидают компанию.',
+      'readme.lead': 'Устанавливаем и настраиваем ИИ-агентов — цифровых сотрудников на вашем сервере: отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Без облаков, без утечек, без выходных.',
       'readme.p': 'Пилот на вашем процессе — 2 недели · Москва и вся РФ. Это не описание продукта, а сам продукт: перед вами рабочий стол компании, на котором ассистент уже отвечает.',
       'readme.btnDemo': 'Показать демо →', 'readme.btnHow': 'Как это устроено',
       'readme.badge': 'Каждый ответ — со ссылкой на пункт документа. Можно проверить.',
@@ -118,6 +119,73 @@
       'mail.phone': 'Телефон', 'mail.email': 'Почта',
       'mail.note': 'Отвечаем в течение рабочего дня',
 
+      /* ИИ-сотрудники (штат) */
+      'staff.title': 'Сотрудники',
+      'staff.h1': 'Штат, который не спит',
+      'staff.lead': 'Сотрудники, которые не спят, не болеют и не уносят данные. Живут на вашем сервере.',
+      'staff.shift': 'график: 24/7',
+      'staff.pay': 'зарплата',
+      'staff.e1.role': 'Документовед', 'staff.e1.do': 'Отвечает по регламентам и базе знаний — со ссылкой на пункт документа.', 'staff.e1.pay': 'внедрение от 150 000 ₽',
+      'staff.e2.role': 'Юрист-проверяющий', 'staff.e2.do': 'Проверяет договоры по вашему чек-листу — с цитатами и указанием рисков.', 'staff.e2.pay': 'внедрение от 150 000 ₽',
+      'staff.e3.role': 'Оператор поддержки', 'staff.e3.do': 'Отвечает клиентам круглосуточно на базе ваших знаний — в чате и на сайте.', 'staff.e3.pay': 'от 120 000 ₽/мес',
+      'staff.e4.role': 'Секретарь-голос', 'staff.e4.do': 'Принимает звонки, записывает обращения и назначает встречи — живым голосом.', 'staff.e4.pay': 'от 200 000 ₽',
+      'staff.e5.role': 'Контент-менеджер', 'staff.e5.do': 'Пишет статьи, посты и рассылки в вашем стиле — по бренд-гайду и базе знаний.', 'staff.e5.pay': 'от 50 000 ₽/мес',
+      'staff.cta': 'Собрать штат — на демо →',
+
+      /* Услуги */
+      'svc.title': 'Услуги',
+      'svc.h1': 'Что мы делаем',
+      'svc.lead': 'Основное направление — локальные ИИ-сотрудники на вашем сервере. Рядом — полный набор студийных услуг Urartu: сайты, боты, автоматизация, контент.',
+      'svc.flag.eb': 'Флагман',
+      'svc.flag.h': 'Локальные ИИ-сотрудники 24/7',
+      'svc.flag.p': 'Внедряем и настраиваем ИИ-агентов — цифровых сотрудников на вашем сервере: отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Без облаков и утечек.',
+      'svc.flag.price': 'Внедрение от 150 000 ₽ · поддержка от 15 000 ₽/мес',
+      'svc.flag.more': 'Подробнее — в Тарифах →',
+      'svc.dir': 'Направления',
+      'svc.s1.h': 'Сайты под ключ', 'svc.s1.p': 'Лендинги, корпоративные, e-commerce', 'svc.s1.price': 'от 50 000 ₽',
+      'svc.s2.h': 'AI-боты и агенты', 'svc.s2.p': 'Telegram, WhatsApp, RAG, голос', 'svc.s2.price': 'от 100 000 ₽',
+      'svc.s3.h': 'Чат-боты поддержки 24/7', 'svc.s3.p': 'На базе знаний клиента', 'svc.s3.price': 'от 120 000 ₽/мес',
+      'svc.s4.h': 'Голосовые ассистенты', 'svc.s4.p': 'Колл-центры, ресепшены', 'svc.s4.price': 'от 200 000 ₽',
+      'svc.s5.h': 'Автоматизация бизнеса', 'svc.s5.p': '1С, Битрикс, AmoCRM, n8n', 'svc.s5.price': 'от 80 000 ₽',
+      'svc.s6.h': 'AI-интеграции', 'svc.s6.p': 'LLM в ваши продукты, fine-tuning', 'svc.s6.price': 'от 150 000 ₽',
+      'svc.s7.h': 'AI-видео', 'svc.s7.p': 'Реклама, аватары', 'svc.s7.price': 'от 20 000 ₽/ролик',
+      'svc.s8.h': 'Контент-фабрика', 'svc.s8.p': 'Статьи, SEO, соцсети', 'svc.s8.price': 'от 50 000 ₽/мес',
+      'svc.formats.eb': 'Форматы сотрудничества',
+      'svc.fmt.starter.note': 'Базовое внедрение под один процесс', 'svc.fmt.starter.price': 'от 150 000 ₽',
+      'svc.fmt.studio.note': 'Комплекс проектов и сопровождение', 'svc.fmt.studio.price': 'от 800 000 ₽',
+      'svc.fmt.atelier.note': 'Выделенная команда, NDA, прямой канал с CTO', 'svc.fmt.atelier.price': 'от 5 000 000 ₽',
+
+      /* Устройства */
+      'dev.title': 'Устройства',
+      'dev.h1': 'ИИ-железо: на чём живут сотрудники',
+      'dev.lead': 'Модель и база знаний работают на вашем оборудовании. Ниже — станции под разный масштаб команды. Точную конфигурацию подбираем на демо.',
+      'dev.d1.name': 'Станция «Старт»', 'dev.d1.spec': 'RTX 4060 Ti 16 ГБ · 64 ГБ ОЗУ', 'dev.d1.team': 'Команда до 10 человек', 'dev.d1.models': 'Тянет модели до 14B', 'dev.d1.price': 'от 180 000 ₽',
+      'dev.d2.name': 'Станция «Про»', 'dev.d2.spec': 'RTX 4090 24 ГБ · 128 ГБ ОЗУ', 'dev.d2.team': 'До 30 сотрудников', 'dev.d2.models': 'Тянет модели до 32B', 'dev.d2.price': 'от 450 000 ₽',
+      'dev.d3.name': 'Станция «Макс»', 'dev.d3.spec': 'RTX 5090 32 ГБ', 'dev.d3.team': 'До 50 сотрудников', 'dev.d3.models': 'Тянет модели до 70B (квант.)', 'dev.d3.price': 'от 650 000 ₽',
+      'dev.d4.name': 'Mac Studio', 'dev.d4.spec': 'M4 Max · 64–128 ГБ', 'dev.d4.team': 'Бесшумный, в кабинет руководителя', 'dev.d4.models': 'Тянет модели до 70B', 'dev.d4.price': 'от 450 000 ₽',
+      'dev.d5.name': 'Сервер Multi-GPU', 'dev.d5.spec': '2–8 × GPU · кластеры', 'dev.d5.team': '100+ пользователей', 'dev.d5.models': 'Несколько моделей параллельно', 'dev.d5.price': 'под заказ, от 1,5 млн ₽',
+      'dev.disclaimer': 'Железо поставляем только под проект внедрения: легально, с документами, гарантией и настройкой под ключ. Цены ориентировочные и зависят от конфигурации и курса.',
+
+      /* Портфолио */
+      'port.title': 'Портфолио',
+      'port.h1': 'Что мы уже сделали',
+      'port.lead': 'Сайты, ИИ-сомелье, боты и системы регистрации — вживую. Откройте любой кейс в новой вкладке.',
+      'port.sec.urartu': 'Кейсы Urartu',
+      'port.sec.hotels': 'Отельные промо-сайты',
+      'port.sec.events': 'События и билеты',
+      'port.sec.bots': 'Telegram-боты',
+      'case.megradzor.name': 'Megradzor Cheese Dairy', 'case.megradzor.res': 'Сайт сыроварни с AI-сомелье — 17 заявок от ресторанов за 2 недели',
+      'case.machanents.name': 'Machanents Art Hotel', 'case.machanents.res': 'Арт-отель у Эчмиадзина — своё SEO и прямое бронирование',
+      'case.annabella.name': 'AnnaBella Boutique Hotel', 'case.annabella.res': 'Бутик-отель в Ереване — журнальный дизайн люксовых travel-изданий',
+      'case.olivia.name': 'Гостевой дом «Оливия», Севастополь', 'case.olivia.res': 'Рейтинг ★9.9 · прямое бронирование без комиссий агрегаторов',
+      'case.alyans.name': 'Гостевой дом «Альянс», Севастополь', 'case.alyans.res': 'Рейтинг ★9.8 · премиальный промо-сайт с прямыми заявками',
+      'case.florentina.name': 'Бутик-отель «Флорентина», Ялта', 'case.florentina.res': 'Тосканский флёр у набережной — авторская айдентика',
+      'case.zhemchuzhina.name': '«Жемчужина Мыса», Геленджик', 'case.zhemchuzhina.res': 'Рейтинг ★9.6 · промо-сайт под прямое бронирование',
+      'case.pushka.name': 'Мини-отель «Пушка», Ялта', 'case.pushka.res': 'Морской стиль, 2 минуты до набережной',
+      'case.akva.name': 'Аква вилла, Краснодар', 'case.akva.res': 'Банно-гостиничный комплекс, рейтинг 5.0 · онлайн-заявка',
+      'case.bidconf.name': 'BIDCONF 2026', 'case.bidconf.res': 'QR-билеты и веб-сканер чек-ина — обслужено 300+ гостей',
+      'case.orderbot.name': 'Бот мониторинга заказов', 'case.orderbot.res': 'Отслеживает биржи и фильтрует подходящие заказы через ИИ',
+
       /* iOS-оболочка */
       'ios.search': 'Поиск',
       'ccx.full': 'На весь экран', 'ccx.fullHint': 'Скрыть панели браузера',
@@ -160,6 +228,9 @@
       'agents.h1': 'Команда ИИ-агентов за работой',
       'agents.p': 'Так устроена многоагентная система: у каждого агента своя роль, они передают задачи друг другу и согласуют результат. Тот же принцип работает во внедрении: один агент ищет ответ в регламентах, второй проверяет договор по чек-листу, третий готовит черновик письма.',
       'agents.play': 'Запустить 3D-офис', 'agents.note': 'загрузится по клику',
+      'agents.building': 'Строим офис', 'agents.hint': '~5 МБ · лучше по Wi-Fi',
+      'agents.retry': 'Попробовать ещё раз',
+      'agents.fs': 'На весь экран', 'agents.fsExit': 'Свернуть',
       'agents.credit': 'Симуляция: открытый проект The Delegation, лицензия MIT',
 
       /* Корзина */
@@ -180,6 +251,7 @@
       /* Виджеты */
       'w.contour.eb': 'Контур', 'w.contour.cap': 'данных ушло наружу',
       'w.speed.eb': 'Скорость', 'w.speed.val': '10&nbsp;сек', 'w.speed.cap': 'ответ по регламентам вместо 10 минут',
+      'w.speed.sub': 'работает 24/7 без выходных',
       'w.cal.mark': '● Демо', 'w.cal.cta': 'Записаться', 'w.cal.ctaSub': 'на 30 минут →',
       'w.fines.eb': 'Штрафы · 152-ФЗ', 'w.fines.val': 'до&nbsp;500&nbsp;млн&nbsp;₽',
       'w.fines.cap': 'оборотный штраф за повторную утечку персональных данных',
@@ -200,12 +272,13 @@
 
     en: {
       /* meta */
-      'meta.title': 'On-Premise AI for Business — Your Own AI Assistant on Your Server | Urartu AI',
-      'meta.desc': 'We deploy a private AI assistant that answers from your policies and contracts, runs on your own server and never sends data to the cloud. 152-FZ compliant. Pilot in 2 weeks. Moscow and all of Russia.',
+      'meta.title': 'Local AI Employees, working 24/7 — On-Premise AI for Business | 152-FZ | Urartu AI',
+      'meta.desc': 'We deploy local AI employees that work 24/7 — digital agents on your own server: answer from your policies, review contracts and run customer support. On-premise AI, never sends data to the cloud. 152-FZ compliant. Pilot in 2 weeks. Moscow and all of Russia.',
 
       /* menu / status */
       'menu.assistant': 'Assistant', 'menu.how': 'How it works', 'menu.who': "Who it's for",
       'menu.pricing': 'Pricing', 'menu.faq': 'FAQ', 'menu.about': 'About', 'menu.mail': 'Contact',
+      'menu.services': 'Services', 'menu.portfolio': 'Portfolio', 'menu.staff': 'Employees',
       'status.local': 'LOCAL · 152-FZ',
       'wifi.tip': "the assistant doesn't need the internet",
       'ui.back': '‹ Back',
@@ -218,8 +291,8 @@
 
       /* README */
       'readme.tag': 'On-premise deployment · 152-FZ',
-      'readme.h1': 'Your own AI. On your server. Data never leaves the company.',
-      'readme.lead': 'We deploy an AI assistant that answers from your policies, contracts and knowledge base — inside your own infrastructure. No clouds, no subscriptions to someone else’s API, no risk of a leak.',
+      'readme.h1': 'Local AI employees. Working 24/7. Data never leaves the company.',
+      'readme.lead': 'We install and configure AI agents — digital employees on your own server: they answer from your policies, review contracts and run customer support. No clouds, no leaks, no days off.',
       'readme.p': 'A pilot on your process — 2 weeks · Moscow and all of Russia. This isn’t a product description, it’s the product itself: what you see is the company’s desktop, where the assistant is already answering.',
       'readme.btnDemo': 'Show me a demo →', 'readme.btnHow': 'How it works',
       'readme.badge': 'Every answer cites the exact document clause. Easy to verify.',
@@ -271,7 +344,7 @@
       'pricing.pilot.price': '₽0 · free',
       'pricing.pilot.note': 'A free pilot for our first clients, no commitment, 30 minutes',
       'pricing.impl.stamp': 'Main format', 'pricing.impl.h': 'Implementation',
-      'pricing.impl.sub': 'Full turnkey project', 'pricing.impl.price': 'from 150 000 ₽ (≈ from $1,700)',
+      'pricing.impl.sub': 'Full turnkey project', 'pricing.impl.price': 'from 150 000 ₽ (≈ from $1,500)',
       'pricing.impl.l1': 'Assistant tailored to your process', 'pricing.impl.l2': 'Knowledge base',
       'pricing.impl.l3': 'Interface', 'pricing.impl.l4': 'Access control',
       'pricing.impl.l5': 'Staff training', 'pricing.impl.l6': 'Documentation',
@@ -309,6 +382,73 @@
       'mail.p': '30 minutes online: we’ll show a working assistant, walk through your process and honestly tell you whether on-premise AI will help you — and what it takes.',
       'mail.phone': 'Phone', 'mail.email': 'Email',
       'mail.note': 'We reply within one business day',
+
+      /* AI employees (staff) */
+      'staff.title': 'Employees',
+      'staff.h1': 'A team that never sleeps',
+      'staff.lead': 'Employees that never sleep, never get sick and never walk off with your data. They live on your own server.',
+      'staff.shift': 'shift: 24/7',
+      'staff.pay': 'salary',
+      'staff.e1.role': 'Document Clerk', 'staff.e1.do': 'Answers from your policies and knowledge base — citing the exact document clause.', 'staff.e1.pay': 'deployment from $1,500',
+      'staff.e2.role': 'Contract Reviewer', 'staff.e2.do': 'Checks contracts against your checklist — with quotes and flagged risks.', 'staff.e2.pay': 'deployment from $1,500',
+      'staff.e3.role': 'Support Operator', 'staff.e3.do': 'Answers customers around the clock from your knowledge base — in chat and on the site.', 'staff.e3.pay': 'from $1,200/mo',
+      'staff.e4.role': 'Voice Secretary', 'staff.e4.do': 'Takes calls, logs requests and books meetings — in a natural voice.', 'staff.e4.pay': 'from $2,000',
+      'staff.e5.role': 'Content Manager', 'staff.e5.do': 'Writes articles, posts and newsletters in your style — following your brand guide and knowledge base.', 'staff.e5.pay': 'from $500/mo',
+      'staff.cta': 'Hire the team — book a demo →',
+
+      /* Services */
+      'svc.title': 'Services',
+      'svc.h1': 'What we do',
+      'svc.lead': 'Our core offering is on-premise AI employees on your own server. Alongside it — Urartu’s full studio stack: websites, bots, automation, content.',
+      'svc.flag.eb': 'Flagship',
+      'svc.flag.h': 'On-premise AI employees 24/7',
+      'svc.flag.p': 'We deploy and tune AI agents — digital employees on your own server: they answer from your policies, review contracts and run customer support. No clouds, no leaks.',
+      'svc.flag.price': 'Deployment from $1,500 · support from $150/mo',
+      'svc.flag.more': 'More — in Pricing →',
+      'svc.dir': 'Directions',
+      'svc.s1.h': 'Turnkey websites', 'svc.s1.p': 'Landing pages, corporate, e-commerce', 'svc.s1.price': 'from $500',
+      'svc.s2.h': 'AI bots & agents', 'svc.s2.p': 'Telegram, WhatsApp, RAG, voice', 'svc.s2.price': 'from $1,000',
+      'svc.s3.h': 'Support chatbots 24/7', 'svc.s3.p': 'Built on the client’s knowledge base', 'svc.s3.price': 'from $1,200/mo',
+      'svc.s4.h': 'Voice assistants', 'svc.s4.p': 'Call centers, reception desks', 'svc.s4.price': 'from $2,000',
+      'svc.s5.h': 'Business automation', 'svc.s5.p': '1C, Bitrix, AmoCRM, n8n', 'svc.s5.price': 'from $800',
+      'svc.s6.h': 'AI integrations', 'svc.s6.p': 'LLMs in your products, fine-tuning', 'svc.s6.price': 'from $1,500',
+      'svc.s7.h': 'AI video', 'svc.s7.p': 'Ads, avatars', 'svc.s7.price': 'from $200/clip',
+      'svc.s8.h': 'Content factory', 'svc.s8.p': 'Articles, SEO, social', 'svc.s8.price': 'from $500/mo',
+      'svc.formats.eb': 'Ways to work together',
+      'svc.fmt.starter.note': 'A base deployment for one process', 'svc.fmt.starter.price': 'from $1,500',
+      'svc.fmt.studio.note': 'A bundle of projects with ongoing support', 'svc.fmt.studio.price': 'from $8,000',
+      'svc.fmt.atelier.note': 'A dedicated team, NDA, a direct line to the CTO', 'svc.fmt.atelier.price': 'from $50,000',
+
+      /* Devices */
+      'dev.title': 'Devices',
+      'dev.h1': 'AI hardware: where your employees live',
+      'dev.lead': 'The model and the knowledge base run on your own hardware. Below are stations for different team sizes. We pick the exact spec at the demo.',
+      'dev.d1.name': '“Start” station', 'dev.d1.spec': 'RTX 4060 Ti 16 GB · 64 GB RAM', 'dev.d1.team': 'A team of up to 10 people', 'dev.d1.models': 'Runs models up to 14B', 'dev.d1.price': 'from $1,800',
+      'dev.d2.name': '“Pro” station', 'dev.d2.spec': 'RTX 4090 24 GB · 128 GB RAM', 'dev.d2.team': 'Up to 30 employees', 'dev.d2.models': 'Runs models up to 32B', 'dev.d2.price': 'from $4,500',
+      'dev.d3.name': '“Max” station', 'dev.d3.spec': 'RTX 5090 32 GB', 'dev.d3.team': 'Up to 50 employees', 'dev.d3.models': 'Runs models up to 70B (quant.)', 'dev.d3.price': 'from $6,500',
+      'dev.d4.name': 'Mac Studio', 'dev.d4.spec': 'M4 Max · 64–128 GB', 'dev.d4.team': 'Silent, for the director’s office', 'dev.d4.models': 'Runs models up to 70B', 'dev.d4.price': 'from $4,500',
+      'dev.d5.name': 'Multi-GPU server', 'dev.d5.spec': '2–8 × GPU · clusters', 'dev.d5.team': '100+ users', 'dev.d5.models': 'Several models in parallel', 'dev.d5.price': 'made to order, from $15,000',
+      'dev.disclaimer': 'Hardware is supplied only as part of a deployment project: legally, with paperwork, warranty and turnkey setup. Prices are indicative and depend on configuration and the exchange rate.',
+
+      /* Portfolio */
+      'port.title': 'Portfolio',
+      'port.h1': 'What we’ve already shipped',
+      'port.lead': 'Websites, an AI sommelier, bots and check-in systems — live. Open any case in a new tab.',
+      'port.sec.urartu': 'Urartu cases',
+      'port.sec.hotels': 'Hotel promo sites',
+      'port.sec.events': 'Events & ticketing',
+      'port.sec.bots': 'Telegram bots',
+      'case.megradzor.name': 'Megradzor Cheese Dairy', 'case.megradzor.res': 'Dairy website with an AI sommelier — 17 restaurant leads in 2 weeks',
+      'case.machanents.name': 'Machanents Art Hotel', 'case.machanents.res': 'Art hotel near Etchmiadzin — its own SEO and direct booking',
+      'case.annabella.name': 'AnnaBella Boutique Hotel', 'case.annabella.res': 'Yerevan boutique hotel — editorial design of luxury travel magazines',
+      'case.olivia.name': 'Olivia guest house, Sevastopol', 'case.olivia.res': 'Rating ★9.9 · direct booking with no aggregator fees',
+      'case.alyans.name': 'Alyans guest house, Sevastopol', 'case.alyans.res': 'Rating ★9.8 · a premium promo site with direct enquiries',
+      'case.florentina.name': 'Florentina boutique hotel, Yalta', 'case.florentina.res': 'Tuscan flair by the seafront — original brand identity',
+      'case.zhemchuzhina.name': 'Zhemchuzhina Mysa, Gelendzhik', 'case.zhemchuzhina.res': 'Rating ★9.6 · a promo site built for direct booking',
+      'case.pushka.name': 'Pushka mini-hotel, Yalta', 'case.pushka.res': 'Nautical style, 2 minutes to the seafront',
+      'case.akva.name': 'Akva Villa, Krasnodar', 'case.akva.res': 'Bath-and-hotel complex, rating 5.0 · online booking',
+      'case.bidconf.name': 'BIDCONF 2026', 'case.bidconf.res': 'QR tickets and a web check-in scanner — 300+ guests served',
+      'case.orderbot.name': 'Order-monitoring bot', 'case.orderbot.res': 'Watches order boards and filters a good fit with AI',
 
       /* iOS shell */
       'ios.search': 'Search',
@@ -352,6 +492,9 @@
       'agents.h1': 'A team of AI agents at work',
       'agents.p': 'This is how a multi-agent system works: every agent owns a role, they hand tasks to each other and agree on the result. The same principle drives a deployment — one agent finds the answer in your policies, another checks a contract against your checklist, a third drafts the reply.',
       'agents.play': 'Launch the 3D office', 'agents.note': 'loads on click',
+      'agents.building': 'Building the office', 'agents.hint': '~5 MB · better on Wi-Fi',
+      'agents.retry': 'Try again',
+      'agents.fs': 'Fullscreen', 'agents.fsExit': 'Exit fullscreen',
       'agents.credit': 'Simulation: The Delegation, an open-source project, MIT license',
 
       /* Trash */
@@ -372,6 +515,7 @@
       /* Widgets */
       'w.contour.eb': 'Perimeter', 'w.contour.cap': 'data sent outside',
       'w.speed.eb': 'Speed', 'w.speed.val': '10&nbsp;sec', 'w.speed.cap': 'an answer from policy instead of 10 minutes',
+      'w.speed.sub': 'runs 24/7, no days off',
       'w.cal.mark': '● Demo', 'w.cal.cta': 'Book', 'w.cal.ctaSub': 'a 30-min call →',
       'w.fines.eb': 'Fines · 152-FZ', 'w.fines.val': 'up&nbsp;to&nbsp;₽500M',
       'w.fines.cap': 'revenue-based fine for a repeat personal-data leak',

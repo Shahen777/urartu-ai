@@ -103,18 +103,111 @@
     stage.appendChild(box);
   }
 
-  function ensureAgentsFrame() {
-    var stage = document.getElementById('agentsStage');
-    if (!stage || stage.querySelector('iframe') || stage.querySelector('.agents__poster')) return;
-    if (!agentsSupported()) { showAgentsFallback(stage); return; }
+  /* Сплэш «Строим офис…»: тёмная заставка поверх iframe, растворяется по load.
+     Если iframe не загрузился за 20 с — на сплэше появляется кнопка «Ещё раз». */
+  function buildAgentsSplash(stage) {
+    var sp = document.createElement('div');
+    sp.className = 'agents__splash';
+    sp.setAttribute('role', 'status');
+    sp.innerHTML =
+      '<div class="agents__splash-in">' +
+        '<svg class="agents__bot" width="58" height="58" viewBox="0 0 48 48" aria-hidden="true" ' +
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<rect x="11" y="16" width="26" height="20" rx="5"/>' +
+        '<line x1="24" y1="9" x2="24" y2="16"/><circle cx="24" cy="7" r="2.2" fill="currentColor" stroke="none"/>' +
+        '<circle cx="19" cy="26" r="2.4" fill="currentColor" stroke="none"/><circle cx="29" cy="26" r="2.4" fill="currentColor" stroke="none"/>' +
+        '<path d="M20 31.5h8"/><line x1="8" y1="24" x2="11" y2="24"/><line x1="37" y1="24" x2="40" y2="24"/></svg>' +
+        '<p class="agents__splash-t"><span class="agents__lbl"></span>' +
+          '<span class="agents__dots" aria-hidden="true"><i></i><i></i><i></i></span></p>' +
+        '<p class="agents__splash-sub"></p>' +
+        '<button type="button" class="agents__retry" hidden></button>' +
+      '</div>';
+    sp.querySelector('.agents__lbl').textContent = tr('agents.building');
+    sp.querySelector('.agents__splash-sub').textContent = tr('agents.hint');
+    sp.querySelector('.agents__retry').textContent = tr('agents.retry');
+    return sp;
+  }
+
+  function loadAgentsFrame(stage) {
+    var oldFrame = stage.querySelector('iframe');
+    if (oldFrame) oldFrame.remove();
+    var splash = stage.querySelector('.agents__splash');
+    if (!splash) { splash = buildAgentsSplash(stage); stage.appendChild(splash); }
+    splash.classList.remove('is-gone');
+    var retry = splash.querySelector('.agents__retry');
+    retry.hidden = true;
+
     var frame = document.createElement('iframe');
     frame.src = 'delegation/index.html';
-    frame.title = document.documentElement.lang === 'en'
+    frame.title = lang() === 'en'
       ? 'The Delegation — 3D office of AI agents'
       : 'The Delegation — 3D-офис ИИ-агентов';
     frame.allow = 'fullscreen';
     frame.loading = 'lazy';
-    stage.appendChild(frame);
+
+    var done = false;
+    var timer = setTimeout(function () { if (!done) retry.hidden = false; }, 20000);
+    frame.addEventListener('load', function () {
+      if (done) return; done = true;
+      clearTimeout(timer);
+      splash.classList.add('is-gone');
+      setTimeout(function () { if (splash.parentNode) splash.remove(); }, reduceMotion ? 0 : 450);
+    });
+    stage.insertBefore(frame, splash);
+    retry.onclick = function () { loadAgentsFrame(stage); };
+  }
+
+  function ensureAgentsFrame() {
+    var stage = document.getElementById('agentsStage');
+    if (!stage || stage.querySelector('iframe') || stage.querySelector('.agents__poster')) return;
+    if (!agentsSupported()) { showAgentsFallback(stage); return; }
+    loadAgentsFrame(stage);
+  }
+
+  /* «На весь экран» для 3D-офиса: нативный Fullscreen API по контейнеру,
+     с запасным вариантом (класс is-cover) там, где API недоступен (iOS Safari). */
+  function agentsFsActive() {
+    var fe = document.fullscreenElement || document.webkitFullscreenElement;
+    var win = document.getElementById('win-agents');
+    return (fe && document.getElementById('agentsStage') &&
+            (fe === document.getElementById('agentsStage') || fe.contains(document.getElementById('agentsStage'))))
+      || (win && win.classList.contains('is-cover'));
+  }
+  function setFsLabel() {
+    var btn = document.getElementById('agentsFs');
+    if (!btn) return;
+    var span = btn.querySelector('span');
+    var active = agentsFsActive();
+    if (span) span.textContent = active ? tr('agents.fsExit') : tr('agents.fs');
+    btn.setAttribute('aria-label', active ? tr('agents.fsExit') : tr('agents.fs'));
+  }
+  function toggleAgentsFs() {
+    var stage = document.getElementById('agentsStage');
+    var win = document.getElementById('win-agents');
+    if (!stage) return;
+    var fe = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fe) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      return;
+    }
+    if (win && win.classList.contains('is-cover')) { win.classList.remove('is-cover'); setFsLabel(); return; }
+    var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    if (req) { try { req.call(stage); } catch (e) { if (win) win.classList.add('is-cover'); setFsLabel(); } }
+    else if (win) { win.classList.add('is-cover'); setFsLabel(); }
+  }
+  function initAgentsFs() {
+    var btn = document.getElementById('agentsFs');
+    if (btn) btn.addEventListener('click', toggleAgentsFs);
+    document.addEventListener('fullscreenchange', setFsLabel);
+    document.addEventListener('webkitfullscreenchange', setFsLabel);
+    document.addEventListener('i18n:change', setFsLabel);
+  }
+
+  /* iOS-переход открытия приложения: пока открыт хотя бы один лист,
+     springboard отъезжает назад (scale .96) и темнеет, док/поиск прячутся */
+  function updateAppOpen() {
+    var any = document.querySelector('.win.is-open:not(.is-closing)');
+    document.documentElement.classList.toggle('app-open', !!any && isMobile());
   }
 
   /* триггеры, вернувшие фокус после закрытия окна (доступность диалогов) */
@@ -137,6 +230,7 @@
     var d = dockApp(id);
     if (d) d.classList.add('is-open');
     if (id === 'win-terminal') runTerminal();
+    updateAppOpen();
     /* только для действий пользователя: переносим фокус в окно и запоминаем,
        куда его вернуть. Автооткрытие README при загрузке фокус не трогает. */
     if (trigger) { lastTrigger[id] = trigger; moveFocus(win); }
@@ -148,6 +242,7 @@
     win.classList.add('is-closing');
     win.removeAttribute('aria-modal');
     activateTop();
+    updateAppOpen();
     var done = function () {
       win.classList.remove('is-open', 'is-closing');
       win.style.transform = '';
@@ -190,7 +285,7 @@
     var dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
 
     bar.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('.tl') || e.target.closest('.win-back')) return;
+      if (e.target.closest('.tl') || e.target.closest('.win-back') || e.target.closest('.win-fs')) return;
       if (isMobile()) return;
       bringToFront(win);
       dragging = true;
@@ -222,27 +317,30 @@
     bar.addEventListener('pointercancel', end);
   }
 
-  /* ---------- МОБИЛЬНЫЙ СВАЙП-ВНИЗ (закрытие листа) ---------- */
+  /* ---------- МОБИЛЬНЫЙ СВАЙП-ВНИЗ (закрытие листа) ----------
+     Тач — через touch events (passive:false), иначе iOS Safari отменяет
+     жест pointercancel'ом; pointer events остаются для мыши. */
   function initSheetSwipe(win) {
     var handle = win.querySelector('.win__grab');
     var bar = win.querySelector('.win__bar');
     if (!handle) return;
-    var startY = 0, dy = 0, active = false, t0 = 0;
+    var startY = 0, dy = 0, active = false, t0 = 0, touching = false;
 
-    function down(e) {
-      if (!isMobile()) return;
-      if (e.target.closest && e.target.closest('.tl')) return;
-      active = true; startY = e.clientY; dy = 0; t0 = Date.now();
+    function start(y, target) {
+      if (!isMobile()) return false;
+      if (target && target.closest && target.closest('.tl')) return false;
+      active = true; startY = y; dy = 0; t0 = Date.now();
       win.style.transition = 'none';
-      try { this.setPointerCapture(e.pointerId); } catch (err) {}
+      return true;
     }
-    function move(e) {
+    function move(y, e) {
       if (!active) return;
-      dy = e.clientY - startY;
+      dy = y - startY;
       if (dy < 0) dy = 0;
+      if (e && e.cancelable) e.preventDefault();
       win.style.transform = 'translateY(' + dy + 'px)';
     }
-    function up(e) {
+    function finish() {
       if (!active) return;
       active = false;
       win.style.transition = '';
@@ -254,12 +352,38 @@
         win.style.transform = '';
       }
     }
+
     [handle, bar].forEach(function (el) {
       if (!el) return;
-      el.addEventListener('pointerdown', down);
-      el.addEventListener('pointermove', move);
-      el.addEventListener('pointerup', up);
-      el.addEventListener('pointercancel', up);
+      /* тач */
+      el.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        touching = start(e.touches[0].clientY, e.target);
+      }, { passive: true });
+      el.addEventListener('touchmove', function (e) {
+        if (!touching) return;
+        move(e.touches[0].clientY, e);
+      }, { passive: false });
+      var tEnd = function () { if (!touching) return; touching = false; finish(); };
+      el.addEventListener('touchend', tEnd);
+      el.addEventListener('touchcancel', tEnd);
+
+      /* мышь/перо */
+      el.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'touch' || touching) return;
+        if (start(e.clientY, e.target)) { try { el.setPointerCapture(e.pointerId); } catch (err) {} }
+      });
+      el.addEventListener('pointermove', function (e) {
+        if (e.pointerType === 'touch' || touching) return;
+        move(e.clientY, e);
+      });
+      var pEnd = function (e) {
+        if (e.pointerType === 'touch' || touching) return;
+        try { el.releasePointerCapture(e.pointerId); } catch (err) {}
+        finish();
+      };
+      el.addEventListener('pointerup', pEnd);
+      el.addEventListener('pointercancel', pEnd);
     });
   }
 
@@ -362,6 +486,7 @@
     wins[i].setAttribute('tabindex', '-1'); // окно принимает фокус при открытии
     initDrag(wins[i]); initFocus(wins[i]); initControls(wins[i]); initSheetSwipe(wins[i]); initResize(wins[i]);
   }
+  initAgentsFs();
 
   /* ---------- ТРИГГЕРЫ ОТКРЫТИЯ ---------- */
   document.addEventListener('click', function (e) {
@@ -437,6 +562,7 @@
       });
     }
     wasMobile = nowMobile;
+    updateAppOpen();
   }
   var _rzT = null;
   window.addEventListener('resize', function () { clearTimeout(_rzT); _rzT = setTimeout(onViewportChange, 120); });
@@ -733,42 +859,80 @@
       updateDots();
     }
 
-    track.addEventListener('pointerdown', function (e) {
-      if (!isMobile()) return;
+    /* Жест ведём через TOUCH EVENTS (passive:false + preventDefault на
+       горизонтали): iOS Safari отбирает горизонтальный жест у pointer-событий
+       (шлёт pointercancel), поэтому на тач полагаться на них нельзя.
+       Pointer events остаются только для мыши/пера. */
+    function dragStart(x, y) {
       dragging = true; decided = false; horiz = false; justSwiped = false;
-      startX = e.clientX; startY = e.clientY; t0 = Date.now();
-      w = pager.clientWidth; pid = e.pointerId;
+      startX = x; startY = y; t0 = Date.now();
+      w = pager.clientWidth;
       track.style.transition = 'none';
-    });
-    track.addEventListener('pointermove', function (e) {
+    }
+    function dragMove(x, y, e) {
       if (!dragging) return;
-      var dx = e.clientX - startX, dy = e.clientY - startY;
+      var dx = x - startX, dy = y - startY;
       if (!decided) {
         if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
           decided = true;
           horiz = Math.abs(dx) > Math.abs(dy);
-          if (horiz) { try { track.setPointerCapture(pid); } catch (err) {} }
         } else return;
       }
       if (!horiz) return;
-      if (e.cancelable) e.preventDefault();
+      if (e && e.cancelable) e.preventDefault();     // забрать жест у браузера
       var base = -cur * w, t = base + dx, min = -(PAGES - 1) * w;
       if (t > 0) t = t * 0.35;                       // резинка у левого края
       else if (t < min) t = min + (t - min) * 0.35;  // резинка у правого края
       track.style.transform = 'translateX(' + t + 'px)';
-    });
-    function endDrag(e) {
+    }
+    function dragEnd(x) {
       if (!dragging) return;
       dragging = false;
-      try { track.releasePointerCapture(pid); } catch (err) {}
-      if (!decided || !horiz) return;
-      var dx = e.clientX - startX;
+      if (!decided || !horiz) { track.style.transition = ''; return; }
+      var dx = x - startX;
       var v = dx / Math.max(Date.now() - t0, 1);
       if (Math.abs(dx) > 8) justSwiped = true;
       var target = cur;
       if (dx < -60 || v < -0.5) target = cur + 1;
       else if (dx > 60 || v > 0.5) target = cur - 1;
       go(target, true);
+    }
+
+    /* --- тач: основной путь на телефоне --- */
+    var touching = false;
+    track.addEventListener('touchstart', function (e) {
+      if (!isMobile() || e.touches.length !== 1) return;
+      touching = true;
+      dragStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    track.addEventListener('touchmove', function (e) {
+      if (!touching) return;
+      dragMove(e.touches[0].clientX, e.touches[0].clientY, e);
+    }, { passive: false });
+    function onTouchEnd(e) {
+      if (!touching) return;
+      touching = false;
+      dragEnd(e.changedTouches[0].clientX);
+    }
+    track.addEventListener('touchend', onTouchEnd);
+    track.addEventListener('touchcancel', onTouchEnd);
+
+    /* --- мышь/перо: pointer events (узкое окно на десктопе) --- */
+    track.addEventListener('pointerdown', function (e) {
+      if (!isMobile() || e.pointerType === 'touch' || touching) return;
+      pid = e.pointerId;
+      dragStart(e.clientX, e.clientY);
+    });
+    track.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch' || touching || !dragging) return;
+      var wasHoriz = horiz;
+      dragMove(e.clientX, e.clientY, e);
+      if (horiz && !wasHoriz) { try { track.setPointerCapture(pid); } catch (err) {} }
+    });
+    function endDrag(e) {
+      if (e.pointerType === 'touch' || touching) return;
+      try { track.releasePointerCapture(pid); } catch (err) {}
+      dragEnd(e.clientX);
     }
     track.addEventListener('pointerup', endDrag);
     track.addEventListener('pointercancel', endDrag);
@@ -858,30 +1022,62 @@
     }
     function toggle() { open ? hide() : show(); }
 
-    /* --- жест: тянем вниз из правого верхнего угла --- */
+    /* --- жест: тянем вниз из правого верхнего угла ---
+       Тач — через touch events (passive:false + preventDefault):
+       iOS Safari иначе отбирает жест (pointercancel) под системную шторку.
+       Pointer events — для мыши. --- */
     if (grab) {
-      var gy = 0, gActive = false;
-      grab.addEventListener('pointerdown', function (e) {
-        gActive = true; gy = e.clientY;
+      var gy = 0, gActive = false, gTouching = false;
+      var gStart = function (y) {
+        gActive = true; gy = y;
         ccx.hidden = false;
         ccx.classList.add('is-dragging');
-        try { grab.setPointerCapture(e.pointerId); } catch (err) {}
-      });
-      grab.addEventListener('pointermove', function (e) {
+      };
+      var gMove = function (y, e) {
         if (!gActive) return;
-        var dy = Math.max(0, e.clientY - gy);
+        var dy = Math.max(0, y - gy);
         var k = Math.min(dy / SHEET_H, 1);
         ccx.style.opacity = k.toFixed(3);
         sheet.style.transform = 'translateY(' + ((k - 1) * 18).toFixed(1) + 'px)';
-        if (e.cancelable) e.preventDefault();
-      });
-      var gEnd = function (e) {
+        if (e && e.cancelable) e.preventDefault();
+      };
+      var gFinish = function (y) {
         if (!gActive) return;
         gActive = false;
         ccx.classList.remove('is-dragging');
+        if (y - gy > 60) show(); else hide();
+      };
+
+      grab.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        gTouching = true;
+        gStart(e.touches[0].clientY);
+      }, { passive: true });
+      grab.addEventListener('touchmove', function (e) {
+        if (!gTouching) return;
+        gMove(e.touches[0].clientY, e);
+      }, { passive: false });
+      var gTEnd = function (e) {
+        if (!gTouching) return;
+        gTouching = false;
+        gFinish(e.changedTouches[0].clientY);
+      };
+      grab.addEventListener('touchend', gTEnd);
+      grab.addEventListener('touchcancel', gTEnd);
+
+      grab.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'touch' || gTouching) return;
+        gStart(e.clientY);
+        try { grab.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+      grab.addEventListener('pointermove', function (e) {
+        if (e.pointerType === 'touch' || gTouching) return;
+        gMove(e.clientY, e);
+      });
+      var gEnd = function (e) {
+        if (e.pointerType === 'touch' || gTouching) return;
         try { grab.releasePointerCapture(e.pointerId); } catch (err) {}
-        var dy = e.clientY - gy;
-        if (dy > 60) show(); else hide();
+        gFinish(e.clientY);
       };
       grab.addEventListener('pointerup', gEnd);
       grab.addEventListener('pointercancel', gEnd);
@@ -891,24 +1087,56 @@
     ccx.addEventListener('click', function (e) { if (e.target === ccx) hide(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) hide(); });
 
-    var sy = 0, sActive = false;
-    sheet.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('button') || e.target.closest('.ccx__slider')) return;
-      sActive = true; sy = e.clientY;
+    /* свайп вверх по панели — тоже на touch events (см. комментарий выше) */
+    var sy = 0, sActive = false, sTouching = false;
+    var sStart = function (y, target) {
+      if (target.closest('button') || target.closest('.ccx__slider')) return false;
+      sActive = true; sy = y;
       ccx.classList.add('is-dragging');
-    });
-    sheet.addEventListener('pointermove', function (e) {
+      return true;
+    };
+    var sMove = function (y, e) {
       if (!sActive) return;
-      var dy = Math.min(0, e.clientY - sy);
+      var dy = Math.min(0, y - sy);
+      if (e && e.cancelable) e.preventDefault();
       sheet.style.transform = 'translateY(' + dy + 'px)';
       ccx.style.opacity = String(Math.max(0, 1 + dy / SHEET_H));
-    });
-    var sEnd = function (e) {
+    };
+    var sFinish = function (y) {
       if (!sActive) return;
       sActive = false;
       ccx.classList.remove('is-dragging');
-      if (e.clientY - sy < -50) hide();
+      if (y - sy < -50) hide();
       else { sheet.style.transform = ''; ccx.style.opacity = ''; }
+    };
+
+    sheet.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) return;
+      sTouching = sStart(e.touches[0].clientY, e.target);
+    }, { passive: true });
+    sheet.addEventListener('touchmove', function (e) {
+      if (!sTouching) return;
+      sMove(e.touches[0].clientY, e);
+    }, { passive: false });
+    var sTEnd = function (e) {
+      if (!sTouching) return;
+      sTouching = false;
+      sFinish(e.changedTouches[0].clientY);
+    };
+    sheet.addEventListener('touchend', sTEnd);
+    sheet.addEventListener('touchcancel', sTEnd);
+
+    sheet.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'touch' || sTouching) return;
+      sStart(e.clientY, e.target);
+    });
+    sheet.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch' || sTouching) return;
+      sMove(e.clientY, e);
+    });
+    var sEnd = function (e) {
+      if (e.pointerType === 'touch' || sTouching) return;
+      sFinish(e.clientY);
     };
     sheet.addEventListener('pointerup', sEnd);
     sheet.addEventListener('pointercancel', sEnd);
@@ -970,14 +1198,33 @@
         apply(MINV + k * (100 - MINV));
       }
 
-      var sliding = false;
+      var sliding = false, slTouching = false;
+      slider.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        slTouching = true; sliding = true;
+        fromY(e.touches[0].clientY);
+      }, { passive: true });
+      slider.addEventListener('touchmove', function (e) {
+        if (!slTouching) return;
+        if (e.cancelable) e.preventDefault();
+        fromY(e.touches[0].clientY);
+      }, { passive: false });
+      var slTEnd = function () { slTouching = false; sliding = false; };
+      slider.addEventListener('touchend', slTEnd);
+      slider.addEventListener('touchcancel', slTEnd);
+
       slider.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'touch' || slTouching) return;
         sliding = true; fromY(e.clientY);
         try { slider.setPointerCapture(e.pointerId); } catch (err) {}
         e.preventDefault();
       });
-      slider.addEventListener('pointermove', function (e) { if (sliding) fromY(e.clientY); });
+      slider.addEventListener('pointermove', function (e) {
+        if (e.pointerType === 'touch' || slTouching) return;
+        if (sliding) fromY(e.clientY);
+      });
       var slEnd = function (e) {
+        if (e.pointerType === 'touch' || slTouching) return;
         if (!sliding) return;
         sliding = false;
         try { slider.releasePointerCapture(e.pointerId); } catch (err) {}
