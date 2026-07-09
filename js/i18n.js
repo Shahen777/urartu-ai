@@ -118,6 +118,11 @@
       'mail.phone': 'Телефон', 'mail.email': 'Почта',
       'mail.note': 'Отвечаем в течение рабочего дня',
 
+      /* iOS-оболочка */
+      'ios.search': 'Поиск',
+      'ccx.full': 'На весь экран', 'ccx.fullHint': 'Скрыть панели браузера',
+      'ccx.callHint': 'Аудио или видео из браузера',
+
       /* Звонок */
       'call.title': 'Звонок', 'call.short': 'Позвонить',
       'call.role': 'Urartu AI · внедрение локального ИИ',
@@ -304,6 +309,11 @@
       'mail.p': '30 minutes online: we’ll show a working assistant, walk through your process and honestly tell you whether on-premise AI will help you — and what it takes.',
       'mail.phone': 'Phone', 'mail.email': 'Email',
       'mail.note': 'We reply within one business day',
+
+      /* iOS shell */
+      'ios.search': 'Search',
+      'ccx.full': 'Full screen', 'ccx.fullHint': 'Hide browser chrome',
+      'ccx.callHint': 'Audio or video from the browser',
 
       /* Call */
       'call.title': 'Call', 'call.short': 'Call',

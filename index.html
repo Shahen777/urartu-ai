@@ -146,12 +146,15 @@
       <circle cx="8.5" cy="11.2" r="1" fill="currentColor"/>
       <line x1="1.5" y1="1.5" x2="15.5" y2="12" stroke="#F3350C" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
-    <!-- батарея -->
-    <svg class="ios-batt" width="26" height="13" viewBox="0 0 26 13" aria-hidden="true">
-      <rect x="0.5" y="0.5" width="22" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1" opacity=".5"/>
-      <rect x="2" y="2" width="17" height="9" rx="1.5" fill="currentColor"/>
-      <rect x="24" y="4" width="1.6" height="5" rx=".8" fill="currentColor" opacity=".5"/>
-    </svg>
+    <!-- батарея с процентами, как на iPhone -->
+    <span class="ios-batt-wrap">
+      <span class="ios-batt-pct" id="iosBattPct">100</span>
+      <svg class="ios-batt" width="26" height="13" viewBox="0 0 26 13" aria-hidden="true">
+        <rect x="0.5" y="0.5" width="22" height="12" rx="3.4" fill="none" stroke="currentColor" stroke-width="1" opacity=".45"/>
+        <rect x="2" y="2" width="19" height="9" rx="2" fill="currentColor"/>
+        <rect x="24" y="4.2" width="1.6" height="4.6" rx=".8" fill="currentColor" opacity=".45"/>
+      </svg>
+    </span>
     <button class="ios-cc" id="iosCC" aria-label="Пункт управления">
       <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true">
         <rect x="2.5" y="3.5" width="15" height="4" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
@@ -162,6 +165,12 @@
     </button>
   </span>
 </div>
+
+<!-- зона перехвата свайпа вниз из правого верхнего угла -->
+<div class="cc-grab" id="ccGrab" aria-hidden="true"></div>
+
+<!-- затемнение экрана (ползунок «яркость») -->
+<div class="screen-dim" id="screenDim" aria-hidden="true"></div>
 
 <!-- ================= МЕНЮ-БАР ================= -->
 <div class="menubar" aria-label="Меню системы">
@@ -650,10 +659,104 @@
   </nav>
 </div>
 
-<!-- индикатор страниц (мобильный, над доком) -->
+<!-- индикатор страниц (мобильный, над строкой поиска) -->
 <div class="pager-dots" id="pagerDots" role="tablist" aria-label="Страницы">
   <button class="is-active" data-page="0" type="button" aria-label="Приложения"></button>
   <button data-page="1" type="button" aria-label="Виджеты"></button>
+</div>
+
+<!-- строка поиска над доком (мобильный) -->
+<button class="ios-search" id="iosSearch" type="button" data-win="win-assistant" aria-label="Спросить ассистента">
+  <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <circle cx="6.8" cy="6.8" r="4.6"/><line x1="10.4" y1="10.4" x2="14" y2="14"/>
+  </svg>
+  <span data-i18n="ios.search">Поиск</span>
+</button>
+
+<!-- индикатор «домой» (мобильный) -->
+<div class="ios-home" aria-hidden="true"></div>
+
+<!-- ============ ПУНКТ УПРАВЛЕНИЯ iOS (свайп вниз из правого верхнего угла) ============ -->
+<div class="ccx" id="ccx" role="dialog" aria-modal="true" aria-label="Пункт управления" hidden>
+  <div class="ccx__sheet" id="ccxSheet">
+    <div class="ccx__grabber" aria-hidden="true"></div>
+
+    <div class="ccx__grid">
+
+      <!-- связь: Wi-Fi выключен (и это наше УТП) -->
+      <div class="ccx__group">
+        <button class="ccx__toggle is-off" id="ccxWifi" type="button" aria-pressed="false" aria-label="Wi-Fi выключен — ассистенту интернет не нужен">
+          <svg width="26" height="21" viewBox="0 0 17 13" aria-hidden="true">
+            <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M1.5 4A10 10 0 0 1 15.5 4"/><path d="M4 6.4a6.4 6.4 0 0 1 9 0"/><path d="M6.4 8.8a3 3 0 0 1 4.2 0"/>
+            </g>
+            <circle cx="8.5" cy="11.2" r="1" fill="currentColor"/>
+            <line x1="1.5" y1="1.5" x2="15.5" y2="12" stroke="#FF453A" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <button class="ccx__toggle is-on" id="ccxLocal" type="button" aria-pressed="true" aria-label="Локальный режим включён">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2 4 5.5v5.8c0 4.6 3.4 8.9 8 10.7 4.6-1.8 8-6.1 8-10.7V5.5L12 2zm0 5a2.6 2.6 0 0 1 2.6 2.6c0 1-.6 1.9-1.4 2.3v2.6a1.2 1.2 0 0 1-2.4 0v-2.6A2.6 2.6 0 0 1 12 7z"/>
+          </svg>
+        </button>
+
+        <button class="ccx__toggle" id="ccxTheme" type="button" aria-label="Переключить тему">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-16a1 1 0 0 1 1 1v1.5a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 17a1 1 0 0 1 1 1v1.5a1 1 0 1 1-2 0V20a1 1 0 0 1 1-1zM3 12a1 1 0 0 1 1-1h1.5a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm15.5 0a1 1 0 0 1 1-1H21a1 1 0 1 1 0 2h-1.5a1 1 0 0 1-1-1zM5.6 5.6a1 1 0 0 1 1.4 0l1 1a1 1 0 0 1-1.4 1.5l-1-1.1a1 1 0 0 1 0-1.4zm10.4 10.4a1 1 0 0 1 1.4 0l1 1a1 1 0 1 1-1.4 1.4l-1-1a1 1 0 0 1 0-1.4zM18.4 5.6a1 1 0 0 1 0 1.4l-1 1A1 1 0 0 1 16 6.6l1-1a1 1 0 0 1 1.4 0zM8 16a1 1 0 0 1 0 1.4l-1 1a1 1 0 1 1-1.4-1.4l1-1a1 1 0 0 1 1.4 0z"/>
+          </svg>
+        </button>
+
+        <button class="ccx__toggle" id="ccxLang" type="button" aria-label="Переключить язык">
+          <span style="font-size:15px;font-weight:700" id="ccxLangLabel">EN</span>
+        </button>
+      </div>
+
+      <!-- яркость -->
+      <div class="ccx__slider" id="ccxBright" role="slider" tabindex="0"
+           aria-label="Яркость" aria-valuemin="30" aria-valuemax="100" aria-valuenow="100" aria-orientation="vertical">
+        <div class="ccx__fill" id="ccxBrightFill" style="--fill:100%"></div>
+        <span class="ccx__slider-ic" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="12" r="4.6"/>
+            <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <line x1="12" y1="2.6" x2="12" y2="4.6"/><line x1="12" y1="19.4" x2="12" y2="21.4"/>
+              <line x1="2.6" y1="12" x2="4.6" y2="12"/><line x1="19.4" y1="12" x2="21.4" y2="12"/>
+              <line x1="5.6" y1="5.6" x2="7" y2="7"/><line x1="17" y1="17" x2="18.4" y2="18.4"/>
+              <line x1="18.4" y1="5.6" x2="17" y2="7"/><line x1="7" y1="17" x2="5.6" y2="18.4"/>
+            </g>
+          </svg>
+        </span>
+      </div>
+
+      <!-- полный экран -->
+      <button class="ccx__tile" id="ccxFull" type="button">
+        <span class="ccx__tile-ic" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/>
+          </svg>
+        </span>
+        <span class="ccx__tile-txt">
+          <span class="ccx__tile-t" data-i18n="ccx.full">На весь экран</span>
+          <span class="ccx__tile-v" data-i18n="ccx.fullHint">Скрыть панели браузера</span>
+        </span>
+      </button>
+
+      <!-- позвонить -->
+      <button class="ccx__tile" id="ccxCall" type="button" data-win="win-call">
+        <span class="ccx__tile-ic" aria-hidden="true" style="background:#30D158">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1z"/>
+          </svg>
+        </span>
+        <span class="ccx__tile-txt">
+          <span class="ccx__tile-t" data-i18n="call.short">Позвонить</span>
+          <span class="ccx__tile-v" data-i18n="ccx.callHint">Аудио или видео из браузера</span>
+        </span>
+      </button>
+
+    </div>
+  </div>
 </div>
 
 <!-- ================= ДОК ================= -->

@@ -784,6 +784,14 @@
       })(d);
     }
 
+    /* стрелки — клавиатурная альтернатива свайпу */
+    document.addEventListener('keydown', function (e) {
+      if (!isMobile()) return;
+      if (e.target.closest && e.target.closest('input, textarea, .win.is-open')) return;
+      if (e.key === 'ArrowRight') go(cur + 1, true);
+      else if (e.key === 'ArrowLeft') go(cur - 1, true);
+    });
+
     function sync() { if (isMobile()) go(cur, false); else clearTransform(); }
     window.addEventListener('resize', sync);
     sync();
@@ -814,6 +822,193 @@
      чтобы не удлинять первый отрисованный кадр. Дальше её ведёт IntersectionObserver. */
   var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 200); };
   idle(function () { if (assistantMayRun()) runAssistant(); });
+
+  /* ============================================================
+     ПУНКТ УПРАВЛЕНИЯ iOS
+     Открывается свайпом вниз из правого верхнего угла (как на iPhone)
+     или кнопкой в статус-баре. Внутри: связь, тема, язык, яркость,
+     полноэкранный режим и звонок.
+     ============================================================ */
+  (function () {
+    var ccx = document.getElementById('ccx');
+    var sheet = document.getElementById('ccxSheet');
+    var grab = document.getElementById('ccGrab');
+    var dim = document.getElementById('screenDim');
+    if (!ccx || !sheet) return;
+
+    var SHEET_H = 420;   // ориентировочная высота панели для расчёта хода пальца
+    var open = false;
+
+    function show() {
+      ccx.hidden = false;
+      /* перерисовка нужна, чтобы сработал переход из hidden */
+      void ccx.offsetHeight;
+      ccx.classList.add('is-open');
+      ccx.classList.remove('is-dragging');
+      sheet.style.transform = '';
+      ccx.style.opacity = '';
+      open = true;
+    }
+    function hide() {
+      ccx.classList.remove('is-open', 'is-dragging');
+      sheet.style.transform = '';
+      ccx.style.opacity = '';
+      open = false;
+      window.setTimeout(function () { if (!open) ccx.hidden = true; }, 240);
+    }
+    function toggle() { open ? hide() : show(); }
+
+    /* --- жест: тянем вниз из правого верхнего угла --- */
+    if (grab) {
+      var gy = 0, gActive = false;
+      grab.addEventListener('pointerdown', function (e) {
+        gActive = true; gy = e.clientY;
+        ccx.hidden = false;
+        ccx.classList.add('is-dragging');
+        try { grab.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+      grab.addEventListener('pointermove', function (e) {
+        if (!gActive) return;
+        var dy = Math.max(0, e.clientY - gy);
+        var k = Math.min(dy / SHEET_H, 1);
+        ccx.style.opacity = k.toFixed(3);
+        sheet.style.transform = 'translateY(' + ((k - 1) * 18).toFixed(1) + 'px)';
+        if (e.cancelable) e.preventDefault();
+      });
+      var gEnd = function (e) {
+        if (!gActive) return;
+        gActive = false;
+        ccx.classList.remove('is-dragging');
+        try { grab.releasePointerCapture(e.pointerId); } catch (err) {}
+        var dy = e.clientY - gy;
+        if (dy > 60) show(); else hide();
+      };
+      grab.addEventListener('pointerup', gEnd);
+      grab.addEventListener('pointercancel', gEnd);
+    }
+
+    /* --- закрытие: тап по фону, свайп вверх по панели, Esc --- */
+    ccx.addEventListener('click', function (e) { if (e.target === ccx) hide(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) hide(); });
+
+    var sy = 0, sActive = false;
+    sheet.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('button') || e.target.closest('.ccx__slider')) return;
+      sActive = true; sy = e.clientY;
+      ccx.classList.add('is-dragging');
+    });
+    sheet.addEventListener('pointermove', function (e) {
+      if (!sActive) return;
+      var dy = Math.min(0, e.clientY - sy);
+      sheet.style.transform = 'translateY(' + dy + 'px)';
+      ccx.style.opacity = String(Math.max(0, 1 + dy / SHEET_H));
+    });
+    var sEnd = function (e) {
+      if (!sActive) return;
+      sActive = false;
+      ccx.classList.remove('is-dragging');
+      if (e.clientY - sy < -50) hide();
+      else { sheet.style.transform = ''; ccx.style.opacity = ''; }
+    };
+    sheet.addEventListener('pointerup', sEnd);
+    sheet.addEventListener('pointercancel', sEnd);
+
+    var iosCC = document.getElementById('iosCC');
+    if (iosCC) iosCC.addEventListener('click', toggle);
+
+    /* --- тема --- */
+    var tTheme = document.getElementById('ccxTheme');
+    function syncTheme() {
+      if (!tTheme) return;
+      var light = currentTheme() === 'light';
+      tTheme.classList.toggle('is-on', light);
+    }
+    if (tTheme) tTheme.addEventListener('click', function () { toggleTheme(); syncTheme(); });
+    syncTheme();
+
+    /* --- язык --- */
+    var tLang = document.getElementById('ccxLang');
+    var lLabel = document.getElementById('ccxLangLabel');
+    function syncLang() {
+      if (lLabel) lLabel.textContent = (lang() === 'en') ? 'RU' : 'EN';
+    }
+    if (tLang) tLang.addEventListener('click', function () {
+      if (window.I18N && window.I18N.toggle) window.I18N.toggle();
+      syncLang();
+    });
+    syncLang();
+
+    /* --- Wi-Fi: всегда выключен, это и есть продукт --- */
+    var tWifi = document.getElementById('ccxWifi');
+    if (tWifi) tWifi.addEventListener('click', function () {
+      tWifi.animate(
+        [{ transform: 'translateX(0)' }, { transform: 'translateX(-4px)' },
+         { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }],
+        { duration: 260, easing: 'ease-out' }
+      );
+    });
+
+    /* --- яркость: затемняем экран поверх всего --- */
+    var slider = document.getElementById('ccxBright');
+    var fill = document.getElementById('ccxBrightFill');
+    if (slider && fill && dim) {
+      var MINV = 30;
+      var val = 100;
+
+      function apply(v) {
+        val = Math.max(MINV, Math.min(100, v));
+        fill.style.setProperty('--fill', val + '%');
+        /* 100 % → без затемнения; 30 % → 0.55 непрозрачности */
+        dim.style.setProperty('--dim', (((100 - val) / 70) * 0.55).toFixed(3));
+        slider.setAttribute('aria-valuenow', String(Math.round(val)));
+      }
+      function fromY(clientY) {
+        var r = slider.getBoundingClientRect();
+        var k = 1 - (clientY - r.top) / r.height;
+        apply(MINV + k * (100 - MINV));
+      }
+
+      var sliding = false;
+      slider.addEventListener('pointerdown', function (e) {
+        sliding = true; fromY(e.clientY);
+        try { slider.setPointerCapture(e.pointerId); } catch (err) {}
+        e.preventDefault();
+      });
+      slider.addEventListener('pointermove', function (e) { if (sliding) fromY(e.clientY); });
+      var slEnd = function (e) {
+        if (!sliding) return;
+        sliding = false;
+        try { slider.releasePointerCapture(e.pointerId); } catch (err) {}
+      };
+      slider.addEventListener('pointerup', slEnd);
+      slider.addEventListener('pointercancel', slEnd);
+      slider.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { apply(val + 5); e.preventDefault(); }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { apply(val - 5); e.preventDefault(); }
+      });
+      apply(100);
+    }
+
+    /* --- полноэкранный режим --- */
+    var tFull = document.getElementById('ccxFull');
+    if (tFull) tFull.addEventListener('click', function () {
+      var el = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        var req = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (req) req.call(el);
+      } else {
+        var exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) exit.call(document);
+      }
+      hide();
+    });
+
+    /* --- звонок --- */
+    var tCall = document.getElementById('ccxCall');
+    if (tCall) tCall.addEventListener('click', function () { hide(); openWindow('win-call', tCall); });
+
+    if (DEV) window.__ccx = { show: show, hide: hide, isOpen: function () { return open; } };
+  })();
 
   /* ============================================================
      ЗВОНОК ИЗ БРАУЗЕРА (аудио / видео)
