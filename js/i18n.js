@@ -455,6 +455,7 @@
       /* G4 — голос Секретаря */
       'voice.aria': 'Голосовой ввод — поговорить с Секретарём',
       'voice.listen': 'Говорите — я слушаю…',
+      'voice.nosr.say': 'Здравствуйте! Говорить я умею, но этот браузер не умеет меня слушать. Откройте сайт в Chrome или Safari — и поговорим.',
       'voice.nosr': 'Голосовой ввод работает в Chrome и Safari — в этом браузере нет API распознавания речи. Напишите текстом: отвечу так же.',
       'voice.denied': 'Микрофон не разрешён. Разрешите доступ в настройках браузера и нажмите микрофон снова.',
       'voice.err': 'Не расслышал. Нажмите микрофон и повторите, пожалуйста.',
@@ -968,6 +969,7 @@
       /* G4 — Secretary voice */
       'voice.aria': 'Voice input — talk to the Secretary',
       'voice.listen': 'Speak — I am listening…',
+      'voice.nosr.say': 'Hello! I can speak, but this browser cannot hear me. Open the site in Chrome or Safari and we will talk.',
       'voice.nosr': 'Voice input works in Chrome and Safari — this browser has no speech-recognition API. Type your message instead: I answer the same way.',
       'voice.denied': 'Microphone is not allowed. Grant access in the browser settings and press the mic again.',
       'voice.err': 'I did not catch that. Press the mic and repeat, please.',

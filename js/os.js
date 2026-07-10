@@ -2577,17 +2577,43 @@
       speakingNow = true;
       setStatus('ai.st.speak');
       var w = $('aiAvaWrap'); if (w) w.classList.add('is-talk');
-      var u = new SpeechSynthesisUtterance(text);
-      var v = pickVoice(); if (v) u.voice = v;
-      u.lang = (lang() === 'en') ? 'en-US' : 'ru-RU';
-      u.rate = 1.02; u.pitch = 1.0;
-      u.onend = u.onerror = function () {
+
+      var finished = false;
+      var finish = function () {
+        if (finished) return;
+        finished = true;
         speakingNow = false;
         if (w) w.classList.remove('is-talk');
         if (!on) return;
         if (then) then(); else listen();
       };
-      try { speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) { u.onend(); }
+
+      var say = function () {
+        var u = new SpeechSynthesisUtterance(text);
+        var v = pickVoice(); if (v) u.voice = v;
+        u.lang = (lang() === 'en') ? 'en-US' : 'ru-RU';
+        u.rate = 1.02; u.pitch = 1.0;
+        u.onend = u.onerror = finish;
+
+        var started = false;
+        u.onstart = function () { started = true; };
+        try {
+          speechSynthesis.resume();   // Chrome иногда «засыпает» в паузе
+          speechSynthesis.speak(u);
+        } catch (e) { finish(); return; }
+
+        /* Сторож: если фраза не зазвучала за 700 мс (браузер её проглотил) —
+           пробуем ещё раз, а затем не бросаем разговор молчащим. */
+        setTimeout(function () {
+          if (started || finished || !on) return;
+          try { speechSynthesis.resume(); speechSynthesis.speak(u); } catch (e) {}
+          setTimeout(function () { if (!started && !finished) finish(); }, 1200);
+        }, 700);
+      };
+
+      /* cancel() вплотную перед speak() в Chrome глотает фразу — даём кадр */
+      try { speechSynthesis.cancel(); } catch (e) {}
+      setTimeout(say, 60);
     }
 
     function stopRec() {
@@ -2666,9 +2692,44 @@
       })();
     }
 
+    /* Синтез речи браузер разрешает ТОЛЬКО внутри пользовательского жеста.
+       Наше приветствие звучит позже — после разрешения микрофона и гудка, —
+       и Chrome с Safari молча его глушат. Лечение: «разблокировать» синтез
+       синхронно в обработчике клика, произнеся пустую фразу. Дальше речь
+       работает всю сессию. */
+    var ttsUnlocked = false;
+    function unlockTTS() {
+      if (ttsUnlocked || !window.speechSynthesis) return;
+      try {
+        var u = new SpeechSynthesisUtterance(' ');
+        u.volume = 0; u.rate = 2;
+        speechSynthesis.speak(u);
+        speechSynthesis.getVoices();   // заодно прогреваем список голосов
+        ttsUnlocked = true;
+      } catch (e) {}
+    }
+
+    /* Короткая фраза без разговора: используется в фолбэках, чтобы посетитель
+       услышал живой голос, даже если распознавание речи в браузере недоступно. */
+    function sayOnce(text) {
+      if (!window.speechSynthesis) return;
+      try {
+        var u = new SpeechSynthesisUtterance(text);
+        var v = pickVoice(); if (v) u.voice = v;
+        u.lang = (lang() === 'en') ? 'en-US' : 'ru-RU';
+        speechSynthesis.resume();
+        speechSynthesis.speak(u);
+      } catch (e) {}
+    }
+
     function start() {
       if (on) return;
-      if (!SR) { showFb('voice.nosr'); return; }
+      unlockTTS();                     // строго синхронно, пока держится жест
+      if (!SR) {
+        showFb('voice.nosr');
+        setTimeout(function () { sayOnce(tr('voice.nosr.say')); }, 120);
+        return;
+      }
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showFb('voice.denied'); return; }
       var btn = $('aiCallBtn');
       if (btn) { btn.disabled = true; btn.classList.add('is-wait'); } // ждём разрешения микрофона
@@ -2746,7 +2807,14 @@
       document.addEventListener('i18n:change', function () {
         var t = $('aiFbText'); if (t && !fb.hidden && t.dataset.k) t.textContent = tr(t.dataset.k);
       });
-      if (window.speechSynthesis) { try { speechSynthesis.getVoices(); } catch (e) {} } // прогрев списка голосов
+      /* Список голосов приходит асинхронно: без прогрева первая фраза
+         озвучивается голосом по умолчанию (часто английским) или не звучит. */
+      if (window.speechSynthesis) {
+        try {
+          speechSynthesis.getVoices();
+          speechSynthesis.addEventListener('voiceschanged', function () { speechSynthesis.getVoices(); });
+        } catch (e) {}
+      }
     }
     init();
     return { end: end };
