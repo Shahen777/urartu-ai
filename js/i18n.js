@@ -12,7 +12,7 @@
       'meta.desc': 'Внедряем локальных ИИ-сотрудников 24/7: цифровые агенты на сервере компании — отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Данные не уходят в облако. Локальный ИИ, 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.',
 
       /* меню / статус */
-      'menu.assistant': 'Ассистент', 'menu.how': 'Как работает', 'menu.who': 'Кому',
+      'menu.assistant': 'Сообщения', 'menu.how': 'Как работает', 'menu.who': 'Кому',
       'menu.pricing': 'Тарифы', 'menu.faq': 'Вопросы', 'menu.about': 'О нас', 'menu.mail': 'Контакты',
       'menu.services': 'Услуги', 'menu.portfolio': 'Портфолио', 'menu.staff': 'Сотрудники',
       'status.local': 'ЛОКАЛЬНО · 152-ФЗ',
@@ -46,6 +46,35 @@
       'assistant.m3.p': 'Протоколы встреч, ответы на претензии, письма клиентам — черновик за минуту, по вашим шаблонам.',
       'assistant.m4.h': 'Всегда с источником',
       'assistant.m4.p': 'Каждый ответ — с указанием пункта и документа. Ответ легко проверить.',
+
+      /* Сообщения (мессенджер, F1) */
+      'msg.title': 'Сообщения',
+      'msg.demo': 'Демо-режим: отвечает локальный сценарий. Настоящий ИИ-сотрудник работает у вас в контуре — покажем на демо.',
+      'msg.ph': 'Сообщение…',
+      'msg.live': 'Шаген (живой)', 'msg.liveSub': 'Написать в Telegram →',
+      'msg.n.documoved': 'Документовед', 'msg.n.lawyer': 'Юрист-проверяющий',
+      'msg.n.support': 'Оператор поддержки', 'msg.n.secretary': 'Секретарь',
+      'msg.prev.documoved': 'Спросите про срок или пункт регламента',
+      'msg.prev.lawyer': 'Пришлите договор — проверю по чек-листу',
+      'msg.prev.support': 'Опишите, что случилось',
+      'msg.prev.secretary': 'Запишу вас на демо',
+      'msg.doc.s1': 'Здравствуйте! Я Документовед. Отвечаю по регламентам и базе знаний — всегда со ссылкой на пункт документа.',
+      'msg.doc.s2': 'Например, спросите: «Какой срок согласования договора на 300 000 ₽?»',
+      'msg.greet.lawyer': 'Здравствуйте. Юрист-проверяющий на связи. Пришлите текст договора или спросите про пункт — проверю по чек-листу.',
+      'msg.greet.support': 'Привет! Оператор поддержки. Опишите, что случилось, — помогу разобраться быстро.',
+      'msg.greet.secretary': 'Здравствуйте! Секретарь Урарту. Могу рассказать про ИИ-сотрудников, цены или записать вас на демо.',
+
+      /* Игра (F2) */
+      'game.title': 'Игра — Собери 70B', 'game.fs': 'На весь экран', 'sb.game': 'Игра',
+
+      /* Spotlight (F3) */
+      'spot.ph': 'Поиск по сайту…', 'spot.empty': 'Ничего не найдено',
+      'spot.k.win': 'окно', 'spot.k.faq': 'вопрос', 'spot.k.svc': 'услуга',
+      'spot.k.dev': 'устройство', 'spot.k.staff': 'сотрудник',
+
+      /* Пуш-баннер (F4) */
+      'push.from': 'Документовед', 'push.now': 'сейчас',
+      'push.body': 'Нашёл ответ про 152-ФЗ — спросите меня →',
 
       /* Как работает */
       'how.title': 'Как это работает',
@@ -97,7 +126,7 @@
       'faq.q1': 'Чем это отличается от ChatGPT?',
       'faq.a1': 'ChatGPT работает на серверах в США, и передавать туда данные клиентов юрлицу нельзя. Наш ассистент работает на вашем сервере, отвечает по вашим документам и показывает источник ответа. Интернет ему не нужен.',
       'faq.q2': 'Наши данные точно никуда не уходят?',
-      'faq.a2': 'Да. Модель и база знаний физически находятся на вашем оборудовании. Наружу не уходит ничего — это проверяется на приёмке (можно отключить интернет и убедиться).',
+      'faq.a2': 'Да. Модель и база знаний физически находятся на вашем оборудовании, персональные данные обрабатываются в контуре компании — как требует 152-ФЗ. Наружу не уходит ничего: это проверяется на приёмке (можно отключить интернет и убедиться).',
       'faq.q3': 'Какое железо нужно?',
       'faq.a3': 'Для команды до 10–20 человек достаточно одной машины с современной видеокартой (порядка 300–400 тыс. ₽, если покупать новую). Часто подходит уже имеющийся сервер. Подбор — часть проекта.',
       'faq.q4': 'А если ассистент ошибётся?',
@@ -166,6 +195,80 @@
       'dev.d5.name': 'Сервер Multi-GPU', 'dev.d5.spec': '2–8 × GPU · кластеры', 'dev.d5.team': '100+ пользователей', 'dev.d5.models': 'Несколько моделей параллельно', 'dev.d5.price': 'под заказ, от 1,5 млн ₽',
       'dev.disclaimer': 'Железо поставляем только под проект внедрения: легально, с документами, гарантией и настройкой под ключ. Цены ориентировочные и зависят от конфигурации и курса.',
 
+      /* Калькулятор проекта (D2) */
+      'calc.title': 'Калькулятор проекта',
+      'sb.calc': 'Калькулятор',
+      'calc.h1': 'Сколько стоит ваш проект',
+      'calc.lead': 'Соберите оценку за 20 секунд: услуга, объём, срочность. Точную смету дадим после 30-минутного брифа.',
+      'calc.step1': 'Что делаем',
+      'calc.step2': 'Объём',
+      'calc.step3': 'Срочность и опции',
+      'calc.svcAi': 'ИИ-сотрудник',
+      'calc.vol1': 'Бриф', 'calc.vol2': 'Стандарт', 'calc.vol3': 'Расширенный', 'calc.vol4': 'Enterprise',
+      'calc.rush': 'Срочно', 'calc.rushSub': 'сжатые сроки ×1.3',
+      'calc.optHw': '+ Железо под ключ', 'calc.optHwSub': 'от 180 000 ₽ разово',
+      'calc.optSup': '+ Поддержка', 'calc.optSupSub': 'от 15 000 ₽/мес отдельной строкой',
+      'calc.hwLink': 'Какое железо мы ставим — в «Устройствах» →',
+      'calc.totalLbl': 'Предварительная оценка',
+      'calc.from': 'от',
+      'calc.moLine': '15 000 ₽/мес — поддержка',
+      'calc.cta': 'Получить точную смету',
+      'calc.voice': 'Обсудить голосом',
+      'calc.disclaimer': 'Предварительная оценка. Финальная — после 30-минутного брифа.',
+      'calc.tg.head': 'Здравствуйте! Расчёт с сайта Urartu AI:',
+      'calc.tg.svc': 'Услуга', 'calc.tg.vol': 'Объём', 'calc.tg.rush': 'Срочность',
+      'calc.tg.yes': 'срочно (×1.3)', 'calc.tg.no': 'стандарт',
+      'calc.tg.opts': 'Опции', 'calc.tg.none': 'без опций',
+      'calc.tg.total': 'Итог',
+
+      /* App Store (E1) */
+      'as.title': 'App Store', 'as.short': 'App Store',
+      'as.h1': 'Магазин продуктов Urartu',
+      'as.lead': 'Всё, что на этом сайте можно потрогать вживую: откройте живые продукты, скачайте коммерческое предложение или установите этот сайт как приложение.',
+      'as.open': 'Открыть', 'as.install': 'Установить', 'as.download': 'Скачать PDF',
+      'as.feat.eb': 'РЕКОМЕНДУЕМ · ПРИЛОЖЕНИЕ НЕДЕЛИ',
+      'as.feat.h': 'ИИ-сотрудник 24/7',
+      'as.feat.p': 'Цифровой сотрудник на вашем сервере: отвечает по регламентам, проверяет договоры, ведёт поддержку. Не спит, не болеет, данные не уносит.',
+      'as.feat.meta': 'Внедрение от 150 000 ₽',
+      'as.sec.live': 'Наши живые продукты',
+      'as.p.game.name': 'Игра «Собери 70B»',
+      'as.p.game.sub': 'Слейте модели в 70B — играбельно',
+      'as.p.calc.name': 'Калькулятор проекта',
+      'as.p.calc.sub': 'Соберите смету за 20 секунд',
+      'as.p.agents.name': '3D-офис ИИ-агентов',
+      'as.p.agents.sub': 'Загляните, как устроен цифровой штат',
+      'as.p.port.name': 'Портфолио студии',
+      'as.p.port.sub': 'Сайты, ИИ-сомелье, боты и билеты',
+      'as.sec.docs': 'Документы',
+      'as.doc.pres.n': 'Коммерческое предложение',
+      'as.doc.pres.s': 'PDF · 5 страниц · сотрудники, железо, услуги',
+      'as.doc.price.n': 'Прайс-лист',
+      'as.doc.price.s': 'PDF · 1 страница · все цены студии',
+      'as.sec.install': 'Установить Urartu OS',
+      'as.install.lead': 'Добавьте этот сайт на экран «Домой» — он откроется как отдельное приложение, во весь экран и без адресной строки.',
+      'as.install.btn': 'Установить приложение',
+      'as.install.ios1': 'Нажмите «Поделиться» в нижней панели Safari.',
+      'as.install.ios2': 'Выберите «На экран „Домой“».',
+      'as.install.ios3': 'Готово — иконка Urartu AI появится на рабочем столе.',
+      'as.oss': 'Открытый код',
+
+      /* Календарь записи на демо (E2) */
+      'cal.title': 'Календарь',
+      'cal.h1': 'Запишитесь на демо',
+      'cal.lead': 'Выберите рабочий день и удобное время. 30 минут онлайн — покажем работающих ИИ-сотрудников на живых примерах.',
+      'cal.dow.mo': 'Пн', 'cal.dow.tu': 'Вт', 'cal.dow.we': 'Ср', 'cal.dow.th': 'Чт',
+      'cal.dow.fr': 'Пт', 'cal.dow.sa': 'Сб', 'cal.dow.su': 'Вс',
+      'cal.slots.h': 'Свободное время',
+      'cal.form.name': 'Имя', 'cal.form.namePh': 'Как вас зовут',
+      'cal.form.contact': 'Как связаться', 'cal.form.contactPh': 'Telegram или телефон',
+      'cal.form.submit': 'Записаться',
+      'cal.err.slot': 'Сначала выберите день и время.',
+      'cal.err.name': 'Пожалуйста, укажите имя.',
+      'cal.note': '30 минут онлайн · без презентаций и обязательств · подтверждение придёт в Telegram. Встреча сразу скачается в ваш календарь (.ics).',
+      'cal.tg.msg': 'Здравствуйте! Хочу записаться на демо {d} в {t}. Меня зовут {n}{c}.',
+      'cal.ics.summary': 'Демо Urartu AI · локальные ИИ-сотрудники',
+      'cal.ics.desc': 'Демонстрация локальных ИИ-сотрудников. Подтверждение придёт в Telegram: @Shahen_kazaryan',
+
       /* Портфолио */
       'port.title': 'Портфолио',
       'port.h1': 'Что мы уже сделали',
@@ -183,6 +286,7 @@
       'case.zhemchuzhina.name': '«Жемчужина Мыса», Геленджик', 'case.zhemchuzhina.res': 'Рейтинг ★9.6 · промо-сайт под прямое бронирование',
       'case.pushka.name': 'Мини-отель «Пушка», Ялта', 'case.pushka.res': 'Морской стиль, 2 минуты до набережной',
       'case.akva.name': 'Аква вилла, Краснодар', 'case.akva.res': 'Банно-гостиничный комплекс, рейтинг 5.0 · онлайн-заявка',
+      'case.qr.name': 'Событие с QR-билетами', 'case.qr.res': 'QR-билеты и веб-сканер чек-ина — 300+ гостей на входе',
       'case.orderbot.name': 'Бот мониторинга заказов', 'case.orderbot.res': 'Отслеживает биржи и фильтрует подходящие заказы через ИИ',
 
       /* iOS-оболочка */
@@ -230,6 +334,7 @@
       'agents.building': 'Строим офис', 'agents.hint': '~5 МБ · лучше по Wi-Fi',
       'agents.retry': 'Попробовать ещё раз',
       'agents.fs': 'На весь экран', 'agents.fsExit': 'Свернуть',
+      'agents.fallback': '3D-офис работает на WebGPU — в этом браузере он недоступен. Схема офиса: агенты передают задачи друг другу.',
       'agents.credit': 'Симуляция: открытый проект The Delegation, лицензия MIT',
 
       /* Корзина */
@@ -257,7 +362,7 @@
       'w.sticky': 'Пилот за&nbsp;2&nbsp;недели на&nbsp;ваших документах. <strong>Бесплатно для&nbsp;первых клиентов, без&nbsp;обязательств.</strong>',
 
       /* Springboard */
-      'sb.assistant': 'Ассистент', 'sb.how': 'Как работает', 'sb.who': 'Кому',
+      'sb.assistant': 'Сообщения', 'sb.how': 'Как работает', 'sb.who': 'Кому',
       'sb.terminal': 'Терминал', 'sb.mail': 'Почта',
 
       /* Чат-виджет (диалог) */
@@ -266,7 +371,149 @@
       'chat.q2': 'Как отозвать согласие на обработку ПДн?',
       'chat.a2': 'Письменно на mos-city@bk.ru. Данные уничтожаются. Основание: Политика, п. 7; 152-ФЗ, ст. 9.',
       'chat.q3': 'Можно отправить договор клиента в ChatGPT?',
-      'chat.a3': 'Нет. Серверы вне РФ — передача ПДн запрещена (152-ФЗ). Спросите локального ассистента.'
+      'chat.a3': 'Нет. Серверы вне РФ — передача ПДн запрещена (152-ФЗ). Спросите локального ассистента.',
+
+      /* ===== ЛОТ G — Испытательный стенд ===== */
+
+      /* G1 — WebLLM (настоящая локальная модель) */
+      'ai.llm.btn': 'Запустить настоящий локальный ИИ',
+      'ai.llm.hint': 'Модель скачается один раз ({size}) и работает офлайн в браузере — как у вас на сервере.',
+      'ai.llm.loading': 'Устанавливаю модель…',
+      'ai.llm.ready': 'Настоящая локальная модель работает в вашем браузере. Откройте вкладку Network — данные никуда не уходят.',
+      'ai.llm.err': 'Не удалось загрузить модель (нужен интернет для первого скачивания). Работаю на локальном поиске и сценариях.',
+      'ai.llm.badge': 'Локальный ИИ включён',
+      'ai.src.intent': 'демо-сценарий',
+      'ai.src.webllm': 'локальная модель в вашем браузере (WebLLM)',
+      'ai.kb.src': 'демо-база юрфирмы «Вектор Права»',
+      'ai.src.faq': 'FAQ этого сайта',
+
+      /* G1 — демо-база «Вектор Права» (регламенты) */
+      'kbv.d1.t': 'Регламент договорной работы, п. 4.1',
+      'kbv.d1.x': 'Договор на сумму до 100 000 ₽ согласует руководитель отдела в течение 1 рабочего дня.',
+      'kbv.d2.t': 'Регламент договорной работы, п. 4.2',
+      'kbv.d2.x': 'Договор на сумму до 300 000 ₽ согласуют юрист и финансовый директор в течение 3 рабочих дней.',
+      'kbv.d3.t': 'Регламент договорной работы, п. 4.3',
+      'kbv.d3.x': 'Договор на сумму свыше 300 000 ₽ согласуется до 5 рабочих дней с визой генерального директора.',
+      'kbv.d4.t': 'Регламент договорной работы, п. 4.4',
+      'kbv.d4.x': 'Новый контрагент: к сроку согласования добавляется 1 день на проверку службой безопасности.',
+      'kbv.p1.t': 'Положение о персональных данных, п. 5.1',
+      'kbv.p1.x': 'Отзыв согласия на обработку персональных данных: обработка прекращается в течение 10 рабочих дней с даты получения отзыва.',
+      'kbv.p2.t': 'Положение о персональных данных, п. 5.2',
+      'kbv.p2.x': 'Об утечке персональных данных компания уведомляет Роскомнадзор в течение 24 часов, результаты внутреннего расследования направляет в течение 72 часов.',
+      'kbv.p3.t': 'Положение о персональных данных, п. 5.3',
+      'kbv.p3.x': 'Ответ на запрос субъекта персональных данных направляется в течение 10 рабочих дней.',
+      'kbv.c1.t': 'Претензионный регламент, п. 2.1',
+      'kbv.c1.x': 'Претензия регистрируется в день поступления; ответ направляется в течение 10 календарных дней; спор свыше 500 000 ₽ эскалируется управляющему партнёру.',
+      'kbv.c2.t': 'Претензионный регламент, п. 2.2',
+      'kbv.c2.x': 'Досудебный порядок обязателен: иск подаётся не ранее чем через 30 календарных дней с даты направления претензии.',
+      'kbv.b1.t': 'Тарифы и биллинг, п. 3.1',
+      'kbv.b1.x': 'Абонентское обслуживание — от 40 000 ₽/мес; час управляющего партнёра — 12 000 ₽; час юриста — 6 000 ₽.',
+      'kbv.b2.t': 'Тарифы и биллинг, п. 3.2',
+      'kbv.b2.x': 'Счета выставляются до 5 числа месяца; срок оплаты — 10 рабочих дней; пеня за просрочку — 0,1% в день.',
+
+      /* G2 — тест «на своём документе» */
+      'doc.btn': 'Проверить на своём документе',
+      'doc.plaque': 'Файл не покидает ваш браузер — индекс строится локально. Это и есть принцип локального ИИ.',
+      'doc.ph': 'Вставьте текст: регламент, инструкцию, договор…',
+      'doc.file': 'или файл .txt / .md',
+      'doc.load': 'Загрузить в ассистента',
+      'doc.clear': 'Очистить',
+      'doc.loaded': 'Готово: документ проиндексирован ({n} фрагм.). Задайте вопрос по его содержанию — отвечу с цитатой.',
+      'doc.cleared': 'Документ удалён из памяти браузера. Снова отвечаю по демо-базе «Вектор Права».',
+      'doc.nores': 'В вашем документе я такого не нашёл. Попробуйте спросить другими словами.',
+      'doc.src': 'ваш документ · фрагмент {n}',
+      'doc.empty': 'Сначала вставьте текст или выберите файл.',
+      'doc.badfile': 'Могу прочитать только текстовые файлы .txt и .md.',
+
+      /* G3 — проверка договора Юристом */
+      'law.btn': 'Проверить договор',
+      'law.ph': 'Вставьте текст договора целиком…',
+      'law.run': 'Проверить по чек-листу',
+      'law.short': 'Текст слишком короткий для проверки — вставьте договор целиком.',
+      'law.head': 'Проверил по чек-листу — {n} пунктов:',
+      'law.final': 'Настоящий Юрист-агент проверяет по ВАШЕМУ чек-листу и с полным пониманием текста — покажем на демо.',
+      'law.ok': 'найдено', 'law.warn': 'проверьте', 'law.miss': 'отсутствует',
+      'law.r1.n': 'Предмет договора', 'law.r1.w': 'Без предмета договор могут признать незаключённым.',
+      'law.r2.n': 'Цена и порядок расчётов', 'law.r2.w': 'Цена не зафиксирована — споры о сумме почти гарантированы.',
+      'law.r3.n': 'НДС', 'law.r3.w': 'Не указано, включает ли цена НДС, — налоговая трактует не в вашу пользу.',
+      'law.r4.n': 'Неустойка', 'law.r4.w': 'Без неустойки с нарушителя взыщут лишь по ставке ЦБ — это мало.',
+      'law.r5.n': 'Симметрия неустойки', 'law.r5.w': 'Ответственность прописана только для одной стороны — признак перекоса договора.',
+      'law.r6.n': 'Подсудность', 'law.r6.w': 'Иначе судиться придётся по месту ответчика — возможно, в другом регионе.',
+      'law.r7.n': 'Срок оплаты', 'law.r7.w': 'Без чёткого срока оплаты дебиторка «зависает» безнаказанно.',
+      'law.r8.n': 'Сроки выполнения', 'law.r8.w': 'Не указан срок работ или поставки — нечего предъявить за просрочку.',
+      'law.r9.n': 'Порядок приёмки', 'law.r9.w': 'Без акта и порядка приёмки сложно доказать, что работы выполнены.',
+      'law.r10.n': 'Форс-мажор', 'law.r10.w': 'Без оговорки о непреодолимой силе эти риски лягут на вас.',
+      'law.r11.n': 'Персональные данные', 'law.r11.w': 'Если передаются ПДн, без пункта о 152-ФЗ возможен штраф.',
+      'law.r12.n': 'Конфиденциальность', 'law.r12.w': 'Без NDA-пункта утечка коммерческой тайны останется без последствий.',
+      'law.r13.n': 'Односторонний отказ', 'law.r13.w': 'Не описан выход из договора — расторжение только через суд.',
+      'law.r14.n': 'Срок действия', 'law.r14.w': 'Без срока действия неясно, когда обязательства прекращаются.',
+      'law.r15.n': 'Реквизиты сторон', 'law.r15.w': 'Без ИНН/ОГРН и счетов сложно исполнить договор и проверить контрагента.',
+
+      /* G4 — голос Секретаря */
+      'voice.aria': 'Голосовой ввод — поговорить с Секретарём',
+      'voice.listen': 'Говорите — я слушаю…',
+      'voice.nosr': 'Голосовой ввод работает в Chrome и Safari — в этом браузере нет API распознавания речи. Напишите текстом: отвечу так же.',
+      'voice.denied': 'Микрофон не разрешён. Разрешите доступ в настройках браузера и нажмите микрофон снова.',
+      'voice.err': 'Не расслышал. Нажмите микрофон и повторите, пожалуйста.',
+
+      /* G5 — Фабрика контента */
+      'fab.title': 'Фабрика контента', 'sb.fab': 'Фабрика',
+      'fab.h1': 'Конвейер контента, который пишет за вас',
+      'fab.lead': 'Так работает наш продукт «Контент-фабрика»: тема превращается в готовую публикацию. Попробуйте генератор — он работает прямо в браузере.',
+      'fab.st1': 'Тема', 'fab.st2': 'Черновик', 'fab.st3': 'Редактура', 'fab.st4': 'Публикация',
+      'fab.fmt': 'Формат',
+      'fab.f1': 'Пост для соцсетей', 'fab.f2': 'Карточка товара', 'fab.f3': 'Ответ на отзыв',
+      'fab.tone': 'Тон', 'fab.t1': 'Деловой', 'fab.t2': 'Дружелюбный',
+      'fab.topicLbl': 'Тема, товар или отзыв',
+      'fab.ph1': 'Например: открытие новой кофейни на Тверской',
+      'fab.ph2': 'Например: керамическая кружка ручной работы, 450 мл',
+      'fab.ph3': 'Вставьте отзыв клиента, на который нужно ответить',
+      'fab.gen': 'Сгенерировать',
+      'fab.copy': 'Скопировать', 'fab.copied': 'Скопировано ✓',
+      'fab.needTopic': 'Введите тему — и конвейер запустится.',
+      'fab.sellH': 'Фабрика — к вам в контур',
+      'fab.sell': 'Календарь публикаций, ваш тон, ваши продукты, согласование в один клик. Статьи, посты, рассылки — каждый день, без выгорания. От 50 000 ₽/мес.',
+      'fab.cta': 'Записаться',
+      'as.p.fab.name': 'Фабрика контента', 'as.p.fab.sub': 'Генератор постов, карточек и ответов',
+
+      /* G6 — «попробовать сейчас» */
+      'try.now': 'Попробовать сейчас',
+      'as.sec.try': 'Испытательный стенд',
+      'as.try.lead': 'Каждую функцию ИИ-сотрудников можно потрогать прямо здесь — без регистрации и загрузок.',
+      'as.try.doc.n': 'Спросить Документоведа', 'as.try.doc.s': 'Ответы по регламентам — или по вашему файлу',
+      'as.try.law.n': 'Проверить договор', 'as.try.law.s': 'Вставьте текст — отчёт по 15 пунктам мгновенно',
+      'as.try.voice.n': 'Поговорить голосом', 'as.try.voice.s': 'Секретарь слушает и отвечает вслух',
+      'as.try.fab.n': 'Сгенерировать контент', 'as.try.fab.s': 'Пост, карточка товара или ответ на отзыв',
+      'readme.try': 'Всё на этом сайте можно потрогать: чат, проверка договора, голос, генератор →',
+
+      /* G3 — доп. строки панели юриста */
+      'law.note': 'Мгновенная проверка по чек-листу из 15 пунктов — прямо в браузере, без отправки куда-либо.',
+      'law.sent': 'Проверьте, пожалуйста, договор ({n} слов).',
+      'law.counts': '✔ найдено: {ok} · ⚠ проверьте: {warn} · ✖ отсутствует: {miss}',
+
+      /* G4 — звонок ИИ-секретарю */
+      'ai.h': 'Поговорить с ИИ-секретарём прямо сейчас',
+      'ai.p': 'Бесплатный тест: голосовой разговор из браузера — как по телефону.',
+      'ai.badge': 'ИИ · 24/7',
+      'ai.call': 'Позвонить ИИ',
+      'ai.note': 'Это демо в вашем браузере. Настоящий Секретарь работает на сервере компании, звонит по телефону и знает вашу базу — от 200 000 ₽.',
+      'ai.name': 'ИИ-секретарь Урарту',
+      'ai.mute': 'Микрофон',
+      'ai.end': 'Завершить',
+      'ai.st.listen': 'слушаю…',
+      'ai.st.think': 'думаю…',
+      'ai.st.speak': 'говорю…',
+      'ai.st.muted': 'микрофон выключен',
+      'ai.greet': 'Компания Урарту, секретарь на связи. Могу рассказать про ИИ-сотрудников, цены или записать вас на демо. Слушаю!',
+      'ai.silence': 'Вы здесь? Могу рассказать про ИИ-сотрудников, цены или записать вас на демо.',
+      'ai.bye': 'Спасибо за звонок! Хорошего дня — и до встречи на демо.',
+      'ai.openCal': 'Отлично, открываю календарь — выберите удобный день и время.',
+      'ai.human': 'Соединяю с Шагеном в Telegram — продолжите там.',
+      'ai.fb.chat': 'Текстовый чат с Секретарём',
+      'ai.fb.back': 'Назад',
+
+      /* G6 — кнопка на карточке Секретаря */
+      'try.voice': 'Позвонить сейчас'
     },
 
     en: {
@@ -275,7 +522,7 @@
       'meta.desc': 'We deploy local AI employees that work 24/7 — digital agents on your own server: answer from your policies, review contracts and run customer support. On-premise AI, never sends data to the cloud. 152-FZ compliant. Pilot in 2 weeks. Moscow and all of Russia.',
 
       /* menu / status */
-      'menu.assistant': 'Assistant', 'menu.how': 'How it works', 'menu.who': "Who it's for",
+      'menu.assistant': 'Messages', 'menu.how': 'How it works', 'menu.who': "Who it's for",
       'menu.pricing': 'Pricing', 'menu.faq': 'FAQ', 'menu.about': 'About', 'menu.mail': 'Contact',
       'menu.services': 'Services', 'menu.portfolio': 'Portfolio', 'menu.staff': 'Employees',
       'status.local': 'LOCAL · 152-FZ',
@@ -309,6 +556,35 @@
       'assistant.m3.p': 'Meeting minutes, replies to claims, client letters — a draft in a minute, following your templates.',
       'assistant.m4.h': 'Always with a source',
       'assistant.m4.p': 'Every answer cites the clause and the document. Easy to verify.',
+
+      /* Messages (messenger, F1) */
+      'msg.title': 'Messages',
+      'msg.demo': 'Demo mode: a local scenario is answering. A real AI employee runs inside your own perimeter — we will show it on the demo.',
+      'msg.ph': 'Message…',
+      'msg.live': 'Shagen (live)', 'msg.liveSub': 'Message on Telegram →',
+      'msg.n.documoved': 'Document Clerk', 'msg.n.lawyer': 'Legal Reviewer',
+      'msg.n.support': 'Support Operator', 'msg.n.secretary': 'Secretary',
+      'msg.prev.documoved': 'Ask about a deadline or a regulation clause',
+      'msg.prev.lawyer': 'Send a contract — I check it against the list',
+      'msg.prev.support': 'Tell me what happened',
+      'msg.prev.secretary': 'I will book you a demo',
+      'msg.doc.s1': 'Hello! I am the Document Clerk. I answer from your regulations and knowledge base — always with a reference to the document clause.',
+      'msg.doc.s2': 'For example, ask: “What is the approval deadline for a 300,000 ₽ contract?”',
+      'msg.greet.lawyer': 'Good day. Legal Reviewer here. Send a contract text or ask about a clause — I check it against the checklist.',
+      'msg.greet.support': 'Hi! Support operator. Tell me what happened — I will help you sort it out fast.',
+      'msg.greet.secretary': 'Hello! Urartu secretary. I can tell you about AI employees, prices, or book you a demo.',
+
+      /* Game (F2) */
+      'game.title': 'Game — Assemble 70B', 'game.fs': 'Fullscreen', 'sb.game': 'Game',
+
+      /* Spotlight (F3) */
+      'spot.ph': 'Search the site…', 'spot.empty': 'Nothing found',
+      'spot.k.win': 'window', 'spot.k.faq': 'FAQ', 'spot.k.svc': 'service',
+      'spot.k.dev': 'device', 'spot.k.staff': 'employee',
+
+      /* Push banner (F4) */
+      'push.from': 'Document Clerk', 'push.now': 'now',
+      'push.body': 'Found the answer about data-protection law (152-FZ) — ask me →',
 
       /* How it works */
       'how.title': 'How it works',
@@ -360,7 +636,7 @@
       'faq.q1': 'How is this different from ChatGPT?',
       'faq.a1': 'ChatGPT runs on servers in the USA, and a company isn’t allowed to send client data there. Our assistant runs on your server, answers from your documents and shows the source of every answer. It doesn’t need the internet.',
       'faq.q2': 'Is our data really staying put?',
-      'faq.a2': 'Yes. The model and the knowledge base physically live on your hardware. Nothing goes out — it’s verified at acceptance (you can disconnect the internet and see for yourself).',
+      'faq.a2': 'Yes. The model and the knowledge base physically live on your hardware, and personal data is processed inside your perimeter — as required by 152-FZ. Nothing goes out: it’s verified at acceptance (you can disconnect the internet and see for yourself).',
       'faq.q3': 'What hardware do we need?',
       'faq.a3': 'For a team of up to 10–20 people, a single machine with a modern GPU is enough (around 300–400k ₽ if bought new). Often an existing server will do. Selecting it is part of the project.',
       'faq.q4': 'What if the assistant makes a mistake?',
@@ -429,6 +705,80 @@
       'dev.d5.name': 'Multi-GPU server', 'dev.d5.spec': '2–8 × GPU · clusters', 'dev.d5.team': '100+ users', 'dev.d5.models': 'Several models in parallel', 'dev.d5.price': 'made to order, from $15,000',
       'dev.disclaimer': 'Hardware is supplied only as part of a deployment project: legally, with paperwork, warranty and turnkey setup. Prices are indicative and depend on configuration and the exchange rate.',
 
+      /* Project calculator (D2) */
+      'calc.title': 'Project calculator',
+      'sb.calc': 'Calculator',
+      'calc.h1': 'What your project will cost',
+      'calc.lead': 'Build an estimate in 20 seconds: service, scope, urgency. The exact quote comes after a 30-minute brief.',
+      'calc.step1': 'What we build',
+      'calc.step2': 'Scope',
+      'calc.step3': 'Urgency & options',
+      'calc.svcAi': 'AI employee',
+      'calc.vol1': 'Brief', 'calc.vol2': 'Standard', 'calc.vol3': 'Extended', 'calc.vol4': 'Enterprise',
+      'calc.rush': 'Rush', 'calc.rushSub': 'tight deadline ×1.3',
+      'calc.optHw': '+ Turnkey hardware', 'calc.optHwSub': 'from $1,800 one-off',
+      'calc.optSup': '+ Support', 'calc.optSupSub': 'from $150/mo as a separate line',
+      'calc.hwLink': 'The hardware we install — in “Devices” →',
+      'calc.totalLbl': 'Preliminary estimate',
+      'calc.from': 'from',
+      'calc.moLine': '$150/mo — support',
+      'calc.cta': 'Get an exact quote',
+      'calc.voice': 'Discuss by voice',
+      'calc.disclaimer': 'A preliminary estimate. The final one comes after a 30-minute brief.',
+      'calc.tg.head': 'Hello! An estimate from the Urartu AI site:',
+      'calc.tg.svc': 'Service', 'calc.tg.vol': 'Scope', 'calc.tg.rush': 'Urgency',
+      'calc.tg.yes': 'rush (×1.3)', 'calc.tg.no': 'standard',
+      'calc.tg.opts': 'Options', 'calc.tg.none': 'none',
+      'calc.tg.total': 'Total',
+
+      /* App Store (E1) */
+      'as.title': 'App Store', 'as.short': 'App Store',
+      'as.h1': 'The Urartu product store',
+      'as.lead': 'Everything on this site you can actually try: open the live products, download our proposal, or install this site as an app.',
+      'as.open': 'Open', 'as.install': 'Install', 'as.download': 'Download PDF',
+      'as.feat.eb': 'FEATURED · APP OF THE WEEK',
+      'as.feat.h': 'AI employee 24/7',
+      'as.feat.p': 'A digital employee on your own server: answers by your policies, checks contracts, runs support. Never sleeps, never leaks your data.',
+      'as.feat.meta': 'From 150,000 ₽ to deploy',
+      'as.sec.live': 'Our live products',
+      'as.p.game.name': 'Game “Assemble 70B”',
+      'as.p.game.sub': 'Merge models up to 70B — playable',
+      'as.p.calc.name': 'Project calculator',
+      'as.p.calc.sub': 'Build an estimate in 20 seconds',
+      'as.p.agents.name': '3D office of AI agents',
+      'as.p.agents.sub': 'See how the digital team is set up',
+      'as.p.port.name': 'Studio portfolio',
+      'as.p.port.sub': 'Websites, AI sommelier, bots and tickets',
+      'as.sec.docs': 'Documents',
+      'as.doc.pres.n': 'Commercial proposal',
+      'as.doc.pres.s': 'PDF · 5 pages · employees, hardware, services',
+      'as.doc.price.n': 'Price list',
+      'as.doc.price.s': 'PDF · 1 page · all studio prices',
+      'as.sec.install': 'Install Urartu OS',
+      'as.install.lead': 'Add this site to your Home Screen — it opens as a standalone app, full-screen and without the address bar.',
+      'as.install.btn': 'Install app',
+      'as.install.ios1': 'Tap “Share” in Safari’s bottom bar.',
+      'as.install.ios2': 'Choose “Add to Home Screen”.',
+      'as.install.ios3': 'Done — the Urartu AI icon appears on your desktop.',
+      'as.oss': 'Open source',
+
+      /* Demo booking calendar (E2) */
+      'cal.title': 'Calendar',
+      'cal.h1': 'Book a demo',
+      'cal.lead': 'Pick a working day and a time that suits you. 30 minutes online — we’ll show AI employees working on live examples.',
+      'cal.dow.mo': 'Mon', 'cal.dow.tu': 'Tue', 'cal.dow.we': 'Wed', 'cal.dow.th': 'Thu',
+      'cal.dow.fr': 'Fri', 'cal.dow.sa': 'Sat', 'cal.dow.su': 'Sun',
+      'cal.slots.h': 'Available time',
+      'cal.form.name': 'Name', 'cal.form.namePh': 'Your name',
+      'cal.form.contact': 'How to reach you', 'cal.form.contactPh': 'Telegram or phone',
+      'cal.form.submit': 'Book',
+      'cal.err.slot': 'Please pick a day and time first.',
+      'cal.err.name': 'Please enter your name.',
+      'cal.note': '30 minutes online · no slides, no obligations · confirmation comes via Telegram. The meeting downloads straight into your calendar (.ics).',
+      'cal.tg.msg': 'Hello! I’d like to book a demo on {d} at {t}. My name is {n}{c}.',
+      'cal.ics.summary': 'Urartu AI demo · local AI employees',
+      'cal.ics.desc': 'A demo of local AI employees. Confirmation will come via Telegram: @Shahen_kazaryan',
+
       /* Portfolio */
       'port.title': 'Portfolio',
       'port.h1': 'What we’ve already shipped',
@@ -446,6 +796,7 @@
       'case.zhemchuzhina.name': 'Zhemchuzhina Mysa, Gelendzhik', 'case.zhemchuzhina.res': 'Rating ★9.6 · a promo site built for direct booking',
       'case.pushka.name': 'Pushka mini-hotel, Yalta', 'case.pushka.res': 'Nautical style, 2 minutes to the seafront',
       'case.akva.name': 'Akva Villa, Krasnodar', 'case.akva.res': 'Bath-and-hotel complex, rating 5.0 · online booking',
+      'case.qr.name': 'Event with QR tickets', 'case.qr.res': 'QR tickets and a web check-in scanner — 300+ guests',
       'case.orderbot.name': 'Order-monitoring bot', 'case.orderbot.res': 'Watches order boards and filters a good fit with AI',
 
       /* iOS shell */
@@ -493,6 +844,7 @@
       'agents.building': 'Building the office', 'agents.hint': '~5 MB · better on Wi-Fi',
       'agents.retry': 'Try again',
       'agents.fs': 'Fullscreen', 'agents.fsExit': 'Exit fullscreen',
+      'agents.fallback': 'The 3D office runs on WebGPU, which this browser lacks. Office diagram: agents hand tasks to each other.',
       'agents.credit': 'Simulation: The Delegation, an open-source project, MIT license',
 
       /* Trash */
@@ -520,7 +872,7 @@
       'w.sticky': 'Pilot in&nbsp;2&nbsp;weeks on&nbsp;your documents. <strong>Free for&nbsp;our&nbsp;first clients, no&nbsp;commitment.</strong>',
 
       /* Springboard */
-      'sb.assistant': 'Assistant', 'sb.how': 'How it works', 'sb.who': "Who it's for",
+      'sb.assistant': 'Messages', 'sb.how': 'How it works', 'sb.who': "Who it's for",
       'sb.terminal': 'Terminal', 'sb.mail': 'Mail',
 
       /* Chat widget dialog */
@@ -529,7 +881,149 @@
       'chat.q2': 'How do I withdraw consent to process personal data?',
       'chat.a2': 'In writing to mos-city@bk.ru. The data is destroyed. Source: Policy, cl. 7; 152-FZ, art. 9.',
       'chat.q3': 'Can I send a client’s contract to ChatGPT?',
-      'chat.a3': 'No. Servers outside Russia — sending personal data is prohibited (152-FZ). Ask the local assistant.'
+      'chat.a3': 'No. Servers outside Russia — sending personal data is prohibited (152-FZ). Ask the local assistant.',
+
+      /* ===== LOT G — Test bench ===== */
+
+      /* G1 — WebLLM (real local model) */
+      'ai.llm.btn': 'Run a real local AI',
+      'ai.llm.hint': 'The model downloads once ({size}) and then runs offline in your browser — same as on your server.',
+      'ai.llm.loading': 'Installing the model…',
+      'ai.llm.ready': 'A real local model is running in your browser. Open the Network tab — no data leaves the page.',
+      'ai.llm.err': 'Could not load the model (internet is needed for the first download). Falling back to local search and scenarios.',
+      'ai.llm.badge': 'Local AI is on',
+      'ai.src.intent': 'demo scenario',
+      'ai.src.webllm': 'local model in your browser (WebLLM)',
+      'ai.kb.src': 'demo base of the Vektor Prava law firm',
+      'ai.src.faq': 'this site’s FAQ',
+
+      /* G1 — Vektor Prava demo knowledge base */
+      'kbv.d1.t': 'Contract-work regulation, cl. 4.1',
+      'kbv.d1.x': 'A contract worth up to 100,000 ₽ is approved by the department head within 1 business day.',
+      'kbv.d2.t': 'Contract-work regulation, cl. 4.2',
+      'kbv.d2.x': 'A contract worth up to 300,000 ₽ is approved by the lawyer and the CFO within 3 business days.',
+      'kbv.d3.t': 'Contract-work regulation, cl. 4.3',
+      'kbv.d3.x': 'A contract worth over 300,000 ₽ is approved within up to 5 business days with the CEO’s sign-off.',
+      'kbv.d4.t': 'Contract-work regulation, cl. 4.4',
+      'kbv.d4.x': 'New counterparty: 1 extra day is added for the security-service check.',
+      'kbv.p1.t': 'Personal-data policy, cl. 5.1',
+      'kbv.p1.x': 'Withdrawal of consent to personal-data processing: processing stops within 10 business days from the date the withdrawal is received.',
+      'kbv.p2.t': 'Personal-data policy, cl. 5.2',
+      'kbv.p2.x': 'In case of a personal-data leak the company notifies the regulator (RKN) within 24 hours and submits the internal investigation results within 72 hours.',
+      'kbv.p3.t': 'Personal-data policy, cl. 5.3',
+      'kbv.p3.x': 'A reply to a personal-data subject’s request is sent within 10 business days.',
+      'kbv.c1.t': 'Claims regulation, cl. 2.1',
+      'kbv.c1.x': 'A claim is registered on the day it arrives; a reply is sent within 10 calendar days; disputes over 500,000 ₽ are escalated to the managing partner.',
+      'kbv.c2.t': 'Claims regulation, cl. 2.2',
+      'kbv.c2.x': 'Pre-trial procedure is mandatory: a lawsuit is filed no earlier than 30 calendar days after the claim is sent.',
+      'kbv.b1.t': 'Rates and billing, cl. 3.1',
+      'kbv.b1.x': 'Retainer service — from 40,000 ₽/mo; managing partner’s hour — 12,000 ₽; lawyer’s hour — 6,000 ₽.',
+      'kbv.b2.t': 'Rates and billing, cl. 3.2',
+      'kbv.b2.x': 'Invoices are issued by the 5th of the month; payment term — 10 business days; late-payment penalty — 0.1% per day.',
+
+      /* G2 — “on your own document” test */
+      'doc.btn': 'Try it on your own document',
+      'doc.plaque': 'The file never leaves your browser — the index is built locally. That is the whole point of local AI.',
+      'doc.ph': 'Paste text: a policy, an instruction, a contract…',
+      'doc.file': 'or a .txt / .md file',
+      'doc.load': 'Load into the assistant',
+      'doc.clear': 'Clear',
+      'doc.loaded': 'Done: the document is indexed ({n} fragments). Ask a question about its content — I answer with a quote.',
+      'doc.cleared': 'The document is removed from browser memory. Answering from the Vektor Prava demo base again.',
+      'doc.nores': 'I could not find that in your document. Try asking in different words.',
+      'doc.src': 'your document · fragment {n}',
+      'doc.empty': 'Paste some text or pick a file first.',
+      'doc.badfile': 'I can only read .txt and .md text files.',
+
+      /* G3 — contract check by the Legal Reviewer */
+      'law.btn': 'Check a contract',
+      'law.ph': 'Paste the full contract text…',
+      'law.run': 'Check against the list',
+      'law.short': 'The text is too short to check — paste the whole contract.',
+      'law.head': 'Checked against the list — {n} items:',
+      'law.final': 'A real Legal Reviewer agent checks against YOUR checklist with full understanding of the text — we will show it on the demo.',
+      'law.ok': 'found', 'law.warn': 'review', 'law.miss': 'missing',
+      'law.r1.n': 'Subject of the contract', 'law.r1.w': 'Without a subject the contract may be deemed not concluded.',
+      'law.r2.n': 'Price and payment terms', 'law.r2.w': 'No fixed price — disputes about the amount are almost guaranteed.',
+      'law.r3.n': 'VAT', 'law.r3.w': 'It is unclear whether the price includes VAT — the tax office will not read it your way.',
+      'law.r4.n': 'Penalty clause', 'law.r4.w': 'Without a penalty you only recover at the central-bank rate — very little.',
+      'law.r5.n': 'Penalty symmetry', 'law.r5.w': 'Liability is set for one party only — a sign of an unbalanced contract.',
+      'law.r6.n': 'Jurisdiction', 'law.r6.w': 'Otherwise you litigate at the defendant’s location — possibly another region.',
+      'law.r7.n': 'Payment deadline', 'law.r7.w': 'Without a clear payment term receivables hang with no consequences.',
+      'law.r8.n': 'Delivery deadlines', 'law.r8.w': 'No work/delivery deadline — nothing to claim for a delay.',
+      'law.r9.n': 'Acceptance procedure', 'law.r9.w': 'Without an acceptance act it is hard to prove the work was done.',
+      'law.r10.n': 'Force majeure', 'law.r10.w': 'Without this clause force-majeure risks fall on you.',
+      'law.r11.n': 'Personal data', 'law.r11.w': 'If personal data is transferred, a missing 152-FZ clause may mean a fine.',
+      'law.r12.n': 'Confidentiality', 'law.r12.w': 'Without an NDA clause a trade-secret leak has no consequences.',
+      'law.r13.n': 'Unilateral termination', 'law.r13.w': 'No exit procedure — termination only through court.',
+      'law.r14.n': 'Term of the contract', 'law.r14.w': 'Without a term it is unclear when the obligations end.',
+      'law.r15.n': 'Parties’ details', 'law.r15.w': 'Without tax IDs and bank accounts the contract is hard to execute and verify.',
+
+      /* G4 — Secretary voice */
+      'voice.aria': 'Voice input — talk to the Secretary',
+      'voice.listen': 'Speak — I am listening…',
+      'voice.nosr': 'Voice input works in Chrome and Safari — this browser has no speech-recognition API. Type your message instead: I answer the same way.',
+      'voice.denied': 'Microphone is not allowed. Grant access in the browser settings and press the mic again.',
+      'voice.err': 'I did not catch that. Press the mic and repeat, please.',
+
+      /* G5 — Content Factory */
+      'fab.title': 'Content Factory', 'sb.fab': 'Factory',
+      'fab.h1': 'A content pipeline that writes for you',
+      'fab.lead': 'This is how our Content Factory product works: a topic becomes a ready-to-publish piece. Try the generator — it runs right in your browser.',
+      'fab.st1': 'Topic', 'fab.st2': 'Draft', 'fab.st3': 'Editing', 'fab.st4': 'Publish',
+      'fab.fmt': 'Format',
+      'fab.f1': 'Social-media post', 'fab.f2': 'Product card', 'fab.f3': 'Review reply',
+      'fab.tone': 'Tone', 'fab.t1': 'Business', 'fab.t2': 'Friendly',
+      'fab.topicLbl': 'Topic, product or review',
+      'fab.ph1': 'E.g.: opening a new coffee shop on Tverskaya',
+      'fab.ph2': 'E.g.: handmade ceramic mug, 450 ml',
+      'fab.ph3': 'Paste the customer review you need to answer',
+      'fab.gen': 'Generate',
+      'fab.copy': 'Copy', 'fab.copied': 'Copied ✓',
+      'fab.needTopic': 'Enter a topic — and the pipeline starts.',
+      'fab.sellH': 'The Factory — inside your perimeter',
+      'fab.sell': 'A publishing calendar, your tone, your products, one-click approval. Articles, posts, newsletters — every day, no burnout. From 50,000 ₽/mo.',
+      'fab.cta': 'Book a demo',
+      'as.p.fab.name': 'Content Factory', 'as.p.fab.sub': 'Posts, product cards and review replies',
+
+      /* G6 — “try now” */
+      'try.now': 'Try it now',
+      'as.sec.try': 'Test bench',
+      'as.try.lead': 'Every AI-employee function can be tried right here — no sign-up, no downloads.',
+      'as.try.doc.n': 'Ask the Document Clerk', 'as.try.doc.s': 'Answers from regulations — or from your own file',
+      'as.try.law.n': 'Check a contract', 'as.try.law.s': 'Paste the text — a 15-point report instantly',
+      'as.try.voice.n': 'Talk by voice', 'as.try.voice.s': 'The Secretary listens and answers out loud',
+      'as.try.fab.n': 'Generate content', 'as.try.fab.s': 'A post, a product card or a review reply',
+      'readme.try': 'Everything on this site is hands-on: chat, contract check, voice, generator →',
+
+      /* G3 — extra lawyer panel strings */
+      'law.note': 'Instant check against a 15-point checklist — right in your browser, nothing is sent anywhere.',
+      'law.sent': 'Please review this contract ({n} words).',
+      'law.counts': '✔ found: {ok} · ⚠ review: {warn} · ✖ missing: {miss}',
+
+      /* G4 — AI secretary call */
+      'ai.h': 'Talk to the AI secretary right now',
+      'ai.p': 'Free test: a voice conversation from your browser — like a phone call.',
+      'ai.badge': 'AI · 24/7',
+      'ai.call': 'Call the AI',
+      'ai.note': 'This is a demo in your browser. The real Secretary runs on the company server, makes phone calls and knows your knowledge base — from 200,000 ₽.',
+      'ai.name': 'Urartu AI Secretary',
+      'ai.mute': 'Mic',
+      'ai.end': 'End',
+      'ai.st.listen': 'listening…',
+      'ai.st.think': 'thinking…',
+      'ai.st.speak': 'speaking…',
+      'ai.st.muted': 'microphone is off',
+      'ai.greet': 'Urartu company, secretary speaking. I can tell you about AI employees, prices, or book you a demo. Go ahead!',
+      'ai.silence': 'Are you there? I can tell you about AI employees, prices, or book a demo.',
+      'ai.bye': 'Thank you for calling! Have a great day — see you at the demo.',
+      'ai.openCal': 'Great, opening the calendar — pick a convenient day and time.',
+      'ai.human': 'Connecting you with Shagen in Telegram — continue there.',
+      'ai.fb.chat': 'Text chat with the Secretary',
+      'ai.fb.back': 'Back',
+
+      /* G6 — Secretary card button */
+      'try.voice': 'Call now'
     }
   };
 
@@ -564,6 +1058,11 @@
     var htmls = document.querySelectorAll('[data-i18n-html]');
     for (var j = 0; j < htmls.length; j++) {
       htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'), l);
+    }
+    /* placeholder-атрибуты (data-i18n-ph) */
+    var phs = document.querySelectorAll('[data-i18n-ph]');
+    for (var p = 0; p < phs.length; p++) {
+      phs[p].setAttribute('placeholder', t(phs[p].getAttribute('data-i18n-ph'), l));
     }
     /* тултипы (data-tip) */
     var tips = document.querySelectorAll('[data-tip-i18n]');

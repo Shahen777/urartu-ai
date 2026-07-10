@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Urartu AI — Прайс-лист</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root{ --ink:#0d1526; --ink2:#3a4560; --muted:#6b7590; --line:#e2e6f0; --blue:#1E74E6; --blue2:#54ABFF; --green:#159B52; --bg:#f6f8fc; }
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{ font-family:-apple-system,"SF Pro Display","Helvetica Neue",Arial,sans-serif; color:var(--ink); }
+  .page{ width:210mm; height:297mm; padding:16mm 16mm 14mm; position:relative; background:#fff; }
+  .top{ display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--ink); padding-bottom:14px; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand__logo{ width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,var(--blue2),var(--blue)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:20px; box-shadow:0 4px 10px rgba(30,116,230,.35); }
+  .brand__name{ font-weight:800; font-size:18px; }
+  .brand__name small{ display:block; font-weight:500; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .top__r{ text-align:right; font-size:11px; color:var(--muted); line-height:1.6; }
+  h1{ font-size:26px; font-weight:800; margin-top:18px; letter-spacing:-.3px; }
+  .sub{ font-size:12.5px; color:var(--ink2); margin-top:6px; }
+  .sec{ font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--blue); margin-top:20px; margin-bottom:8px; }
+  table{ width:100%; border-collapse:collapse; }
+  td{ padding:8px 4px; border-bottom:1px solid var(--line); font-size:12.5px; vertical-align:top; }
+  td.n{ font-weight:700; width:44%; }
+  td.d{ color:var(--ink2); }
+  td.p{ text-align:right; font-weight:800; color:var(--green); white-space:nowrap; width:22%; }
+  tr.flag td{ background:#eaf2ff; }
+  tr.flag td.n{ color:var(--blue); }
+  tr.flag td.p{ color:var(--blue); }
+  .fmt{ margin-top:18px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .fmt__c{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .fmt__n{ font-size:14px; font-weight:800; }
+  .fmt__p{ font-size:13px; font-weight:800; color:var(--green); margin-top:4px; }
+  .fmt__d{ font-size:10.5px; color:var(--muted); margin-top:6px; line-height:1.4; }
+  .foot{ position:absolute; left:16mm; right:16mm; bottom:12mm; border-top:1px solid var(--line); padding-top:12px; font-size:10.5px; color:var(--muted); line-height:1.6; display:flex; justify-content:space-between; }
+  .foot b{ color:var(--ink); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <div class="brand"><div class="brand__logo">U</div><div class="brand__name">Urartu AI<small>Локальный ИИ для бизнеса</small></div></div>
+    <div class="top__r">Прайс-лист · 2026<br>Цены ориентировочные, «от»</div>
+  </div>
+
+  <h1>Прайс-лист Urartu AI</h1>
+  <p class="sub">Локальные ИИ-сотрудники, разработка, автоматизация и контент. Финальная смета — после 30-минутного брифа.</p>
+
+  <div class="sec">ИИ-сотрудники 24/7 (флагман)</div>
+  <table>
+    <tr class="flag"><td class="n">Внедрение ИИ-сотрудника</td><td class="d">Установка и настройка агента на вашем сервере, обучение на базе знаний</td><td class="p">от 150 000 ₽</td></tr>
+    <tr class="flag"><td class="n">Поддержка и сопровождение</td><td class="d">Обновления моделей, мониторинг, доработка сценариев</td><td class="p">от 15 000 ₽/мес</td></tr>
+  </table>
+
+  <div class="sec">Разработка и агенты</div>
+  <table>
+    <tr><td class="n">Сайты под ключ</td><td class="d">Лендинги, корпоративные, e-commerce</td><td class="p">от 50 000 ₽</td></tr>
+    <tr><td class="n">AI-боты и агенты</td><td class="d">Telegram, WhatsApp, RAG, голос</td><td class="p">от 100 000 ₽</td></tr>
+    <tr><td class="n">Чат-боты поддержки 24/7</td><td class="d">На базе знаний клиента</td><td class="p">от 120 000 ₽/мес</td></tr>
+    <tr><td class="n">Голосовые ассистенты</td><td class="d">Колл-центры, ресепшены</td><td class="p">от 200 000 ₽</td></tr>
+    <tr><td class="n">AI-интеграции</td><td class="d">LLM в ваши продукты, fine-tuning</td><td class="p">от 150 000 ₽</td></tr>
+  </table>
+
+  <div class="sec">Автоматизация и контент</div>
+  <table>
+    <tr><td class="n">Автоматизация бизнеса</td><td class="d">1С, Битрикс, AmoCRM, n8n</td><td class="p">от 80 000 ₽</td></tr>
+    <tr><td class="n">AI-видео</td><td class="d">Реклама, аватары</td><td class="p">от 20 000 ₽/ролик</td></tr>
+    <tr><td class="n">Контент-фабрика</td><td class="d">Статьи, SEO, соцсети</td><td class="p">от 50 000 ₽/мес</td></tr>
+  </table>
+
+  <div class="sec">ИИ-железо под ключ</div>
+  <table>
+    <tr><td class="n">Станция «Старт» · «Про» · «Макс»</td><td class="d">Рабочие станции RTX 4060 Ti / 4090 / 5090 — модели до 70B</td><td class="p">от 180 000 ₽</td></tr>
+    <tr><td class="n">Mac Studio · Сервер Multi-GPU</td><td class="d">Бесшумные и кластерные решения для 100+ пользователей</td><td class="p">от 450 000 ₽</td></tr>
+  </table>
+
+  <div class="sec">Форматы сотрудничества</div>
+  <div class="fmt">
+    <div class="fmt__c"><div class="fmt__n">Starter</div><div class="fmt__p">от 150 000 ₽</div><div class="fmt__d">Базовое внедрение под один процесс</div></div>
+    <div class="fmt__c"><div class="fmt__n">Studio</div><div class="fmt__p">от 800 000 ₽</div><div class="fmt__d">Комплекс проектов и сопровождение</div></div>
+    <div class="fmt__c"><div class="fmt__n">Atelier</div><div class="fmt__p">от 5 000 000 ₽</div><div class="fmt__d">Выделенная команда, NDA, прямой канал с CTO</div></div>
+  </div>
+
+  <div class="foot">
+    <span><b>ООО «Урарту»</b> · mos-city@bk.ru · +7 926 333-78-47 · @Shahen_kazaryan</span>
+    <span>Москва и вся РФ</span>
+  </div>
+</div>
+</body>
+</html>

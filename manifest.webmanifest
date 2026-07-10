@@ -1,0 +1,20 @@
+{
+  "name": "Urartu AI — Локальные ИИ-сотрудники 24/7",
+  "short_name": "Urartu AI",
+  "description": "Локальные ИИ-сотрудники на вашем сервере: отвечают по регламентам, проверяют договоры, ведут поддержку. Данные не покидают компанию. 152-ФЗ.",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a1120",
+  "theme_color": "#0a1120",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "icons/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -203,6 +203,51 @@
     document.addEventListener('i18n:change', setFsLabel);
   }
 
+  /* ---------- ИГРА «Собери 70B»: iframe грузится по первому открытию ----------
+     Как и 3D-офис — ничего внешнего при старте страницы; тяжёлое только по клику. */
+  function ensureGameFrame() {
+    var stage = document.getElementById('gameStage');
+    if (!stage || stage.querySelector('iframe')) return;
+    var frame = document.createElement('iframe');
+    frame.src = 'game/index.html';
+    frame.title = lang() === 'en' ? 'Assemble 70B — game' : 'Собери 70B — игра';
+    frame.loading = 'lazy';
+    frame.setAttribute('allow', 'fullscreen');
+    stage.appendChild(frame);
+  }
+  function gameFsActive() {
+    var fe = document.fullscreenElement || document.webkitFullscreenElement;
+    var win = document.getElementById('win-game');
+    var st = document.getElementById('gameStage');
+    return (fe && st && (fe === st || fe.contains(st))) || (win && win.classList.contains('is-cover'));
+  }
+  function setGameFsLabel() {
+    var btn = document.getElementById('gameFs');
+    if (!btn) return;
+    var span = btn.querySelector('span');
+    var active = gameFsActive();
+    if (span) span.textContent = active ? tr('agents.fsExit') : tr('game.fs');
+    btn.setAttribute('aria-label', active ? tr('agents.fsExit') : tr('game.fs'));
+  }
+  function toggleGameFs() {
+    var stage = document.getElementById('gameStage');
+    var win = document.getElementById('win-game');
+    if (!stage) return;
+    var fe = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fe) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+    if (win && win.classList.contains('is-cover')) { win.classList.remove('is-cover'); setGameFsLabel(); return; }
+    var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    if (req) { try { req.call(stage); } catch (e) { if (win) win.classList.add('is-cover'); setGameFsLabel(); } }
+    else if (win) { win.classList.add('is-cover'); setGameFsLabel(); }
+  }
+  function initGameFs() {
+    var btn = document.getElementById('gameFs');
+    if (btn) btn.addEventListener('click', toggleGameFs);
+    document.addEventListener('fullscreenchange', setGameFsLabel);
+    document.addEventListener('webkitfullscreenchange', setGameFsLabel);
+    document.addEventListener('i18n:change', setGameFsLabel);
+  }
+
   /* iOS-переход открытия приложения: пока открыт хотя бы один лист,
      springboard отъезжает назад (scale .96) и темнеет, док/поиск прячутся */
   function updateAppOpen() {
@@ -217,10 +262,92 @@
     try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
   }
 
+  /* ============================================================
+     D1 — АНИМАЦИЯ ОКНА ИЗ ИКОНКИ-ТРИГГЕРА (как в macOS)
+     Открытие: transform-origin ставится в центр иконки (в координатах
+     окна), окно «вылетает» scale(.25)→1 за 320ms cubic-bezier(.32,.72,0,1).
+     Закрытие/сворачивание: обратно в иконку (в док — «всасывается»), 240ms.
+     Reduced-motion: мгновенно, без анимаций.
+     ============================================================ */
+  var WIN_EASE = 'cubic-bezier(.32,.72,0,1)';
+
+  /* центр видимого элемента-триггера в координатах вьюпорта */
+  function triggerPoint(trg) {
+    if (!trg || !trg.getBoundingClientRect || !document.contains(trg)) return null;
+    if (trg.offsetParent === null && getComputedStyle(trg).position !== 'fixed') return null; // скрыт
+    var r = trg.getBoundingClientRect();
+    if (!r.width && !r.height) return null;
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+
+  /* transform-origin окна = точка триггера в локальных координатах окна.
+     Рект меряем с transform:none — текущий scale(.96/.25) исказил бы точку. */
+  function setOriginToTrigger(win, pt) {
+    var prev = win.style.transform;
+    win.style.transform = 'none';
+    var r = win.getBoundingClientRect();
+    win.style.transform = prev;
+    win.style.transformOrigin = (pt.x - r.left) + 'px ' + (pt.y - r.top) + 'px';
+  }
+
+  /* окно вылетает из иконки; вернуть false, если анимация невозможна */
+  function animateWinFrom(win, trg) {
+    if (reduceMotion || isMobile() || !win.animate) return false;
+    var pt = triggerPoint(trg);
+    if (!pt) return false;
+    setOriginToTrigger(win, pt);
+    var anim = win.animate(
+      [{ transform: 'scale(.25)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }],
+      { duration: 320, easing: WIN_EASE }
+    );
+    anim.onfinish = function () { win.style.transformOrigin = ''; };
+    return true;
+  }
+
+  /* окно «всасывается» в иконку (scale к origin + fade); done — по завершении */
+  function animateWinTo(win, trg, done) {
+    if (reduceMotion || isMobile() || !win.animate) return false;
+    var pt = triggerPoint(trg);
+    if (!pt) return false;
+    setOriginToTrigger(win, pt);
+    var fin = false;
+    var end = function () { if (fin) return; fin = true; win.style.transformOrigin = ''; done(); };
+    var anim = win.animate(
+      [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.22)', opacity: 0 }],
+      { duration: 240, easing: WIN_EASE }
+    );
+    anim.onfinish = end;
+    anim.oncancel = end;
+    setTimeout(end, 320); // страховка, если onfinish не пришёл
+    return true;
+  }
+
+  /* мобильный отклик от точки тапа: иконка пульсирует (лист выезжает по CSS) */
+  function pulseTrigger(trg) {
+    if (reduceMotion || !trg) return;
+    var el = trg.querySelector && trg.querySelector('img') || trg;
+    if (!el.animate) return;
+    el.animate(
+      [{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }],
+      { duration: 260, easing: 'ease-out' }
+    );
+  }
+
+  /* скриншоты внутри окон грузим при первом открытии (вес первой загрузки) */
+  function hydrateImages(win) {
+    Array.prototype.forEach.call(win.querySelectorAll('img[data-src]'), function (im) {
+      im.src = im.getAttribute('data-src');
+      im.removeAttribute('data-src');
+    });
+  }
+
   function openWindow(id, trigger) {
     var win = document.getElementById(id);
     if (!win) return;
+    hydrateImages(win);
     if (id === 'win-agents') ensureAgentsFrame();
+    if (id === 'win-game') ensureGameFrame();
+    if (id === 'win-assistant' && window.Messenger) window.Messenger.onOpen();
     place(win);
     win.style.transform = '';
     win.classList.remove('is-closing');
@@ -233,7 +360,13 @@
     updateAppOpen();
     /* только для действий пользователя: переносим фокус в окно и запоминаем,
        куда его вернуть. Автооткрытие README при загрузке фокус не трогает. */
-    if (trigger) { lastTrigger[id] = trigger; moveFocus(win); }
+    if (trigger) {
+      lastTrigger[id] = trigger;
+      moveFocus(win);
+      /* красивое открытие: десктоп — вылет из иконки, мобайл — пульс иконки */
+      if (isMobile()) pulseTrigger(trigger);
+      else animateWinFrom(win, trigger);
+    }
   }
 
   function hideWindow(id, keepDot) {
@@ -246,12 +379,20 @@
     var done = function () {
       win.classList.remove('is-open', 'is-closing');
       win.style.transform = '';
+      win.style.transformOrigin = '';
       win.removeEventListener('transitionend', done);
     };
-    if (reduceMotion) { done(); } else { win.addEventListener('transitionend', done); setTimeout(done, 340); }
+    /* куда «улетает» окно: сворачивание — в иконку дока,
+       закрытие — в иконку-триггер (или в док, если триггер пропал) */
+    var trg = lastTrigger[id];
+    var target = keepDot
+      ? (dockApp(id) || trg)
+      : ((trg && document.contains(trg)) ? trg : dockApp(id));
+    if (reduceMotion) { done(); }
+    else if (animateWinTo(win, target, done)) { /* полёт в иконку запущен */ }
+    else { win.addEventListener('transitionend', done); setTimeout(done, 340); }
     if (!keepDot) { var d = dockApp(id); if (d) d.classList.remove('is-open'); }
     /* вернуть фокус на триггер, если он ещё в DOM */
-    var trg = lastTrigger[id];
     if (trg && document.contains(trg)) moveFocus(trg);
     lastTrigger[id] = null;
   }
@@ -487,6 +628,7 @@
     initDrag(wins[i]); initFocus(wins[i]); initControls(wins[i]); initSheetSwipe(wins[i]); initResize(wins[i]);
   }
   initAgentsFs();
+  initGameFs();
 
   /* ---------- ТРИГГЕРЫ ОТКРЫТИЯ ---------- */
   document.addEventListener('click', function (e) {
@@ -514,6 +656,9 @@
       return;
     }
     if (e.key !== 'Escape') return;
+    // Spotlight сам обрабатывает Esc — не закрываем окно под ним
+    var spot = document.getElementById('spot');
+    if (spot && !spot.hasAttribute('hidden')) return;
     if (!document.getElementById('cc').hasAttribute('hidden')) { closeCC(); return; }
     var win = topOpenWindow();
     if (win) closeWindow(win.id);
@@ -1354,6 +1499,422 @@
   })();
 
   /* ============================================================
+     КАЛЬКУЛЯТОР ПРОЕКТА (D2) — конфигуратор стоимости
+
+     Формула: ИТОГ = база(услуга) × объём(×1/×1.8/×3/×6) × срочность(×1/×1.3),
+     округлённая до тысячи; «Железо под ключ» добавляет 180 000 ₽ разово.
+     «Поддержка» (от 15 000 ₽/мес) — отдельной строкой, в разовый итог
+     не входит. Курс для второй валюты: 1 $ ≈ 100 ₽ (как в прайсе V5).
+     Сумма пересчитывается живьём с «прокруткой» цифр (300ms, tabular-nums).
+     ============================================================ */
+  (function () {
+    var win = document.getElementById('win-calc');
+    if (!win) return;
+
+    /* тарифная сетка — чистый JS-объект, цены «от», ₽ */
+    var RATES = {
+      services: {           // база = цена «от» из окна «Услуги» (V5)
+        ai: 150000,         // ИИ-сотрудник / внедрение
+        site: 50000,        // сайт под ключ
+        bot: 100000,        // AI-бот / агент
+        voice: 200000,      // голосовой ассистент
+        auto: 80000,        // автоматизация бизнеса
+        integr: 150000,     // AI-интеграции
+        video: 20000,       // AI-видео (за ролик)
+        content: 50000      // контент-фабрика (в месяц)
+      },
+      rush: 1.3,            // срочность: сжатые сроки = +30%
+      hw: 180000,           // железо под ключ: от Станции «Старт»
+      supportMo: 15000,     // поддержка, ₽/мес — отдельной строкой
+      usd: 100              // 1 $ ≈ 100 ₽, округляем красиво
+    };
+    /* имя услуги для текста сметы — те же i18n-ключи, что в окне «Услуги» */
+    var SVC_KEY = {
+      ai: 'calc.svcAi', site: 'svc.s1.h', bot: 'svc.s2.h', voice: 'svc.s4.h',
+      auto: 'svc.s5.h', integr: 'svc.s6.h', video: 'svc.s7.h', content: 'svc.s8.h'
+    };
+
+    var state = { svc: 'ai', mult: 1, volIdx: 1, rush: false, hw: false, sup: false };
+
+    var elSum = document.getElementById('calcSum');
+    var elAlt = document.getElementById('calcAlt');
+    var elMo = document.getElementById('calcMo');
+    var elCta = document.getElementById('calcCta');
+
+    function total() {
+      var x = RATES.services[state.svc] * state.mult;         // база × объём
+      if (state.rush) x *= RATES.rush;                        // × срочность
+      x = Math.round(x / 1000) * 1000;                        // до тысячи
+      if (state.hw) x += RATES.hw;                            // + железо разово
+      return x;
+    }
+
+    /* 351000 → «351 000» (неразрывные пробелы) / "351,000" */
+    function fmtRub(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+    function fmtUsd(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+    function toUsd(rub) { return Math.round(rub / RATES.usd / 10) * 10; }
+
+    /* нарисовать сумму (rub) в текущем языке: RU — «от X ₽» + «≈ $Y», EN — наоборот */
+    function paint(rub) {
+      var usd = toUsd(rub);
+      if (lang() === 'en') {
+        elSum.textContent = tr('calc.from') + ' $' + fmtUsd(usd);
+        elAlt.textContent = '≈ ' + fmtRub(rub) + ' ₽';
+      } else {
+        elSum.textContent = tr('calc.from') + ' ' + fmtRub(rub) + ' ₽';
+        elAlt.textContent = '≈ $' + fmtUsd(usd);
+      }
+    }
+
+    /* «прокрутка» цифр: от показанного значения к новому за 300ms */
+    var shownRub = total(), rollRaf = null;
+    function rollTo(target) {
+      if (rollRaf) { cancelAnimationFrame(rollRaf); rollRaf = null; }
+      if (reduceMotion || !window.requestAnimationFrame) { shownRub = target; paint(target); return; }
+      var from = shownRub, t0 = null;
+      rollRaf = requestAnimationFrame(function step(ts) {
+        if (t0 === null) t0 = ts;
+        var k = Math.min((ts - t0) / 300, 1);
+        var e = 1 - Math.pow(1 - k, 3);                       // ease-out cubic
+        /* промежуточные значения держим кратными тысяче — цифры «крутятся» ровно */
+        var v = Math.round((from + (target - from) * e) / 1000) * 1000;
+        paint(v);
+        if (k < 1) rollRaf = requestAnimationFrame(step);
+        else { shownRub = target; rollRaf = null; }
+      });
+    }
+
+    /* текст расчёта для Telegram — собирается из тех же i18n-строк */
+    function tgHref() {
+      var t = total();
+      var sum = (lang() === 'en')
+        ? tr('calc.from') + ' $' + fmtUsd(toUsd(t)) + ' (≈ ' + fmtRub(t) + ' ₽)'
+        : tr('calc.from') + ' ' + fmtRub(t) + ' ₽';
+      var opts = [];
+      if (state.hw) opts.push(tr('calc.optHw').replace(/^\+\s*/, ''));
+      if (state.sup) opts.push(tr('calc.optSup').replace(/^\+\s*/, '') + ' (' + tr('calc.moLine') + ')');
+      var lines = [
+        tr('calc.tg.head'),
+        tr('calc.tg.svc') + ': ' + tr(SVC_KEY[state.svc]),
+        tr('calc.tg.vol') + ': ' + tr('calc.vol' + state.volIdx) + ' (×' + state.mult + ')',
+        tr('calc.tg.rush') + ': ' + tr(state.rush ? 'calc.tg.yes' : 'calc.tg.no'),
+        tr('calc.tg.opts') + ': ' + (opts.length ? opts.join(', ') : tr('calc.tg.none')),
+        tr('calc.tg.total') + ': ' + sum
+      ];
+      return 'https://t.me/Shahen_kazaryan?text=' + encodeURIComponent(lines.join('\n'));
+    }
+
+    function render(animate) {
+      var t = total();
+      if (animate === false) { shownRub = t; paint(t); }
+      else rollTo(t);
+      var mo = state.sup;
+      elMo.hidden = !mo;
+      if (mo) elMo.textContent = '+ ' + tr('calc.moLine');
+      if (elCta) elCta.href = tgHref();
+    }
+
+    /* шаг 1: услуга */
+    var svcWrap = document.getElementById('calcSvc');
+    if (svcWrap) svcWrap.addEventListener('click', function (e) {
+      var b = e.target.closest('.calc-svc__btn');
+      if (!b) return;
+      state.svc = b.dataset.svc;
+      var all = svcWrap.querySelectorAll('.calc-svc__btn');
+      for (var i = 0; i < all.length; i++) {
+        var sel = all[i] === b;
+        all[i].classList.toggle('is-sel', sel);
+        all[i].setAttribute('aria-checked', sel ? 'true' : 'false');
+      }
+      render();
+    });
+
+    /* шаг 2: объём (сегмент-контрол iOS) */
+    var volWrap = document.getElementById('calcVol');
+    if (volWrap) volWrap.addEventListener('click', function (e) {
+      var b = e.target.closest('.calc-seg__btn');
+      if (!b) return;
+      state.mult = parseFloat(b.dataset.mult);
+      var all = volWrap.querySelectorAll('.calc-seg__btn');
+      for (var i = 0; i < all.length; i++) {
+        var sel = all[i] === b;
+        if (sel) state.volIdx = i + 1;
+        all[i].classList.toggle('is-sel', sel);
+        all[i].setAttribute('aria-checked', sel ? 'true' : 'false');
+      }
+      render();
+    });
+
+    /* шаг 3: срочность + опции (тумблеры) */
+    function bindSwitch(id, key) {
+      var b = document.getElementById(id);
+      if (!b) return;
+      b.addEventListener('click', function () {
+        state[key] = !state[key];
+        b.classList.toggle('is-on', state[key]);
+        b.setAttribute('aria-checked', state[key] ? 'true' : 'false');
+        render();
+      });
+    }
+    bindSwitch('calcRush', 'rush');
+    bindSwitch('calcHw', 'hw');
+    bindSwitch('calcSup', 'sup');
+
+    /* смена языка: перерисовать суммы и ссылку без анимации */
+    document.addEventListener('i18n:change', function () { render(false); });
+
+    render(false);
+  })();
+
+  /* ============================================================
+     КАЛЕНДАРЬ ЗАПИСИ НА ДЕМО (E2)
+
+     Сетка месяца (пн–вс, сегодня подсвечен, прошедшие/выходные недоступны),
+     навигация ← → в пределах [текущий месяц … +2]. Клик по рабочему дню →
+     слоты 11:00–17:30 (шаг 30 мин). Слот + имя → «Записаться»:
+     deep-link t.me с prefilled-текстом + автоскачивание .ics (VEVENT 30 мин)
+     Blob-ом. Никакой отправки на сервер — только ссылка и файл.
+     ============================================================ */
+  (function () {
+    var win = document.getElementById('win-calendar');
+    if (!win) return;
+
+    var monthEl = document.getElementById('calMonth');
+    var gridEl = document.getElementById('calGrid');
+    var prevBtn = document.getElementById('calPrev');
+    var nextBtn = document.getElementById('calNext');
+    var panel = document.getElementById('calPanel');
+    var slotsEl = document.getElementById('calSlots');
+    var pickedDayEl = document.getElementById('calPickedDay');
+    var pickedLine = document.getElementById('calPickedLine');
+    var form = document.getElementById('calForm');
+    var nameEl = document.getElementById('calName');
+    var contactEl = document.getElementById('calContact');
+    var submitBtn = document.getElementById('calSubmit');
+    var errEl = document.getElementById('calErr');
+
+    /* названия месяцев — локальные данные (офлайн, без Intl-сюрпризов) */
+    var MONTHS = {
+      ru: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+      en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    };
+    var MONTHS_GEN = { // родительный падеж для «10 июля»
+      ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
+    };
+
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var RANGE = 2;                                   // навигация до +2 месяцев вперёд
+    var minKey = today.getFullYear() * 12 + today.getMonth();
+    var maxKey = minKey + RANGE;
+    var viewY = today.getFullYear(), viewM = today.getMonth();
+    var selDate = null, selTime = null;
+
+    function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+    /* слоты 11:00–17:30, шаг 30 мин: демо длится 30 минут и завершается к 18:00 */
+    var SLOTS = [];
+    for (var hh = 11; hh <= 17; hh++) { SLOTS.push(pad2(hh) + ':00'); SLOTS.push(pad2(hh) + ':30'); }
+    function isWknd(dt) { var d = dt.getDay(); return d === 0 || d === 6; }
+    function sameDay(a, b) { return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+
+    /* «10 июля 2026» / «July 10, 2026» */
+    function humanDate(dt) {
+      var d = dt.getDate(), y = dt.getFullYear(), m = dt.getMonth();
+      if (lang() === 'en') return MONTHS.en[m] + ' ' + d + ', ' + y;
+      return d + ' ' + MONTHS_GEN.ru[m] + ' ' + y;
+    }
+
+    function updateNav() {
+      var key = viewY * 12 + viewM;
+      prevBtn.disabled = key <= minKey;
+      nextBtn.disabled = key >= maxKey;
+    }
+
+    function renderGrid() {
+      monthEl.textContent = MONTHS[lang()][viewM] + ' ' + viewY;
+      updateNav();
+      gridEl.innerHTML = '';
+      var first = new Date(viewY, viewM, 1);
+      var lead = (first.getDay() + 6) % 7;            // понедельник = 0
+      var days = new Date(viewY, viewM + 1, 0).getDate();
+      for (var b = 0; b < lead; b++) {
+        var blank = document.createElement('span');
+        blank.className = 'calx__day calx__day--blank';
+        blank.setAttribute('aria-hidden', 'true');
+        gridEl.appendChild(blank);
+      }
+      for (var d = 1; d <= days; d++) {
+        var dt = new Date(viewY, viewM, d); dt.setHours(0, 0, 0, 0);
+        var cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'calx__day';
+        cell.textContent = d;
+        cell.setAttribute('role', 'gridcell');
+        var past = dt < today, wknd = isWknd(dt);
+        if (sameDay(dt, today)) cell.classList.add('calx__day--today');
+        if (wknd) cell.classList.add('calx__day--wknd');
+        if (past || wknd) {
+          cell.classList.add('calx__day--past');
+          cell.disabled = true;
+        } else {
+          (function (date) {
+            cell.addEventListener('click', function () { pickDay(date); });
+          })(dt);
+        }
+        if (selDate && sameDay(dt, selDate)) cell.classList.add('calx__day--sel');
+        cell.setAttribute('aria-label', humanDate(dt));
+        gridEl.appendChild(cell);
+      }
+    }
+
+    function pickDay(dt) {
+      selDate = dt; selTime = null;
+      renderGrid();
+      pickedDayEl.textContent = humanDate(dt);
+      renderSlots();
+      panel.hidden = false;
+      pickedLine.hidden = true;
+      updateSubmit();
+      if (!reduceMotion && panel.scrollIntoView) {
+        try { panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+      }
+    }
+
+    function renderSlots() {
+      slotsEl.innerHTML = '';
+      SLOTS.forEach(function (tm) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'calx__slot';
+        b.textContent = tm;
+        b.setAttribute('role', 'radio');
+        b.setAttribute('aria-checked', selTime === tm ? 'true' : 'false');
+        if (selTime === tm) b.classList.add('calx__slot--sel');
+        b.addEventListener('click', function () {
+          selTime = tm;
+          var all = slotsEl.querySelectorAll('.calx__slot');
+          for (var i = 0; i < all.length; i++) {
+            var on = all[i] === b;
+            all[i].classList.toggle('calx__slot--sel', on);
+            all[i].setAttribute('aria-checked', on ? 'true' : 'false');
+          }
+          pickedLine.hidden = false;
+          pickedLine.textContent = '✓ ' + humanDate(selDate) + ' · ' + selTime;
+          updateSubmit();
+        });
+        slotsEl.appendChild(b);
+      });
+    }
+
+    function updateSubmit() {
+      var ok = !!selDate && !!selTime && nameEl.value.trim().length > 0;
+      submitBtn.disabled = !ok;
+    }
+
+    /* deep-link Telegram с расчётом записи */
+    function tgHref() {
+      var contact = contactEl.value.trim();
+      var msg = tr('cal.tg.msg')
+        .replace('{d}', humanDate(selDate))
+        .replace('{t}', selTime)
+        .replace('{n}', nameEl.value.trim())
+        .replace('{c}', contact ? (', ' + contact) : '');
+      return 'https://t.me/Shahen_kazaryan?text=' + encodeURIComponent(msg);
+    }
+
+    /* .ics VEVENT на 30 минут (плавающее локальное время) */
+    function icsStamp(dt) {
+      return dt.getUTCFullYear() + pad2(dt.getUTCMonth() + 1) + pad2(dt.getUTCDate()) +
+        'T' + pad2(dt.getUTCHours()) + pad2(dt.getUTCMinutes()) + pad2(dt.getUTCSeconds()) + 'Z';
+    }
+    function icsLocal(y, mo, d, h, mi) {
+      return y + pad2(mo + 1) + pad2(d) + 'T' + pad2(h) + pad2(mi) + '00';
+    }
+    function downloadIcs() {
+      var parts = selTime.split(':');
+      var h = +parts[0], mi = +parts[1];
+      var startL = icsLocal(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), h, mi);
+      var endM = mi + 30, endH = h + Math.floor(endM / 60); endM = endM % 60;
+      var endL = icsLocal(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), endH, endM);
+      var uid = selDate.getTime() + '-' + h + mi + '-urartu@shahen777.github.io';
+      var lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Urartu AI//Demo//RU',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        'UID:' + uid,
+        'DTSTAMP:' + icsStamp(new Date()),
+        'DTSTART:' + startL,
+        'DTEND:' + endL,
+        'SUMMARY:' + tr('cal.ics.summary'),
+        'DESCRIPTION:' + tr('cal.ics.desc'),
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ];
+      var blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'urartu-demo.ics';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    }
+
+    prevBtn.addEventListener('click', function () {
+      var key = viewY * 12 + viewM; if (key <= minKey) return;
+      viewM--; if (viewM < 0) { viewM = 11; viewY--; }
+      selDate = null; selTime = null; panel.hidden = true; renderGrid();
+    });
+    nextBtn.addEventListener('click', function () {
+      var key = viewY * 12 + viewM; if (key >= maxKey) return;
+      viewM++; if (viewM > 11) { viewM = 0; viewY++; }
+      selDate = null; selTime = null; panel.hidden = true; renderGrid();
+    });
+
+    nameEl.addEventListener('input', updateSubmit);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!selDate || !selTime) { errEl.hidden = false; errEl.textContent = tr('cal.err.slot'); return; }
+      if (!nameEl.value.trim()) { errEl.hidden = false; errEl.textContent = tr('cal.err.name'); nameEl.focus(); return; }
+      errEl.hidden = true;
+      downloadIcs();                                 // встреча падает в календарь клиента
+      window.open(tgHref(), '_blank', 'noopener');   // и уходит запрос в Telegram
+    });
+
+    document.addEventListener('i18n:change', function () {
+      renderGrid();
+      if (selDate) { pickedDayEl.textContent = humanDate(selDate); renderSlots(); }
+      if (selDate && selTime) pickedLine.textContent = '✓ ' + humanDate(selDate) + ' · ' + selTime;
+    });
+
+    renderGrid();
+  })();
+
+  /* ============================================================
+     PWA-установка (E1) — кнопка «Установить приложение»
+     Появляется только если браузер прислал beforeinstallprompt.
+     Внешнего ничего не грузит; iOS-инструкция в окне остаётся всегда.
+     ============================================================ */
+  (function () {
+    var btn = document.getElementById('pwaInstall');
+    if (!btn) return;
+    var deferred = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault(); deferred = e; btn.hidden = false;
+    });
+    btn.addEventListener('click', function () {
+      if (!deferred) return;
+      deferred.prompt();
+      var done = function () { deferred = null; btn.hidden = true; };
+      if (deferred.userChoice && deferred.userChoice.then) deferred.userChoice.then(done, done);
+      else done();
+    });
+    window.addEventListener('appinstalled', function () { deferred = null; btn.hidden = true; });
+  })();
+
+  /* ============================================================
      МАГНИФИКАЦИЯ ДОКА (как в macOS)
 
      Ключ к «настоящему» ощущению: иконка растёт РАЗМЕРОМ, а не scale().
@@ -1460,6 +2021,818 @@
         apps = [];
       }, { passive: true });
     }
+  })();
+
+  /* ============================================================
+     F1 — МЕССЕНДЖЕР «Сообщения» (чат с ИИ-агентами поверх LocalAI)
+     ============================================================ */
+  var Messenger = (function () {
+    var AVA = {
+      documoved: '<svg viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h9l5 5v19H9z"/><path d="M18 4v5h5"/><line x1="12.5" y1="15" x2="19.5" y2="15"/><line x1="12.5" y1="19" x2="19.5" y2="19"/><line x1="12.5" y1="23" x2="17" y2="23"/></svg>',
+      lawyer:    '<svg viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l9 3v7c0 6-4 10-9 13-5-3-9-7-9-13V7z"/><path d="M12 15.5l3 3 5-6"/></svg>',
+      support:   '<svg viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17v-2a9 9 0 0 1 18 0v2"/><rect x="4.5" y="16" width="4.5" height="8" rx="1.8"/><rect x="23" y="16" width="4.5" height="8" rx="1.8"/><path d="M25 24v1a4 4 0 0 1-4 4h-3"/></svg>',
+      secretary: '<svg viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="11" r="5"/><path d="M6 27a10 10 0 0 1 20 0"/></svg>'
+    };
+    var CONVS = [
+      { id: 'documoved', nameKey: 'msg.n.documoved', time: '9:41', seed: [ { who: 'them', key: 'msg.doc.s1' }, { who: 'them', key: 'msg.doc.s2' } ], prevKey: 'msg.prev.documoved' },
+      { id: 'lawyer',    nameKey: 'msg.n.lawyer',    time: '9:38', seed: [ { who: 'them', key: 'msg.greet.lawyer' } ], prevKey: 'msg.prev.lawyer' },
+      { id: 'support',   nameKey: 'msg.n.support',   time: '9:15', seed: [ { who: 'them', key: 'msg.greet.support' } ], prevKey: 'msg.prev.support' },
+      { id: 'secretary', nameKey: 'msg.n.secretary', time: '8:52', seed: [ { who: 'them', key: 'msg.greet.secretary' } ], prevKey: 'msg.prev.secretary' }
+    ];
+    var threads = {};   // id -> [ {who, text|key, chips?} ]
+    var cur = null, inited = false, typingEl = null;
+
+    function el(id) { return document.getElementById(id); }
+    function textOf(m) { return (m.key != null) ? tr(m.key) : m.text; }
+
+    function buildList() {
+      var wrap = el('msgConvs'); if (!wrap) return;
+      wrap.innerHTML = '';
+      CONVS.forEach(function (c) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'msg__conv'; b.setAttribute('role', 'tab');
+        b.dataset.agent = c.id;
+        b.innerHTML =
+          '<span class="msg__av msg__av--' + c.id + '" aria-hidden="true">' + AVA[c.id] + '</span>' +
+          '<span class="msg__conv-txt"><span class="msg__conv-top"><span class="msg__conv-name"></span>' +
+          '<span class="msg__conv-time">' + c.time + '</span></span>' +
+          '<span class="msg__conv-last"></span></span>';
+        b.addEventListener('click', function () { select(c.id); });
+        wrap.appendChild(b);
+        c._btn = b;
+      });
+      refreshPreviews();
+    }
+
+    function refreshPreviews() {
+      CONVS.forEach(function (c) {
+        if (!c._btn) return;
+        c._btn.querySelector('.msg__conv-name').textContent = tr(c.nameKey);
+        var t = threads[c.id];
+        var last = (c._lastText != null) ? c._lastText : tr(c.prevKey);
+        c._btn.querySelector('.msg__conv-last').textContent = last;
+        c._btn.classList.toggle('is-active', c.id === cur);
+        c._btn.setAttribute('aria-selected', c.id === cur ? 'true' : 'false');
+      });
+    }
+
+    function bubble(m) {
+      var row = document.createElement('div');
+      row.className = 'msg__row msg__row--' + (m.who === 'me' ? 'me' : 'them');
+      var b = document.createElement('div');
+      b.className = 'msg__bubble';
+      if (m.html) { b.classList.add('msg__bubble--rich'); b.innerHTML = m.html; } // html строится только нашим кодом (G1), пользовательский текст экранируется
+      else b.textContent = textOf(m);
+      row.appendChild(b);
+      if (m.chips && m.chips.length) {
+        var cr = document.createElement('div');
+        cr.className = 'msg__chips';
+        m.chips.forEach(function (ch) {
+          var cb = document.createElement('button');
+          cb.type = 'button'; cb.className = 'msg__chip'; cb.dataset.win = ch.win;
+          cb.textContent = ch.label; // открытие окна — через глобальный [data-win] обработчик
+          cr.appendChild(cb);
+        });
+        row.appendChild(cr);
+      }
+      return row;
+    }
+
+    function renderThread() {
+      var th = el('msgThread'); if (!th) return;
+      th.innerHTML = '';
+      (threads[cur] || []).forEach(function (m) { th.appendChild(bubble(m)); });
+      scrollDown();
+    }
+    function scrollDown() { var th = el('msgThread'); if (th) th.scrollTop = th.scrollHeight; }
+
+    function setHead() {
+      var c = find(cur); if (!c) return;
+      var av = el('msgHeadAv'); if (av) av.innerHTML = AVA[cur];
+      var nm = el('msgHeadName'); if (nm) nm.textContent = tr(c.nameKey);
+    }
+    function find(id) { for (var i = 0; i < CONVS.length; i++) if (CONVS[i].id === id) return CONVS[i]; return null; }
+
+    function select(id) {
+      cur = id;
+      var win = el('msg'); if (win) win.classList.add('is-chat');
+      setHead(); renderThread(); refreshPreviews(); updateTools(id);
+      var f = el('msgText'); if (f && !isMobile()) { try { f.focus(); } catch (e) {} }
+    }
+
+    /* G2/G3/G4 — инструменты, зависящие от агента */
+    function updateTools(id) {
+      var tools = el('msgTools'); if (!tools) return;
+      var d = el('msgDocBtn'), l = el('msgLawBtn'), c = el('msgCallBtn');
+      if (d) d.hidden = (id !== 'documoved');
+      if (l) l.hidden = (id !== 'lawyer');
+      if (c) c.hidden = (id !== 'secretary');
+      tools.hidden = !((d && !d.hidden) || (l && !l.hidden) || (c && !c.hidden));
+      var dp = el('msgDocPanel'), lp = el('msgLawPanel');
+      if (dp && id !== 'documoved') dp.hidden = true;
+      if (lp && id !== 'lawyer') lp.hidden = true;
+    }
+
+    function showTyping() {
+      var th = el('msgThread'); if (!th) return;
+      typingEl = document.createElement('div');
+      typingEl.className = 'msg__row msg__row--them';
+      typingEl.innerHTML = '<div class="msg__bubble msg__typing"><i></i><i></i><i></i></div>';
+      th.appendChild(typingEl); scrollDown();
+    }
+    function clearTyping() { if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl); typingEl = null; }
+
+    function push(m) {
+      threads[cur] = threads[cur] || [];
+      threads[cur].push(m);
+      var th = el('msgThread'); if (th) { th.appendChild(bubble(m)); scrollDown(); }
+      var c = find(cur); if (c) c._lastText = textOf(m);
+      refreshPreviews();
+    }
+
+    function send(text) {
+      text = (text || '').trim(); if (!text || !cur) return;
+      push({ who: 'me', text: text });
+      showTyping();
+      var delay = reduceMotion ? 0 : (800 + Math.random() * 700); // 0.8–1.5с
+      var agent = cur;
+      setTimeout(function () {
+        var fin = function (res) {
+          clearTyping();
+          push({ who: 'them', text: res.text, html: res.html, chips: res.chips || [] });
+        };
+        if (window.LocalAI && window.LocalAI.askAsync) {
+          // G1: асинхронный уровень (WebLLM, если пользователь её включил)
+          window.LocalAI.askAsync(agent, text, lang()).then(fin, function () {
+            fin(window.LocalAI.ask(agent, text, lang()));
+          });
+        } else {
+          fin(window.LocalAI ? window.LocalAI.ask(agent, text, lang()) : { text: text, chips: [] });
+        }
+      }, delay);
+    }
+
+    function init() {
+      if (inited) return; inited = true;
+      threads = {};
+      CONVS.forEach(function (c) { threads[c.id] = c.seed.slice(); });
+      buildList();
+      var form = el('msgForm'), field = el('msgText'), back = el('msgBack');
+      if (form) form.addEventListener('submit', function (e) {
+        e.preventDefault(); if (!field) return; var v = field.value; field.value = ''; send(v);
+      });
+      if (back) back.addEventListener('click', function () {
+        var win = el('msg'); if (win) win.classList.remove('is-chat');
+      });
+      document.addEventListener('i18n:change', function () {
+        if (!inited) return;
+        buildListPreservePrev(); setHead(); renderThread();
+      });
+      initTools();
+      cur = 'documoved';
+    }
+
+    /* ---------- G2/G3: панели «свой документ» и «проверка договора» ---------- */
+    function escG(s) { return (window.LocalAI && window.LocalAI.escape) ? window.LocalAI.escape(s) : String(s); }
+
+    function initTools() {
+      var docBtn = el('msgDocBtn'), docPanel = el('msgDocPanel'), lawBtn = el('msgLawBtn'), lawPanel = el('msgLawPanel'), callBtn = el('msgCallBtn');
+      var docFileName = '';
+      if (docBtn) docBtn.addEventListener('click', function () {
+        if (docPanel) { docPanel.hidden = !docPanel.hidden; if (lawPanel) lawPanel.hidden = true; }
+      });
+      if (lawBtn) lawBtn.addEventListener('click', function () {
+        if (lawPanel) { lawPanel.hidden = !lawPanel.hidden; if (docPanel) docPanel.hidden = true; }
+      });
+      if (callBtn) callBtn.addEventListener('click', function () {
+        openWindow('win-call', callBtn);
+      });
+
+      /* файл .txt/.md — читается ЛОКАЛЬНО, никуда не отправляется */
+      var docFile = el('docFile');
+      if (docFile) docFile.addEventListener('change', function () {
+        var f = docFile.files && docFile.files[0]; if (!f) return;
+        var docOkEl = el('docOk');
+        if (!/\.(txt|md|markdown|text)$/i.test(f.name) && !/^text\//.test(f.type || '')) {
+          if (docOkEl) { docOkEl.textContent = tr('doc.badfile'); docOkEl.hidden = false; }
+          docFile.value = ''; return;
+        }
+        docFileName = f.name;
+        var r = new FileReader();
+        r.onload = function () {
+          var ta = el('docText');
+          if (ta) ta.value = String(r.result || '').slice(0, 300000);
+          if (docOkEl) docOkEl.hidden = true;
+        };
+        r.readAsText(f);
+      });
+
+      var docLoad = el('docLoad'), docClear = el('docClear'), docOk = el('docOk');
+      if (docLoad) docLoad.addEventListener('click', function () {
+        var ta = el('docText'); var txt = ta ? ta.value.trim() : '';
+        if (!txt) { if (docOk) { docOk.textContent = tr('doc.empty'); docOk.hidden = false; } if (ta) ta.focus(); return; }
+        var n = window.LocalAI.doc.set(txt, docFileName);
+        if (docOk) { docOk.textContent = tr('doc.loaded').replace('{n}', n); docOk.hidden = false; }
+        if (docClear) docClear.hidden = false;
+        if (docPanel) docPanel.hidden = true;
+        push({ who: 'them', text: tr('doc.loaded').replace('{n}', n) });
+      });
+      if (docClear) docClear.addEventListener('click', function () {
+        window.LocalAI.doc.clear();
+        var ta = el('docText'); if (ta) ta.value = '';
+        docFileName = '';
+        if (docOk) docOk.hidden = true;
+        docClear.hidden = true;
+        push({ who: 'them', text: tr('doc.cleared') });
+      });
+
+      /* G3 — мгновенная детерминированная проверка договора */
+      var lawCheck = el('lawCheck');
+      if (lawCheck) lawCheck.addEventListener('click', function () {
+        var ta = el('lawText'); var txt = ta ? ta.value.trim() : '';
+        if (!txt) { if (ta) ta.focus(); return; }
+        var r = window.LocalAI.checkContract(txt);
+        if (lawPanel) lawPanel.hidden = true;
+        push({ who: 'me', text: tr('law.sent').replace('{n}', r.words) });
+        if (r.words < 30) { push({ who: 'them', text: tr('law.short') }); return; }
+        push({ who: 'them', text: tr('law.head').replace('{n}', r.items.length), html: lawReportHtml(r) });
+      });
+
+      initLlmButton();
+    }
+
+    function lawReportHtml(r) {
+      var ic = { ok: '✔', warn: '⚠', miss: '✖' };
+      var rows = r.items.map(function (it) {
+        var note = (it.status === 'ok') ? tr('law.ok')
+                 : tr('law.' + it.status) + ': ' + tr('law.' + it.id + '.w');
+        return '<li class="law-' + it.status + '"><i>' + ic[it.status] + '</i><span><b>' +
+               escG(tr('law.' + it.id + '.n')) + '</b> — ' + escG(note) + '</span></li>';
+      }).join('');
+      var counts = tr('law.counts').replace('{ok}', r.counts.ok).replace('{warn}', r.counts.warn).replace('{miss}', r.counts.miss);
+      return '<div class="law-rep"><b>' + escG(tr('law.head').replace('{n}', r.items.length)) + '</b>' +
+             '<span class="law-rep__counts">' + escG(counts) + '</span>' +
+             '<ul>' + rows + '</ul>' +
+             '<p class="law-rep__final">' + escG(tr('law.final')) + '</p></div>';
+    }
+
+    /* ---------- G1: кнопка «Запустить настоящий локальный ИИ» ---------- */
+    function initLlmButton() {
+      var btn = el('llmBtn'), prog = el('llmProg'), bar = el('llmProgBar'), ptx = el('llmProgText'),
+          demo = el('msgDemoText'), hint = el('llmHint'), size = el('llmSize');
+      if (!btn || !window.LocalAI || !window.LocalAI.webllm) return;
+      var szLabel = function () { return (lang() === 'en') ? '~950 MB' : '~950 МБ'; };
+      var refresh = function () {
+        if (size) size.textContent = '(' + szLabel() + ')';
+        if (hint && !hint.hidden) hint.textContent = tr('ai.llm.hint').replace('{size}', szLabel());
+      };
+      if (navigator.gpu && window.LocalAI.webllm.state === 'idle') { // без WebGPU честно не показываем
+        btn.hidden = false;
+        if (hint) { hint.hidden = false; hint.textContent = tr('ai.llm.hint').replace('{size}', szLabel()); }
+      }
+      document.addEventListener('i18n:change', refresh);
+      refresh();
+      btn.addEventListener('click', function () {
+        btn.hidden = true;
+        if (hint) hint.hidden = true;
+        if (prog) prog.hidden = false;
+        if (demo) demo.textContent = tr('ai.llm.loading');
+        window.LocalAI.webllm.load(function (frac) {
+          var pc = Math.round(frac * 100);
+          if (bar) bar.style.width = pc + '%';
+          if (ptx) ptx.textContent = pc + '%';
+        }).then(function () {
+          if (prog) prog.hidden = true;
+          if (demo) demo.textContent = tr('ai.llm.ready');
+          var dm = el('msgDemo'); if (dm) dm.classList.add('is-llm');
+        }).catch(function () {
+          if (prog) prog.hidden = true;
+          if (demo) demo.textContent = tr('ai.llm.err');
+          btn.hidden = false;
+          if (hint) hint.hidden = false;
+        });
+      });
+    }
+    /* при смене языка обновляем ярлыки, сохранив динамические превью */
+    function buildListPreservePrev() {
+      var saved = {};
+      CONVS.forEach(function (c) { saved[c.id] = c._lastText; });
+      buildList();
+      CONVS.forEach(function (c) { c._lastText = saved[c.id]; });
+      refreshPreviews();
+    }
+
+    function onOpen() {
+      init();
+      try { sessionStorage.setItem('msgOpened', '1'); } catch (e) {}
+      if (window.Push) window.Push.suppress();
+      if (!cur || (isMobile())) { /* мобайл — стартуем со списка */ }
+      if (!isMobile()) select(cur || 'documoved');
+      else { setHead(); renderThread(); refreshPreviews(); }
+    }
+    function openConversation(id) {
+      init();
+      openWindow('win-assistant', document.getElementById('push') || dockApp('win-assistant'));
+      select(id);
+    }
+
+    return { init: init, onOpen: onOpen, openConversation: openConversation };
+  })();
+  window.Messenger = Messenger;
+  Messenger.init();
+
+  /* G6 — делегированный обработчик [data-chat]: открыть диалог агента */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-chat]') : null;
+    if (!b || !window.Messenger) return;
+    window.Messenger.openConversation(b.dataset.chat);
+  });
+
+  /* ============================================================
+     F3 — SPOTLIGHT-ПОИСК (Cmd+K / лупа / мобильная строка)
+     Индекс собирается из DOM (живой текст → i18n-паритет автоматом).
+     ============================================================ */
+  var Spotlight = (function () {
+    var overlay, field, results, empty, open = false, idx = [], sel = -1, lastFocus = null;
+
+    function build() {
+      idx = [];
+      var seen = {};
+      // окна из springboard
+      Array.prototype.forEach.call(document.querySelectorAll('.springboard .sb-icon[data-win]'), function (b) {
+        var win = b.dataset.win, lbl = (b.querySelector('span') || {}).textContent;
+        if (win && lbl && !seen[win]) { seen[win] = 1; idx.push({ label: lbl.trim(), win: win, kind: 'win' }); }
+      });
+      // FAQ вопросы (ищем и по тексту ответа — например, «152-ФЗ»)
+      Array.prototype.forEach.call(document.querySelectorAll('#win-faq details'), function (d) {
+        var s = d.querySelector('summary');
+        if (s) idx.push({ label: s.textContent.trim(), win: 'win-faq', kind: 'faq', detail: d, text: d.textContent });
+      });
+      // услуги
+      Array.prototype.forEach.call(document.querySelectorAll('#win-services .svc-card h4, #win-services .svc-flag__h'), function (h) {
+        idx.push({ label: h.textContent.trim(), win: 'win-services', kind: 'svc' });
+      });
+      // устройства
+      Array.prototype.forEach.call(document.querySelectorAll('#win-devices h3, #win-devices .dev-card h4'), function (h) {
+        var t = h.textContent.trim(); if (t) idx.push({ label: t, win: 'win-devices', kind: 'dev' });
+      });
+      // сотрудники
+      Array.prototype.forEach.call(document.querySelectorAll('#win-staff .staff-card__role'), function (h) {
+        idx.push({ label: h.textContent.trim(), win: 'win-staff', kind: 'staff' });
+      });
+    }
+
+    function kindLabel(k) {
+      return tr('spot.k.' + k);
+    }
+    function query(q) {
+      q = q.trim().toLowerCase();
+      if (!q) return idx.slice(0, 8);
+      var out = [];
+      for (var i = 0; i < idx.length; i++) {
+        var l = idx[i].label.toLowerCase();
+        var pos = l.indexOf(q);
+        if (pos > -1) { out.push({ e: idx[i], score: (pos === 0 ? 0 : 1) + l.length / 100 }); continue; }
+        // совпадение в теле (ответ FAQ) — ниже приоритетом
+        if (idx[i].text && idx[i].text.toLowerCase().indexOf(q) > -1) out.push({ e: idx[i], score: 3 });
+      }
+      out.sort(function (a, b) { return a.score - b.score; });
+      return out.slice(0, 10).map(function (o) { return o.e; });
+    }
+
+    function render() {
+      var q = field.value;
+      var list = query(q);
+      results.innerHTML = ''; sel = -1;
+      empty.hidden = list.length > 0;
+      list.forEach(function (e, i) {
+        var li = document.createElement('li');
+        li.className = 'spot__item'; li.setAttribute('role', 'option'); li.tabIndex = -1;
+        li.innerHTML = '<span class="spot__label"></span><span class="spot__kind">' + kindLabel(e.kind) + '</span>';
+        li.querySelector('.spot__label').textContent = e.label;
+        li.addEventListener('click', function () { choose(e); });
+        li.addEventListener('mousemove', function () { setSel(i); });
+        results.appendChild(li);
+      });
+      curList = list;
+      if (list.length) setSel(0);
+    }
+    var curList = [];
+    function setSel(i) {
+      var items = results.children;
+      for (var k = 0; k < items.length; k++) items[k].classList.toggle('is-sel', k === i);
+      sel = i;
+    }
+    function choose(e) {
+      hide();
+      openWindow(e.win, document.getElementById('spotBtn') || null);
+      if (e.detail) {
+        setTimeout(function () {
+          try { e.detail.open = true; if (!reduceMotion && e.detail.scrollIntoView) e.detail.scrollIntoView({ block: 'nearest' }); } catch (x) {}
+        }, 60);
+      }
+    }
+
+    function show() {
+      if (!overlay) return;
+      build();
+      lastFocus = document.activeElement;
+      overlay.hidden = false;
+      document.documentElement.classList.add('spot-open');
+      requestAnimationFrame(function () { overlay.classList.add('is-open'); });
+      field.value = ''; render();
+      setTimeout(function () { try { field.focus(); } catch (e) {} }, 30);
+      open = true;
+    }
+    function hide() {
+      if (!overlay || !open) return;
+      open = false;
+      overlay.classList.remove('is-open');
+      document.documentElement.classList.remove('spot-open');
+      var fin = function () { overlay.hidden = true; };
+      if (reduceMotion) fin(); else setTimeout(fin, 180);
+      if (lastFocus && document.contains(lastFocus)) { try { lastFocus.focus(); } catch (e) {} }
+    }
+
+    function init() {
+      overlay = document.getElementById('spot');
+      field = document.getElementById('spotField');
+      results = document.getElementById('spotResults');
+      empty = document.getElementById('spotEmpty');
+      if (!overlay || !field) return;
+      field.addEventListener('input', render);
+      overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) hide(); });
+      field.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { e.preventDefault(); hide(); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); if (curList.length) setSel(Math.min(sel + 1, curList.length - 1)); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); if (curList.length) setSel(Math.max(sel - 1, 0)); }
+        else if (e.key === 'Enter') { e.preventDefault(); if (curList[sel]) choose(curList[sel]); }
+      });
+      // Cmd/Ctrl+K — открыть; повторно — закрыть; Esc — закрыть (даже если поле не в фокусе)
+      document.addEventListener('keydown', function (e) {
+        if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault(); open ? hide() : show();
+        } else if (e.key === 'Escape' && open) { e.preventDefault(); hide(); }
+      });
+      var sb = document.getElementById('spotBtn');
+      if (sb) sb.addEventListener('click', show);
+      var ios = document.getElementById('iosSearch');
+      if (ios) ios.addEventListener('click', function (e) { e.preventDefault(); show(); });
+    }
+    return { init: init, show: show, hide: hide };
+  })();
+  Spotlight.init();
+
+  /* ============================================================
+     F4 — ПУШ-БАННЕР (через 25с, один раз за сессию)
+     ============================================================ */
+  var Push = (function () {
+    var elp, timer = null, suppressed = false;
+    function suppress() { suppressed = true; if (timer) { clearTimeout(timer); timer = null; } hide(true); }
+    function hide(instant) {
+      if (!elp) return;
+      elp.classList.remove('is-in');
+      if (instant || reduceMotion) elp.hidden = true;
+      else setTimeout(function () { elp.hidden = true; }, 260);
+    }
+    function shownAlready() {
+      try { return sessionStorage.getItem('pushShown') === '1' || sessionStorage.getItem('msgOpened') === '1'; } catch (e) { return false; }
+    }
+    function reveal() {
+      if (suppressed || shownAlready() || !elp) return;
+      try { sessionStorage.setItem('pushShown', '1'); } catch (e) {}
+      elp.hidden = false;
+      requestAnimationFrame(function () { elp.classList.add('is-in'); });
+    }
+    function initSwipe() {
+      var y0 = 0, dy = 0, on = false;
+      elp.addEventListener('touchstart', function (e) { if (e.touches.length !== 1) return; on = true; y0 = e.touches[0].clientY; dy = 0; elp.style.transition = 'none'; }, { passive: true });
+      elp.addEventListener('touchmove', function (e) { if (!on) return; dy = e.touches[0].clientY - y0; if (dy > 0) dy = 0; elp.style.transform = 'translateY(' + dy + 'px)'; }, { passive: true });
+      elp.addEventListener('touchend', function () { if (!on) return; on = false; elp.style.transition = ''; if (dy < -30) hide(); else elp.style.transform = ''; });
+    }
+    function init() {
+      elp = document.getElementById('push');
+      if (!elp) return;
+      elp.addEventListener('click', function () {
+        hide();
+        if (window.Messenger) window.Messenger.openConversation('documoved');
+        else openWindow('win-assistant', elp);
+      });
+      initSwipe();
+      if (!shownAlready()) timer = setTimeout(reveal, 25000);
+    }
+    return { init: init, suppress: suppress };
+  })();
+  Push.init();
+  window.Push = Push;
+
+  /* ============================================================
+     G4 — «ПОЗВОНИТЬ ИИ-СЕКРЕТАРЮ»: живой голосовой звонок в браузере
+     getUserMedia → гудок → TTS-приветствие → SpeechRecognition →
+     LocalAI.ask('secretary') → ответ голосом. Всё локально, кроме
+     системных голосов ОС. Честные фолбэки: нет распознавания (Firefox),
+     нет микрофона, нет русского голоса (тогда субтитры).
+     ============================================================ */
+  var VoiceCall = (function () {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var home, live, fb, on = false, muted = false, speakingNow = false;
+    var stream = null, actx = null, analyser = null, raf = 0;
+    var rec = null, recWanted = false;
+    var t0 = 0, tInt = 0, silT = 0, iosT = 0;
+
+    function $(id) { return document.getElementById(id); }
+    function setStatus(key) { var s = $('aiStatus'); if (s) s.textContent = tr(key); }
+    function fmt(sec) { var m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+
+    /* субтитры: держим последние 2 реплики */
+    function sub(who, text) {
+      var box = $('aiSubs'); if (!box) return;
+      var row = document.createElement('div');
+      row.className = 'aicall__sub aicall__sub--' + who;
+      row.textContent = text;
+      box.appendChild(row);
+      while (box.children.length > 2) box.removeChild(box.firstChild);
+    }
+
+    /* русский голос: предпочитаем Milena / Google русский */
+    function pickVoice() {
+      var want = (lang() === 'en') ? /^en/i : /^ru/i;
+      var vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+      var best = null;
+      for (var i = 0; i < vs.length; i++) {
+        if (!want.test(vs[i].lang)) continue;
+        if (/milena/i.test(vs[i].name)) return vs[i];
+        if (/google/i.test(vs[i].name) && !best) best = vs[i];
+        if (!best) best = vs[i];
+      }
+      return best; // null → системный по умолчанию, субтитры всё равно есть
+    }
+
+    function speak(text, then) {
+      sub('ai', text);
+      stopRec();
+      if (!window.speechSynthesis) { setTimeout(function () { if (then) then(); else listen(); }, 900); return; }
+      speakingNow = true;
+      setStatus('ai.st.speak');
+      var w = $('aiAvaWrap'); if (w) w.classList.add('is-talk');
+      var u = new SpeechSynthesisUtterance(text);
+      var v = pickVoice(); if (v) u.voice = v;
+      u.lang = (lang() === 'en') ? 'en-US' : 'ru-RU';
+      u.rate = 1.02; u.pitch = 1.0;
+      u.onend = u.onerror = function () {
+        speakingNow = false;
+        if (w) w.classList.remove('is-talk');
+        if (!on) return;
+        if (then) then(); else listen();
+      };
+      try { speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) { u.onend(); }
+    }
+
+    function stopRec() {
+      recWanted = false;
+      if (rec) { try { rec.onend = null; rec.stop(); } catch (e) {} rec = null; }
+      if (silT) { clearTimeout(silT); silT = 0; }
+    }
+
+    function listen() {
+      if (!on || muted || speakingNow) return;
+      setStatus('ai.st.listen');
+      recWanted = true;
+      rec = new SR();
+      rec.lang = (lang() === 'en') ? 'en-US' : 'ru-RU';
+      rec.interimResults = false;
+      rec.continuous = false;
+      rec.onresult = function (e) {
+        var txt = (e.results[0] && e.results[0][0]) ? e.results[0][0].transcript : '';
+        if (txt) { sub('me', txt); handle(txt); }
+      };
+      rec.onerror = function (e) {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { end(); showFb('voice.denied'); }
+      };
+      rec.onend = function () { // перезапуск после каждой фразы
+        if (on && recWanted && !speakingNow && !muted) setTimeout(function () { if (on && recWanted && !speakingNow && !muted) listen(); }, 150);
+      };
+      try { rec.start(); } catch (e) {}
+      /* молчание 8с → мягкое приглашение */
+      if (silT) clearTimeout(silT);
+      silT = setTimeout(function () { if (on && !speakingNow && !muted) speak(tr('ai.silence')); }, 8000);
+    }
+
+    function handle(txt) {
+      if (silT) { clearTimeout(silT); silT = 0; }
+      setStatus('ai.st.think');
+      var low = txt.toLowerCase();
+      if (/до свидан|пока\b|прощай|goodbye|bye\b/.test(low)) { speak(tr('ai.bye'), function () { end(); }); return; }
+      if (/запиш|демо|встреч|назнач|календар|book|demo|schedule|meeting/.test(low)) {
+        speak(tr('ai.openCal'));
+        openWindow('win-calendar', $('aiCallBtn'));
+        return;
+      }
+      if (/человек|шаген|живо[йм]|менеджер|оператор|human|shagen|real person/.test(low)) {
+        speak(tr('ai.human'));
+        try { window.open('https://t.me/Shahen_kazaryan', '_blank', 'noopener'); } catch (e) {}
+        return;
+      }
+      var fin = function (res) { if (on) speak(res.text); };
+      if (window.LocalAI && window.LocalAI.askAsync) window.LocalAI.askAsync('secretary', txt, lang()).then(fin, function () { fin(window.LocalAI.ask('secretary', txt, lang())); });
+      else fin(window.LocalAI ? window.LocalAI.ask('secretary', txt, lang()) : { text: txt });
+    }
+
+    /* гудок 0.6с — тихий синусоидальный тон 425 Гц (как в телефонной сети) */
+    function dialTone(then) {
+      try {
+        var o = actx.createOscillator(), g = actx.createGain();
+        o.frequency.value = 425; g.gain.value = 0.045;
+        o.connect(g); g.connect(actx.destination);
+        o.start(); o.stop(actx.currentTime + 0.6);
+        o.onended = then;
+      } catch (e) { then(); }
+    }
+
+    /* полоска уровня микрофона — посетитель видит, что его слышат */
+    function meter() {
+      if (!analyser) return;
+      var data = new Uint8Array(analyser.frequencyBinCount);
+      var el = $('aiMicLevel');
+      (function loop() {
+        if (!on) return;
+        analyser.getByteTimeDomainData(data);
+        var max = 0;
+        for (var i = 0; i < data.length; i += 4) { var v = Math.abs(data[i] - 128); if (v > max) max = v; }
+        if (el) el.style.width = Math.min(100, Math.round(max / 70 * 100)) + '%';
+        raf = requestAnimationFrame(loop);
+      })();
+    }
+
+    function start() {
+      if (on) return;
+      if (!SR) { showFb('voice.nosr'); return; }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showFb('voice.denied'); return; }
+      var btn = $('aiCallBtn');
+      if (btn) { btn.disabled = true; btn.classList.add('is-wait'); } // ждём разрешения микрофона
+      var done = function () { if (btn) { btn.disabled = false; btn.classList.remove('is-wait'); } };
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function (s) {
+        done(); stream = s; begin();
+      }, function () { done(); showFb('voice.denied'); });
+    }
+
+    function begin() {
+      on = true; muted = false;
+      home.hidden = true; fb.hidden = true; live.hidden = false;
+      var mb = $('aiMute'); if (mb) { mb.classList.remove('is-off'); mb.setAttribute('aria-pressed', 'false'); }
+      var box = $('aiSubs'); if (box) box.innerHTML = '';
+      try {
+        actx = new (window.AudioContext || window.webkitAudioContext)();
+        var src = actx.createMediaStreamSource(stream);
+        analyser = actx.createAnalyser(); analyser.fftSize = 512;
+        src.connect(analyser);
+      } catch (e) { actx = null; analyser = null; }
+      t0 = Date.now();
+      var tEl = $('aiTimer');
+      tInt = setInterval(function () { if (tEl) tEl.textContent = fmt(Math.floor((Date.now() - t0) / 1000)); }, 1000);
+      if (tEl) tEl.textContent = '00:00';
+      /* iOS Safari: synthesis глохнет — будим resume() по таймеру */
+      iosT = setInterval(function () { try { if (window.speechSynthesis && speechSynthesis.speaking) speechSynthesis.resume(); } catch (e) {} }, 5000);
+      meter();
+      setStatus('ai.st.speak');
+      var greet = function () { speak(tr('ai.greet')); };
+      if (actx) dialTone(greet); else greet();
+    }
+
+    function end() {
+      if (!on && live.hidden) return;
+      on = false;
+      stopRec();
+      try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } // ОСВОБОЖДАЕМ микрофон
+      if (actx) { try { actx.close(); } catch (e) {} actx = null; analyser = null; }
+      if (tInt) { clearInterval(tInt); tInt = 0; }
+      if (iosT) { clearInterval(iosT); iosT = 0; }
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      var w = $('aiAvaWrap'); if (w) w.classList.remove('is-talk');
+      live.hidden = true; home.hidden = false;
+    }
+
+    function showFb(key) {
+      var t = $('aiFbText'); if (t) { t.textContent = tr(key); t.dataset.k = key; }
+      home.hidden = true; live.hidden = true; fb.hidden = false;
+    }
+
+    function init() {
+      home = $('callHome'); live = $('aiCall'); fb = $('aiFb');
+      var btn = $('aiCallBtn');
+      if (!home || !live || !btn) return;
+      btn.addEventListener('click', start); // строго по жесту (iOS-автоплей)
+      var e1 = $('aiEnd'); if (e1) e1.addEventListener('click', end);
+      var mb = $('aiMute');
+      if (mb) mb.addEventListener('click', function () {
+        muted = !muted;
+        mb.classList.toggle('is-off', muted);
+        mb.setAttribute('aria-pressed', muted ? 'true' : 'false');
+        if (muted) { stopRec(); setStatus('ai.st.muted'); }
+        else listen();
+      });
+      var back = $('aiFbBack'); if (back) back.addEventListener('click', function () { fb.hidden = true; home.hidden = false; });
+      var fbChat = $('aiFbChat'); if (fbChat) fbChat.addEventListener('click', function () { fb.hidden = true; home.hidden = false; });
+      /* закрытие окна «Звонок» завершает разговор и освобождает микрофон */
+      var win = document.getElementById('win-call');
+      if (win) win.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-act="close"]')) end();
+      });
+      window.addEventListener('pagehide', end);
+      /* перевод фолбэка при смене языка */
+      document.addEventListener('i18n:change', function () {
+        var t = $('aiFbText'); if (t && !fb.hidden && t.dataset.k) t.textContent = tr(t.dataset.k);
+      });
+      if (window.speechSynthesis) { try { speechSynthesis.getVoices(); } catch (e) {} } // прогрев списка голосов
+    }
+    init();
+    return { end: end };
+  })();
+  window.VoiceCall = VoiceCall;
+
+  /* ============================================================
+     G5 — ФАБРИКА КОНТЕНТА: живой генератор (WebLLM или умные шаблоны)
+     ============================================================ */
+  (function Factory() {
+    var fmt = 'post', tone = 'biz', typing = 0;
+    function $(id) { return document.getElementById(id); }
+
+    function segInit(boxId, set) {
+      var box = $(boxId); if (!box) return;
+      box.addEventListener('click', function (e) {
+        var b = e.target.closest('.fx-seg'); if (!b) return;
+        Array.prototype.forEach.call(box.querySelectorAll('.fx-seg'), function (x) {
+          var onx = (x === b);
+          x.classList.toggle('is-on', onx);
+          x.setAttribute('aria-checked', onx ? 'true' : 'false');
+        });
+        set(b.dataset.val);
+      });
+    }
+
+    function typeOut(el, text, done) {
+      if (typing) { clearInterval(typing); typing = 0; }
+      if (reduceMotion) { el.textContent = text; if (done) done(); return; }
+      el.textContent = '';
+      var i = 0;
+      typing = setInterval(function () {
+        i += 2;
+        el.textContent = text.slice(0, i);
+        if (i >= text.length) { clearInterval(typing); typing = 0; if (done) done(); }
+      }, 14);
+    }
+
+    var PH = { post: 'fab.ph1', card: 'fab.ph2', review: 'fab.ph3' };
+    function setPh() {
+      var ta = $('fxTopic'); if (ta) ta.placeholder = tr(PH[fmt] || 'fab.ph1');
+    }
+    function init() {
+      var go = $('fxGo'); if (!go) return;
+      segInit('fxFormat', function (v) { fmt = v; setPh(); });
+      segInit('fxTone', function (v) { tone = v; });
+      setPh();
+      document.addEventListener('i18n:change', setPh);
+      go.addEventListener('click', function () {
+        var ta = $('fxTopic');
+        var topic = ta ? ta.value.trim() : '';
+        var out = $('fxOut'), txt = $('fxText'), src = $('fxSrc');
+        if (!out || !txt) return;
+        out.hidden = false;
+        if (!topic) { txt.textContent = tr('fab.needTopic'); if (src) src.textContent = ''; if (ta) ta.focus(); return; }
+        txt.textContent = '…';
+        go.disabled = true;
+        window.LocalAI.generate({ format: fmt, tone: tone, topic: topic, lang: lang() }).then(function (r) {
+          go.disabled = false;
+          if (src) src.textContent = (r.source === 'webllm') ? tr('ai.src.webllm') : tr('ai.src.intent');
+          typeOut(txt, r.text);
+        }, function () { go.disabled = false; });
+      });
+      var cp = $('fxCopy');
+      if (cp) cp.addEventListener('click', function () {
+        var txt = $('fxText'); if (!txt) return;
+        var val = txt.textContent;
+        var okFlash = function () {
+          cp.textContent = tr('fab.copied');
+          setTimeout(function () { cp.textContent = tr('fab.copy'); }, 1400);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(val).then(okFlash, okFlash);
+        else okFlash();
+      });
+    }
+    init();
+  })();
+
+  /* ============================================================
+     F2 — URL-параметр ?open=<win-id> (белый список id окон)
+     Игра ссылается на ?open=win-devices при победе.
+     ============================================================ */
+  (function handleOpenParam() {
+    var m = /[?&]open=([\w-]+)/.exec(location.search);
+    if (!m) return;
+    var id = m[1];
+    if (!document.getElementById(id) || !/^win-[\w-]+$/.test(id)) return; // валидация по белому списку
+    setTimeout(function () { openWindow(id, dockApp(id) || null); }, reduceMotion ? 0 : 300);
   })();
 
   // экспорт для тестов (только локально)

@@ -2,3 +2,10 @@
 .playwright-mcp/
 node_modules/
 *.log
+# Служебные документы разработки — не публикуются (внутренняя кухня, цены, стратегия)
+BRIEF-*.md
+AUDIT-BRIEF.md
+PLAN-*.md
+UPGRADE-*.md
+SPEC-OS.md
+research/

@@ -41,6 +41,13 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="icons/pwa-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0a1120">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Urartu AI">
   <link rel="stylesheet" href="css/os.css">
 
   <script type="application/ld+json">
@@ -245,6 +252,8 @@
   <button class="menu-item" data-win="win-services" data-i18n="menu.services">Услуги</button>
   <button class="menu-item" data-win="win-faq" data-i18n="menu.faq">Вопросы</button>
   <button class="menu-item" data-win="win-portfolio" data-i18n="menu.portfolio">Портфолио</button>
+  <button class="menu-item" data-win="win-appstore" data-i18n="as.short">App Store</button>
+  <button class="menu-item" data-win="win-calendar" data-i18n="cal.title">Календарь</button>
   <button class="menu-item" data-win="win-about" data-i18n="menu.about">О нас</button>
   <button class="menu-item" data-win="win-mail" data-i18n="menu.mail">Контакты</button>
 
@@ -261,6 +270,9 @@
         <line x1="1.5" y1="1.5" x2="15.5" y2="12.5" stroke="#F3350C" stroke-width="1.6" stroke-linecap="round"/>
       </svg>
     </span>
+    <button class="menubar__toggle menubar__spot" id="spotBtn" aria-label="Поиск" title="Поиск (⌘K)">
+      <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="6.8" cy="6.8" r="4.6"/><line x1="10.4" y1="10.4" x2="14" y2="14"/></svg>
+    </button>
     <button class="menubar__toggle" id="langToggle" aria-label="Сменить язык" title="РУ / EN"><span id="langLabel">РУ</span></button>
     <button class="menubar__toggle menubar__theme" id="themeToggle" aria-label="Сменить тему">
       <svg class="ico-moon" width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M16 12.6A7 7 0 0 1 7.4 4 7 7 0 1 0 16 12.6z" fill="currentColor"/></svg>
@@ -325,23 +337,79 @@
           <button class="wbtn" data-win="win-how" data-i18n="readme.btnHow">Как это устроено</button>
         </div>
         <p class="hero-proof" data-i18n="readme.badge">Каждый ответ — со ссылкой на пункт документа. Можно проверить.</p>
+        <button class="readme-touch" type="button" data-win="win-appstore"><span aria-hidden="true">▶</span> <span data-i18n="readme.try">Всё на этом сайте можно потрогать: чат, проверка договора, голос, генератор →</span></button>
       </div>
     </article>
 
-    <!-- Ассистент -->
-    <article class="win" id="win-assistant" role="dialog" aria-label="Ассистент">
+    <!-- Сообщения (мессенджер с ИИ-агентами) -->
+    <article class="win win--msg" id="win-assistant" role="dialog" aria-label="Сообщения">
       <span class="win__grab" aria-hidden="true"></span>
-      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="assistant.title">Ассистент · Локально</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
-      <div class="win__body">
-        <h2 data-i18n="assistant.h1">ИИ-ассистент, который знает ваши документы наизусть</h2>
-        <div class="plaque"><p data-i18n="assistant.plaque">Ассистент отвечает только по вашей базе знаний и всегда показывает источник — пункт и документ. Если ответа в документах нет, он так и говорит. Это фиксируется в договоре критериями приёмки.</p></div>
-        <h3 data-i18n="assistant.h2">Что он умеет</h3>
-        <div class="grid2">
-          <div class="mini"><h4 data-i18n="assistant.m1.h">Ответы по регламентам за 10 секунд</h4><p data-i18n="assistant.m1.p">«Какой срок согласования договора на 300 тысяч?» Ассистент отвечает со ссылкой на пункт документа — вместо 10 минут поиска по папкам.</p></div>
-          <div class="mini"><h4 data-i18n="assistant.m2.h">Проверка документов</h4><p data-i18n="assistant.m2.p">Загрузите договор — ассистент проверит его по вашему чек-листу и покажет, что не так, с цитатами.</p></div>
-          <div class="mini"><h4 data-i18n="assistant.m3.h">Суммаризация и черновики</h4><p data-i18n="assistant.m3.p">Протоколы встреч, ответы на претензии, письма клиентам — черновик за минуту, по вашим шаблонам.</p></div>
-          <div class="mini"><h4 data-i18n="assistant.m4.h">Всегда с источником</h4><p data-i18n="assistant.m4.p">Каждый ответ — с указанием пункта и документа. Ответ легко проверить.</p></div>
-        </div>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="msg.title">Сообщения</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body msg" id="msg">
+        <aside class="msg__side" aria-label="Диалоги">
+          <div class="msg__side-h" data-i18n="msg.title">Сообщения</div>
+          <div class="msg__convs" id="msgConvs" role="tablist"></div>
+          <a class="msg__live" href="https://t.me/Shahen_kazaryan" target="_blank" rel="noopener">
+            <span class="msg__av msg__av--live" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L3 21l1.1-4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+            </span>
+            <span class="msg__conv-txt">
+              <span class="msg__conv-name" data-i18n="msg.live">Шаген (живой)</span>
+              <span class="msg__conv-last" data-i18n="msg.liveSub">Написать в Telegram →</span>
+            </span>
+          </a>
+        </aside>
+        <section class="msg__chat" aria-label="Переписка">
+          <header class="msg__head">
+            <button class="msg__back" id="msgBack" type="button" aria-label="К списку диалогов">
+              <svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1.5 2 9l7 7.5"/></svg>
+            </button>
+            <span class="msg__av" id="msgHeadAv" aria-hidden="true"></span>
+            <span class="msg__head-name" id="msgHeadName">Документовед</span>
+          </header>
+          <div class="msg__demo" role="note" id="msgDemo">
+            <span id="msgDemoText" data-i18n="msg.demo">Демо-режим: отвечает локальный сценарий. Настоящий ИИ-сотрудник работает у вас в контуре — покажем на демо.</span>
+            <button class="msg__llm" id="llmBtn" type="button" hidden><span data-i18n="ai.llm.btn">Запустить настоящий локальный ИИ</span> <span id="llmSize">(~950 МБ)</span></button>
+            <small class="msg__llm-hint" id="llmHint" hidden></small>
+            <span class="msg__llm-prog" id="llmProg" hidden><i id="llmProgBar"></i><em id="llmProgText">0%</em></span>
+          </div>
+
+          <!-- G6/G2/G3: инструменты агента -->
+          <div class="msg__tools" id="msgTools" hidden>
+            <button class="msg__tool" id="msgDocBtn" type="button" hidden data-i18n="doc.btn">Проверить на своём документе</button>
+            <button class="msg__tool" id="msgLawBtn" type="button" hidden data-i18n="law.btn">Проверить договор</button>
+            <button class="msg__tool" id="msgCallBtn" type="button" hidden data-i18n="as.try.voice.n">Поговорить голосом</button>
+          </div>
+
+          <!-- G2: панель «свой документ» -->
+          <div class="msg__panel" id="msgDocPanel" hidden>
+            <p class="msg__panel-note" data-i18n="doc.plaque">Файл не покидает ваш браузер — индекс строится локально. Это и есть принцип локального ИИ.</p>
+            <textarea class="msg__panel-ta" id="docText" rows="6" data-i18n-ph="doc.ph" placeholder="Вставьте текст: регламент, инструкцию, договор…"></textarea>
+            <div class="msg__panel-row">
+              <label class="msg__file wbtn"><input type="file" id="docFile" accept=".txt,.md,text/plain,text/markdown" hidden><span data-i18n="doc.file">или файл .txt / .md</span></label>
+              <button class="wbtn wbtn--primary" id="docLoad" type="button" data-i18n="doc.load">Загрузить в ассистента</button>
+              <button class="wbtn" id="docClear" type="button" hidden data-i18n="doc.clear">Очистить</button>
+            </div>
+            <p class="msg__panel-ok" id="docOk" hidden></p>
+          </div>
+
+          <!-- G3: панель «проверка договора» -->
+          <div class="msg__panel" id="msgLawPanel" hidden>
+            <p class="msg__panel-note" data-i18n="law.note">Мгновенная проверка по чек-листу из 15 пунктов — прямо в браузере, без отправки куда-либо.</p>
+            <textarea class="msg__panel-ta" id="lawText" rows="7" data-i18n-ph="law.ph" placeholder="Вставьте текст договора целиком…"></textarea>
+            <div class="msg__panel-row">
+              <button class="wbtn wbtn--primary" id="lawCheck" type="button" data-i18n="law.run">Проверить по чек-листу</button>
+            </div>
+          </div>
+
+          <div class="msg__thread" id="msgThread" role="log" aria-live="polite" aria-relevant="additions"></div>
+          <form class="msg__input" id="msgForm" autocomplete="off">
+            <input class="msg__field" id="msgText" type="text" data-i18n-ph="msg.ph" placeholder="Сообщение…" aria-label="Сообщение" enterkeyhint="send">
+            <button class="msg__send" type="submit" aria-label="Отправить">
+              <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg>
+            </button>
+          </form>
+        </section>
       </div>
     </article>
 
@@ -362,6 +430,7 @@
                 <span class="staff-chip"><span class="staff-chip__dot"></span><span data-i18n="staff.shift">график: 24/7</span></span>
                 <span class="staff-card__pay"><span class="staff-card__pay-eb" data-i18n="staff.pay">зарплата</span><b data-i18n="staff.e1.pay">внедрение от 150 000 ₽</b></span>
               </div>
+                <button class="staff-try" type="button" data-chat="documoved"><span aria-hidden="true">▶</span> <span data-i18n="try.now">Попробовать сейчас</span></button>
             </div>
           </article>
           <article class="staff-card">
@@ -373,6 +442,7 @@
                 <span class="staff-chip"><span class="staff-chip__dot"></span><span data-i18n="staff.shift">график: 24/7</span></span>
                 <span class="staff-card__pay"><span class="staff-card__pay-eb" data-i18n="staff.pay">зарплата</span><b data-i18n="staff.e2.pay">внедрение от 150 000 ₽</b></span>
               </div>
+                <button class="staff-try" type="button" data-chat="lawyer"><span aria-hidden="true">▶</span> <span data-i18n="try.now">Попробовать сейчас</span></button>
             </div>
           </article>
           <article class="staff-card">
@@ -384,6 +454,7 @@
                 <span class="staff-chip"><span class="staff-chip__dot"></span><span data-i18n="staff.shift">график: 24/7</span></span>
                 <span class="staff-card__pay"><span class="staff-card__pay-eb" data-i18n="staff.pay">зарплата</span><b data-i18n="staff.e3.pay">от 120 000 ₽/мес</b></span>
               </div>
+                <button class="staff-try" type="button" data-chat="support"><span aria-hidden="true">▶</span> <span data-i18n="try.now">Попробовать сейчас</span></button>
             </div>
           </article>
           <article class="staff-card">
@@ -395,6 +466,7 @@
                 <span class="staff-chip"><span class="staff-chip__dot"></span><span data-i18n="staff.shift">график: 24/7</span></span>
                 <span class="staff-card__pay"><span class="staff-card__pay-eb" data-i18n="staff.pay">зарплата</span><b data-i18n="staff.e4.pay">от 200 000 ₽</b></span>
               </div>
+                <button class="staff-try" type="button" data-win="win-call"><span aria-hidden="true">▶</span> <span data-i18n="try.voice">Позвонить сейчас</span></button>
             </div>
           </article>
           <article class="staff-card staff-card--wide">
@@ -406,6 +478,7 @@
                 <span class="staff-chip"><span class="staff-chip__dot"></span><span data-i18n="staff.shift">график: 24/7</span></span>
                 <span class="staff-card__pay"><span class="staff-card__pay-eb" data-i18n="staff.pay">зарплата</span><b data-i18n="staff.e5.pay">от 50 000 ₽/мес</b></span>
               </div>
+                <button class="staff-try" type="button" data-win="win-factory"><span aria-hidden="true">▶</span> <span data-i18n="try.now">Попробовать сейчас</span></button>
             </div>
           </article>
         </div>
@@ -495,7 +568,7 @@
         <h2 data-i18n="faq.h1">Вопросы, которые задают до демо</h2>
         <div class="faq">
           <details><summary data-i18n="faq.q1">Чем это отличается от ChatGPT?</summary><p data-i18n="faq.a1">ChatGPT работает на серверах в США, и передавать туда данные клиентов юрлицу нельзя. Наш ассистент работает на вашем сервере, отвечает по вашим документам и показывает источник ответа. Интернет ему не нужен.</p></details>
-          <details><summary data-i18n="faq.q2">Наши данные точно никуда не уходят?</summary><p data-i18n="faq.a2">Да. Модель и база знаний физически находятся на вашем оборудовании. Наружу не уходит ничего — это проверяется на приёмке (можно отключить интернет и убедиться).</p></details>
+          <details><summary data-i18n="faq.q2">Наши данные точно никуда не уходят?</summary><p data-i18n="faq.a2">Да. Модель и база знаний физически находятся на вашем оборудовании, персональные данные обрабатываются в контуре компании — как требует 152-ФЗ. Наружу не уходит ничего: это проверяется на приёмке (можно отключить интернет и убедиться).</p></details>
           <details><summary data-i18n="faq.q3">Какое железо нужно?</summary><p data-i18n="faq.a3">Для команды до 10–20 человек достаточно одной машины с современной видеокартой (порядка 300–400 тыс. ₽, если покупать новую). Часто подходит уже имеющийся сервер. Подбор — часть проекта.</p></details>
           <details><summary data-i18n="faq.q4">А если ассистент ошибётся?</summary><p data-i18n="faq.a4">Ассистент отвечает только по вашей базе и всегда даёт ссылку на пункт документа — ответ легко проверить. Сдача проекта проходит по тестовому набору ваших вопросов с зафиксированной в договоре точностью.</p></details>
           <details><summary data-i18n="faq.q5">Сколько длится внедрение?</summary><p data-i18n="faq.a5">Пилот — 2 недели, полное внедрение — 3–6 недель в зависимости от объёма документов и интеграций.</p></details>
@@ -541,6 +614,24 @@
 
         <!-- Экран вызова -->
         <div class="call" id="callHome">
+
+          <!-- G4: живой голосовой тест ИИ-секретаря -->
+          <div class="aicall-card" id="aiCallCard">
+            <div class="aicall-card__top">
+              <span class="aicall-card__ava" aria-hidden="true"><svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="16" height="13" rx="4"/><circle cx="13" cy="16" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="16" r="1.6" fill="currentColor" stroke="none"/><path d="M13 20h6"/><line x1="16" y1="10" x2="16" y2="6"/><circle cx="16" cy="5" r="1.4"/><path d="M8 15H5.5M24 15h2.5"/></svg></span>
+              <div class="aicall-card__t">
+                <h3 class="aicall-card__h" data-i18n="ai.h">Поговорить с ИИ-секретарём прямо сейчас</h3>
+                <p class="aicall-card__p" data-i18n="ai.p">Бесплатный тест: голосовой разговор из браузера — как по телефону.</p>
+              </div>
+              <span class="aicall-card__badge" data-i18n="ai.badge">ИИ · 24/7</span>
+            </div>
+            <button class="aicall-card__btn" id="aiCallBtn" type="button">
+              <span class="call__ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1z"/></svg></span>
+              <span data-i18n="ai.call">Позвонить ИИ</span>
+            </button>
+            <p class="aicall-card__note" data-i18n="ai.note">Это демо в вашем браузере. Настоящий Секретарь работает на сервере компании, звонит по телефону и знает вашу базу — от 200 000 ₽.</p>
+          </div>
+
           <div class="call__card">
             <div class="call__avatar" aria-hidden="true">ШК</div>
             <h2 class="call__name">Шаген Казарян</h2>
@@ -578,6 +669,42 @@
             <span class="call-live__status" id="callStatus" data-i18n="call.connecting">Соединение…</span>
             <button class="call-live__copy" id="callCopy" data-i18n="call.copy">Скопировать ссылку</button>
             <button class="call-live__end" id="callEnd" data-i18n="call.end">Завершить</button>
+          </div>
+        </div>
+
+        <!-- G4: живой звонок ИИ-секретарю (в стиле FaceTime) -->
+        <div class="aicall" id="aiCall" hidden>
+          <div class="aicall__stage">
+            <div class="aicall__ava-wrap" id="aiAvaWrap">
+              <span class="aicall__wave" aria-hidden="true"></span>
+              <span class="aicall__wave aicall__wave--2" aria-hidden="true"></span>
+              <span class="aicall__ava" aria-hidden="true"><svg viewBox="0 0 32 32" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="16" height="13" rx="4"/><circle cx="13" cy="16" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="16" r="1.6" fill="currentColor" stroke="none"/><path d="M13 20h6"/><line x1="16" y1="10" x2="16" y2="6"/><circle cx="16" cy="5" r="1.4"/><path d="M8 15H5.5M24 15h2.5"/></svg></span>
+            </div>
+            <h3 class="aicall__name" data-i18n="ai.name">ИИ-секретарь Урарту</h3>
+            <div class="aicall__timer" id="aiTimer" aria-hidden="true">00:00</div>
+            <div class="aicall__status" id="aiStatus">…</div>
+            <div class="aicall__mic" aria-hidden="true"><i id="aiMicLevel"></i></div>
+            <div class="aicall__subs" id="aiSubs" aria-live="polite"></div>
+          </div>
+          <div class="aicall__bar">
+            <button class="aicall__ctl" id="aiMute" type="button" aria-pressed="false">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="21"/></svg>
+              <span data-i18n="ai.mute">Микрофон</span>
+            </button>
+            <button class="aicall__end" id="aiEnd" type="button">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 9c-2.6 0-5 .5-7.1 1.5-.6.3-1 .9-.9 1.6l.3 2.2c.1.6.6 1 1.2.9l3-.4c.5-.1.9-.5 1-1l.3-1.6c.7-.2 1.4-.2 2.2-.2s1.5.1 2.2.2l.3 1.6c.1.5.5.9 1 1l3 .4c.6.1 1.1-.3 1.2-.9l.3-2.2c.1-.7-.3-1.3-.9-1.6C17 9.5 14.6 9 12 9z"/></svg>
+              <span data-i18n="ai.end">Завершить</span>
+            </button>
+          </div>
+          <p class="aicall__honest" data-i18n="ai.note">Это демо в вашем браузере. Настоящий Секретарь работает на сервере компании, звонит по телефону и знает вашу базу — от 200 000 ₽.</p>
+        </div>
+
+        <!-- G4: честные фолбэки (нет распознавания / нет микрофона) -->
+        <div class="aicall-fb" id="aiFb" hidden>
+          <p class="aicall-fb__t" id="aiFbText"></p>
+          <div class="win-actions">
+            <button class="wbtn wbtn--primary" id="aiFbChat" type="button" data-chat="secretary" data-i18n="ai.fb.chat">Текстовый чат с Секретарём</button>
+            <button class="wbtn" id="aiFbBack" type="button" data-i18n="ai.fb.back">Назад</button>
           </div>
         </div>
 
@@ -635,6 +762,15 @@
         <p data-i18n="agents.p">Так устроена многоагентная система: у каждого агента своя роль, они передают задачи друг другу и согласуют результат. Тот же принцип работает во внедрении: один агент ищет ответ в регламентах, второй проверяет договор по чек-листу, третий готовит черновик письма.</p>
         <div class="agents" id="agentsStage"></div>
         <p class="note mono agents__credit"><span data-i18n="agents.credit">Симуляция: открытый проект The Delegation, лицензия MIT</span> · <a href="https://github.com/arturitu/the-delegation" target="_blank" rel="noopener">github.com/arturitu/the-delegation</a></p>
+      </div>
+    </article>
+
+    <!-- Игра «Собери 70B» -->
+    <article class="win win--wide" id="win-game" role="dialog" aria-label="Игра — Собери 70B">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="game.title">Игра — Собери 70B</span><button class="win-fs" id="gameFs" type="button" aria-label="На весь экран"><svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5V3.5h4M17 7.5V3.5h-4M3 12.5v4h4M17 12.5v4h-4"/></svg><span data-i18n="game.fs">На весь экран</span></button><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <div class="game-stage" id="gameStage"></div>
       </div>
     </article>
 
@@ -816,17 +952,17 @@
         <h3 class="port-sec" data-i18n="port.sec.urartu">Кейсы Urartu</h3>
         <div class="port-grid">
           <a class="case-card" href="https://www.urartu.pro/ru/cases/megradzor" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/megradzor.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/megradzor.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.megradzor.name">Megradzor Cheese Dairy</h4>
             <p class="case-card__res" data-i18n="case.megradzor.res">Сайт сыроварни с AI-сомелье — 17 заявок от ресторанов за 2 недели</p>
           </a>
           <a class="case-card" href="https://www.urartu.pro/ru/cases/machanents-vagharshapat" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/machanents.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/machanents.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.machanents.name">Machanents Art Hotel</h4>
             <p class="case-card__res" data-i18n="case.machanents.res">Арт-отель у Эчмиадзина — своё SEO и прямое бронирование</p>
           </a>
           <a class="case-card" href="https://www.urartu.pro/ru/cases/annabella-yerevan" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/annabella.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/annabella.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.annabella.name">AnnaBella Boutique Hotel</h4>
             <p class="case-card__res" data-i18n="case.annabella.res">Бутик-отель в Ереване — журнальный дизайн люксовых travel-изданий</p>
           </a>
@@ -835,32 +971,32 @@
         <h3 class="port-sec" data-i18n="port.sec.hotels">Отельные промо-сайты</h3>
         <div class="port-grid">
           <a class="case-card" href="https://shahen777.github.io/urartu-sites/olivia-sevastopol/" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/olivia.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/olivia.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.olivia.name">Гостевой дом «Оливия», Севастополь</h4>
             <p class="case-card__res" data-i18n="case.olivia.res">Рейтинг ★9.9 · прямое бронирование без комиссий агрегаторов</p>
           </a>
           <a class="case-card" href="https://shahen777.github.io/urartu-sites/alyans-sevastopol/" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/alyans.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/alyans.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.alyans.name">Гостевой дом «Альянс», Севастополь</h4>
             <p class="case-card__res" data-i18n="case.alyans.res">Рейтинг ★9.8 · премиальный промо-сайт с прямыми заявками</p>
           </a>
           <a class="case-card" href="https://shahen777.github.io/urartu-sites/florentina-yalta/" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/florentina.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/florentina.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.florentina.name">Бутик-отель «Флорентина», Ялта</h4>
             <p class="case-card__res" data-i18n="case.florentina.res">Тосканский флёр у набережной — авторская айдентика</p>
           </a>
           <a class="case-card" href="https://shahen777.github.io/urartu-sites/zhemchuzhina-mysa-gelendzhik/" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/zhemchuzhina.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/zhemchuzhina.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.zhemchuzhina.name">«Жемчужина Мыса», Геленджик</h4>
             <p class="case-card__res" data-i18n="case.zhemchuzhina.res">Рейтинг ★9.6 · промо-сайт под прямое бронирование</p>
           </a>
           <a class="case-card" href="https://shahen777.github.io/urartu-sites/pushka-yalta/" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/pushka.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/pushka.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.pushka.name">Мини-отель «Пушка», Ялта</h4>
             <p class="case-card__res" data-i18n="case.pushka.res">Морской стиль, 2 минуты до набережной</p>
           </a>
           <a class="case-card" href="https://shahen777.github.io/urartu-sites/akva-villa/" target="_blank" rel="noopener">
-            <span class="case-card__shot"><img src="portfolio/akva.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <span class="case-card__shot"><img data-src="portfolio/akva.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
             <h4 class="case-card__name" data-i18n="case.akva.name">Аква вилла, Краснодар</h4>
             <p class="case-card__res" data-i18n="case.akva.res">Банно-гостиничный комплекс, рейтинг 5.0 · онлайн-заявка</p>
           </a>
@@ -868,6 +1004,13 @@
 
         <h3 class="port-sec" data-i18n="port.sec.events">События и билеты</h3>
         <div class="port-grid">
+          <div class="case-card case-card--nolink">
+            <span class="case-card__shot case-card__shot--icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" width="46" height="46" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="13" height="13" rx="2"/><rect x="29" y="6" width="13" height="13" rx="2"/><rect x="6" y="29" width="13" height="13" rx="2"/><path d="M29 29h5v5M42 29v13M34 42h8M29 38v4"/></svg>
+            </span>
+            <h4 class="case-card__name" data-i18n="case.qr.name">Событие с QR-билетами</h4>
+            <p class="case-card__res" data-i18n="case.qr.res">QR-билеты и веб-сканер чек-ина — 300+ гостей на входе</p>
+          </div>
         </div>
 
         <h3 class="port-sec" data-i18n="port.sec.bots">Telegram-боты</h3>
@@ -879,6 +1022,277 @@
             <h4 class="case-card__name" data-i18n="case.orderbot.name">Бот мониторинга заказов</h4>
             <p class="case-card__res" data-i18n="case.orderbot.res">Отслеживает биржи и фильтрует подходящие заказы через ИИ</p>
           </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Калькулятор — конфигуратор стоимости проекта (D2) -->
+    <article class="win win--calc" id="win-calc" role="dialog" aria-label="Калькулятор проекта">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="calc.title">Калькулятор проекта</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="calc.h1">Сколько стоит ваш проект</h2>
+        <p class="lead" data-i18n="calc.lead">Соберите оценку за 20 секунд: услуга, объём, срочность. Точную смету дадим после 30-минутного брифа.</p>
+
+        <h3 class="calc-step"><span class="calc-step__n">1</span><span data-i18n="calc.step1">Что делаем</span></h3>
+        <div class="calc-svc" id="calcSvc" role="radiogroup" aria-label="Услуга">
+          <button type="button" class="calc-svc__btn is-sel" data-svc="ai" role="radio" aria-checked="true"><span class="calc-svc__name" data-i18n="calc.svcAi">ИИ-сотрудник</span><span class="calc-svc__price" data-i18n="svc.fmt.starter.price">от 150 000 ₽</span></button>
+          <button type="button" class="calc-svc__btn" data-svc="site" role="radio" aria-checked="false"><span class="calc-svc__name" data-i18n="svc.s1.h">Сайты под ключ</span><span class="calc-svc__price" data-i18n="svc.s1.price">от 50 000 ₽</span></button>
+          <button type="button" class="calc-svc__btn" data-svc="bot" role="radio" aria-checked="false"><span class="calc-svc__name" data-i18n="svc.s2.h">AI-боты и агенты</span><span class="calc-svc__price" data-i18n="svc.s2.price">от 100 000 ₽</span></button>
+          <button type="button" class="calc-svc__btn" data-svc="voice" role="radio" aria-checked="false"><span class="calc-svc__name" data-i18n="svc.s4.h">Голосовые ассистенты</span><span class="calc-svc__price" data-i18n="svc.s4.price">от 200 000 ₽</span></button>
+          <button type="button" class="calc-svc__btn" data-svc="auto" role="radio" aria-checked="false"><span class="calc-svc__name" data-i18n="svc.s5.h">Автоматизация бизнеса</span><span class="calc-svc__price" data-i18n="svc.s5.price">от 80 000 ₽</span></button>
+          <button type="button" class="calc-svc__btn" data-svc="integr" role="radio" aria-checked="false"><span class="calc-svc__name" data-i18n="svc.s6.h">AI-интеграции</span><span class="calc-svc__price" data-i18n="svc.s6.price">от 150 000 ₽</span></button>
+          <button type="button" class="calc-svc__btn" data-svc="video" role="radio" aria-checked="false"><span class="calc-svc__name" data-i18n="svc.s7.h">AI-видео</span><span class="calc-svc__price" data-i18n="svc.s7.price">от 20 000 ₽/ролик</span></button>
+          <button type="button" class="calc-svc__btn" data-svc="content" role="radio" aria-checked="false"><span class="calc-svc__name" data-i18n="svc.s8.h">Контент-фабрика</span><span class="calc-svc__price" data-i18n="svc.s8.price">от 50 000 ₽/мес</span></button>
+        </div>
+
+        <h3 class="calc-step"><span class="calc-step__n">2</span><span data-i18n="calc.step2">Объём</span></h3>
+        <div class="calc-seg" id="calcVol" role="radiogroup" aria-label="Объём проекта">
+          <button type="button" class="calc-seg__btn is-sel" data-mult="1" role="radio" aria-checked="true"><span data-i18n="calc.vol1">Бриф</span><small>×1</small></button>
+          <button type="button" class="calc-seg__btn" data-mult="1.8" role="radio" aria-checked="false"><span data-i18n="calc.vol2">Стандарт</span><small>×1.8</small></button>
+          <button type="button" class="calc-seg__btn" data-mult="3" role="radio" aria-checked="false"><span data-i18n="calc.vol3">Расширенный</span><small>×3</small></button>
+          <button type="button" class="calc-seg__btn" data-mult="6" role="radio" aria-checked="false"><span data-i18n="calc.vol4">Enterprise</span><small>×6</small></button>
+        </div>
+
+        <h3 class="calc-step"><span class="calc-step__n">3</span><span data-i18n="calc.step3">Срочность и опции</span></h3>
+        <div class="calc-opts">
+          <button type="button" class="calc-opt" id="calcRush" role="switch" aria-checked="false">
+            <span class="calc-sw" aria-hidden="true"></span>
+            <span class="calc-opt__txt"><span data-i18n="calc.rush">Срочно</span> <small class="calc-opt__sub" data-i18n="calc.rushSub">сжатые сроки ×1.3</small></span>
+          </button>
+          <button type="button" class="calc-opt" id="calcHw" role="switch" aria-checked="false">
+            <span class="calc-sw" aria-hidden="true"></span>
+            <span class="calc-opt__txt"><span data-i18n="calc.optHw">+ Железо под ключ</span> <small class="calc-opt__sub" data-i18n="calc.optHwSub">от 180 000 ₽ разово</small></span>
+          </button>
+          <button type="button" class="calc-opt" id="calcSup" role="switch" aria-checked="false">
+            <span class="calc-sw" aria-hidden="true"></span>
+            <span class="calc-opt__txt"><span data-i18n="calc.optSup">+ Поддержка</span> <small class="calc-opt__sub" data-i18n="calc.optSupSub">от 15 000 ₽/мес отдельной строкой</small></span>
+          </button>
+          <button type="button" class="calc-hwlink" data-win="win-devices" data-i18n="calc.hwLink">Какое железо мы ставим — в «Устройствах» →</button>
+        </div>
+
+        <div class="calc-total" aria-live="polite">
+          <span class="calc-total__lbl" data-i18n="calc.totalLbl">Предварительная оценка</span>
+          <div class="calc-total__sum" id="calcSum">от 150 000 ₽</div>
+          <div class="calc-total__alt" id="calcAlt">≈ $1,500</div>
+          <div class="calc-total__mo" id="calcMo" hidden>+ 15 000 ₽/мес — поддержка</div>
+        </div>
+
+        <div class="win-actions">
+          <a class="wbtn wbtn--primary" id="calcCta" href="https://t.me/Shahen_kazaryan" target="_blank" rel="noopener" data-i18n="calc.cta">Получить точную смету</a>
+          <button class="wbtn" data-win="win-call" data-i18n="calc.voice">Обсудить голосом</button>
+        </div>
+        <p class="note" data-i18n="calc.disclaimer">Предварительная оценка. Финальная — после 30-минутного брифа.</p>
+      </div>
+    </article>
+
+    <!-- App Store — витрина живых продуктов и документов (E1) -->
+    <article class="win win--wide" id="win-appstore" role="dialog" aria-label="App Store">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="as.title">App Store</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="as.h1">Магазин продуктов Urartu</h2>
+        <p class="lead" data-i18n="as.lead">Всё, что на этом сайте можно потрогать вживую: откройте живые продукты, скачайте коммерческое предложение или установите этот сайт как приложение.</p>
+
+        <!-- Featured -->
+        <button class="as-feat" data-win="win-staff" aria-label="Установить ИИ-сотрудника — открыть Штат">
+          <span class="as-feat__eb" data-i18n="as.feat.eb">РЕКОМЕНДУЕМ · ПРИЛОЖЕНИЕ НЕДЕЛИ</span>
+          <span class="as-feat__h" data-i18n="as.feat.h">ИИ-сотрудник 24/7</span>
+          <span class="as-feat__p" data-i18n="as.feat.p">Цифровой сотрудник на вашем сервере: отвечает по регламентам, проверяет договоры, ведёт поддержку. Не спит, не болеет, данные не уносит.</span>
+          <span class="as-feat__cta"><span class="as-pill as-pill--light" data-i18n="as.install">Установить</span><span class="as-feat__meta" data-i18n="as.feat.meta">Внедрение от 150 000 ₽</span></span>
+        </button>
+
+        <!-- Живые продукты -->
+        <h3 class="as-sec" data-i18n="as.sec.live">Наши живые продукты</h3>
+        <div class="as-grid">
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic"><picture><source srcset="icons/game.webp" type="image/webp"><img src="icons/game.png" alt="" width="128" height="128" loading="lazy" decoding="async"></picture></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.p.game.name">Игра «Собери 70B»</h4><p class="as-card__sub" data-i18n="as.p.game.sub">Слейте модели в 70B — играбельно</p></div>
+              <button class="as-pill" data-win="win-game" data-i18n="as.open">Открыть</button>
+            </div>
+          </article>
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic"><picture><source srcset="icons/calc.webp" type="image/webp"><img src="icons/calc.png" alt="" width="128" height="128" loading="lazy" decoding="async"></picture></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.p.calc.name">Калькулятор проекта</h4><p class="as-card__sub" data-i18n="as.p.calc.sub">Соберите смету за 20 секунд</p></div>
+              <button class="as-pill" data-win="win-calc" data-i18n="as.open">Открыть</button>
+            </div>
+          </article>
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic"><picture><source srcset="icons/agents.webp" type="image/webp"><img src="icons/agents.png" alt="" width="128" height="128" loading="lazy" decoding="async"></picture></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.p.agents.name">3D-офис ИИ-агентов</h4><p class="as-card__sub" data-i18n="as.p.agents.sub">Загляните, как устроен цифровой штат</p></div>
+              <button class="as-pill" data-win="win-agents" data-i18n="as.open">Открыть</button>
+            </div>
+          </article>
+          <article class="as-card">
+            <span class="as-card__shot"><img data-src="portfolio/megradzor.webp" alt="" width="480" height="300" loading="lazy" decoding="async"></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.p.port.name">Портфолио студии</h4><p class="as-card__sub" data-i18n="as.p.port.sub">Сайты, ИИ-сомелье, боты и билеты</p></div>
+              <button class="as-pill" data-win="win-portfolio" data-i18n="as.open">Открыть</button>
+            </div>
+          </article>
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic"><picture><source srcset="icons/factory.webp" type="image/webp"><img src="icons/factory.png" alt="" width="128" height="128" loading="lazy" decoding="async"></picture></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.p.fab.name">Фабрика контента</h4><p class="as-card__sub" data-i18n="as.p.fab.sub">Генератор постов, карточек и ответов</p></div>
+              <button class="as-pill" data-win="win-factory" data-i18n="as.open">Открыть</button>
+            </div>
+          </article>
+                  </div>
+
+        <!-- G6: Испытательный стенд -->
+        <h3 class="as-sec" data-i18n="as.sec.try">Испытательный стенд</h3>
+        <p class="as-try-lead" data-i18n="as.try.lead">Каждую функцию ИИ-сотрудников можно потрогать прямо здесь — без регистрации и загрузок.</p>
+        <div class="as-grid">
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic"><picture><source srcset="icons/assistant.webp" type="image/webp"><img src="icons/assistant.png" alt="" width="128" height="128" loading="lazy" decoding="async"></picture></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.try.doc.n">Спросить Документоведа</h4><p class="as-card__sub" data-i18n="as.try.doc.s">Ответы по регламентам — или по вашему файлу</p></div>
+              <button class="as-pill" data-chat="documoved" data-i18n="try.now">Попробовать сейчас</button>
+            </div>
+          </article>
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic"><picture><source srcset="icons/staff.webp" type="image/webp"><img src="icons/staff.png" alt="" width="128" height="128" loading="lazy" decoding="async"></picture></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.try.law.n">Проверить договор</h4><p class="as-card__sub" data-i18n="as.try.law.s">Вставьте текст — отчёт по 15 пунктам мгновенно</p></div>
+              <button class="as-pill" data-chat="lawyer" data-i18n="try.now">Попробовать сейчас</button>
+            </div>
+          </article>
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic"><picture><source srcset="icons/call.webp" type="image/webp"><img src="icons/call.png" alt="" width="128" height="128" loading="lazy" decoding="async"></picture></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.try.voice.n">Поговорить голосом</h4><p class="as-card__sub" data-i18n="as.try.voice.s">Секретарь слушает и отвечает вслух</p></div>
+              <button class="as-pill" data-win="win-call" data-i18n="try.now">Попробовать сейчас</button>
+            </div>
+          </article>
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic"><picture><source srcset="icons/factory.webp" type="image/webp"><img src="icons/factory.png" alt="" width="128" height="128" loading="lazy" decoding="async"></picture></span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.try.fab.n">Сгенерировать контент</h4><p class="as-card__sub" data-i18n="as.try.fab.s">Пост, карточка товара или ответ на отзыв</p></div>
+              <button class="as-pill" data-win="win-factory" data-i18n="try.now">Попробовать сейчас</button>
+            </div>
+          </article>
+        </div>
+
+        <!-- Документы -->
+        <h3 class="as-sec" data-i18n="as.sec.docs">Документы</h3>
+        <div class="as-docs">
+          <a class="as-doc" href="docs/urartu-ai-presentation.pdf" download>
+            <span class="as-doc__ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v4h4"/><path d="M9 13h6M9 17h4"/></svg></span>
+            <span class="as-doc__b"><span class="as-doc__n" data-i18n="as.doc.pres.n">Коммерческое предложение</span><span class="as-doc__s" data-i18n="as.doc.pres.s">PDF · 5 страниц · сотрудники, железо, услуги</span></span>
+            <span class="as-pill as-pill--ghost" data-i18n="as.download">Скачать PDF</span>
+          </a>
+          <a class="as-doc" href="docs/price.pdf" download>
+            <span class="as-doc__ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v4h4"/><path d="M9 13h6M9 17h3"/><path d="M12 9.5V11"/></svg></span>
+            <span class="as-doc__b"><span class="as-doc__n" data-i18n="as.doc.price.n">Прайс-лист</span><span class="as-doc__s" data-i18n="as.doc.price.s">PDF · 1 страница · все цены студии</span></span>
+            <span class="as-pill as-pill--ghost" data-i18n="as.download">Скачать PDF</span>
+          </a>
+        </div>
+
+        <!-- Установить Urartu OS -->
+        <h3 class="as-sec" data-i18n="as.sec.install">Установить Urartu OS</h3>
+        <div class="as-install">
+          <p class="as-install__lead" data-i18n="as.install.lead">Добавьте этот сайт на экран «Домой» — он откроется как отдельное приложение, во весь экран и без адресной строки.</p>
+          <button class="wbtn wbtn--primary as-install__btn" id="pwaInstall" hidden data-i18n="as.install.btn">Установить приложение</button>
+          <ol class="as-install__ios">
+            <li data-i18n="as.install.ios1">Нажмите «Поделиться» в нижней панели Safari.</li>
+            <li data-i18n="as.install.ios2">Выберите «На экран „Домой“».</li>
+            <li data-i18n="as.install.ios3">Готово — иконка Urartu AI появится на рабочем столе.</li>
+          </ol>
+        </div>
+
+        <div class="as-foot">
+          <span class="as-foot__t" data-i18n="as.oss">Открытый код</span>
+          <a class="as-foot__l" href="https://github.com/Shahen777/urartu-ai" target="_blank" rel="noopener">github.com/Shahen777/urartu-ai</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Календарь — запись на демо (E2) -->
+    <article class="win win--cal" id="win-calendar" role="dialog" aria-label="Календарь — запись на демо">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="cal.title">Календарь</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="cal.h1">Запишитесь на демо</h2>
+        <p class="lead" data-i18n="cal.lead">Выберите рабочий день и удобное время. 30 минут онлайн — покажем работающих ИИ-сотрудников на живых примерах.</p>
+
+        <div class="calx">
+          <div class="calx__head">
+            <button class="calx__nav" id="calPrev" type="button" aria-label="Предыдущий месяц">‹</button>
+            <span class="calx__month" id="calMonth" aria-live="polite">—</span>
+            <button class="calx__nav" id="calNext" type="button" aria-label="Следующий месяц">›</button>
+          </div>
+          <div class="calx__dow" aria-hidden="true">
+            <span data-i18n="cal.dow.mo">Пн</span><span data-i18n="cal.dow.tu">Вт</span><span data-i18n="cal.dow.we">Ср</span><span data-i18n="cal.dow.th">Чт</span><span data-i18n="cal.dow.fr">Пт</span><span data-i18n="cal.dow.sa">Сб</span><span data-i18n="cal.dow.su">Вс</span>
+          </div>
+          <div class="calx__grid" id="calGrid" role="grid" aria-label="Дни месяца"></div>
+        </div>
+
+        <div class="calx__panel" id="calPanel" hidden>
+          <h3 class="calx__slotsh"><span data-i18n="cal.slots.h">Свободное время</span> · <span id="calPickedDay"></span></h3>
+          <div class="calx__slots" id="calSlots" role="radiogroup" aria-label="Время демо"></div>
+
+          <form class="calx__form" id="calForm" novalidate>
+            <div class="calx__picked" id="calPickedLine" hidden></div>
+            <label class="calx__field"><span data-i18n="cal.form.name">Имя</span>
+              <input type="text" id="calName" name="name" autocomplete="name" required data-i18n-ph="cal.form.namePh" placeholder="Как вас зовут">
+            </label>
+            <label class="calx__field"><span data-i18n="cal.form.contact">Как связаться</span>
+              <input type="text" id="calContact" name="contact" autocomplete="tel" data-i18n-ph="cal.form.contactPh" placeholder="Telegram или телефон">
+            </label>
+            <button class="wbtn wbtn--primary calx__submit" id="calSubmit" type="submit" disabled data-i18n="cal.form.submit">Записаться</button>
+            <p class="calx__err" id="calErr" hidden role="alert"></p>
+          </form>
+        </div>
+
+        <p class="note" data-i18n="cal.note">30 минут онлайн · без презентаций и обязательств · подтверждение придёт в Telegram. Встреча сразу скачается в ваш календарь (.ics).</p>
+      </div>
+    </article>
+
+    <!-- Фабрика контента (G5) -->
+    <article class="win" id="win-factory" role="dialog" aria-label="Фабрика контента">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="fab.title">Фабрика контента</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="fab.h1">Конвейер контента, который пишет за вас</h2>
+        <p class="lead" data-i18n="fab.lead">Так работает наш продукт «Контент-фабрика»: тема превращается в готовую публикацию. Попробуйте генератор — он работает прямо в браузере.</p>
+
+        <!-- конвейер с бегущим импульсом -->
+        <div class="fx-line" aria-hidden="true">
+          <span class="fx-step" data-i18n="fab.st1">Тема</span><span class="fx-arr"><i class="fx-pulse"></i></span>
+          <span class="fx-step" data-i18n="fab.st2">Черновик</span><span class="fx-arr"><i class="fx-pulse fx-pulse--d2"></i></span>
+          <span class="fx-step" data-i18n="fab.st3">Редактура</span><span class="fx-arr"><i class="fx-pulse fx-pulse--d3"></i></span>
+          <span class="fx-step fx-step--go" data-i18n="fab.st4">Публикация</span>
+        </div>
+
+        <div class="fx-form">
+          <div class="fx-row" role="radiogroup" aria-label="Формат" id="fxFormat">
+            <button type="button" class="fx-seg is-on" data-val="post" role="radio" aria-checked="true" data-i18n="fab.f1">Пост для соцсетей</button>
+            <button type="button" class="fx-seg" data-val="card" role="radio" aria-checked="false" data-i18n="fab.f2">Карточка товара</button>
+            <button type="button" class="fx-seg" data-val="review" role="radio" aria-checked="false" data-i18n="fab.f3">Ответ на отзыв</button>
+          </div>
+          <div class="fx-row" role="radiogroup" aria-label="Тон" id="fxTone">
+            <button type="button" class="fx-seg is-on" data-val="biz" role="radio" aria-checked="true" data-i18n="fab.t1">Деловой</button>
+            <button type="button" class="fx-seg" data-val="fun" role="radio" aria-checked="false" data-i18n="fab.t2">Дружелюбный</button>
+          </div>
+          <label class="fx-lbl" for="fxTopic" data-i18n="fab.topicLbl">Тема, товар или отзыв</label>
+          <textarea class="fx-topic" id="fxTopic" rows="2" placeholder="Например: открытие новой кофейни на Тверской"></textarea>
+          <button class="wbtn wbtn--primary fx-go" id="fxGo" type="button" data-i18n="fab.gen">Сгенерировать</button>
+        </div>
+
+        <div class="fx-out" id="fxOut" hidden>
+          <div class="fx-text" id="fxText"></div>
+          <div class="fx-out__row">
+            <button class="wbtn" id="fxCopy" type="button" data-i18n="fab.copy">Скопировать</button>
+            <span class="fx-src" id="fxSrc"></span>
+          </div>
+        </div>
+
+        <div class="fx-sell">
+          <p><b data-i18n="fab.sellH">Фабрика — к вам в контур</b><br><span data-i18n="fab.sell">Календарь публикаций, ваш тон, ваши продукты, согласование в один клик. Статьи, посты, рассылки — каждый день, без выгорания. От 50 000 ₽/мес.</span></p>
+          <button class="wbtn wbtn--primary" data-win="win-calendar" data-i18n="fab.cta">Записаться</button>
         </div>
       </div>
     </article>
@@ -899,7 +1313,12 @@
     <button class="sb-icon" data-win="win-devices"><picture><source srcset="icons/devices.webp" type="image/webp"><img src="icons/devices.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="dev.title">Устройства</span></button>
     <button class="sb-icon" data-win="win-portfolio"><picture><source srcset="icons/portfolio.webp" type="image/webp"><img src="icons/portfolio.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="port.title">Портфолио</span></button>
     <button class="sb-icon" data-win="win-pricing"><picture><source srcset="icons/pricing.webp" type="image/webp"><img src="icons/pricing.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="menu.pricing">Тарифы</span></button>
+    <button class="sb-icon" data-win="win-calc"><picture><source srcset="icons/calc.webp" type="image/webp"><img src="icons/calc.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.calc">Калькулятор</span></button>
+    <button class="sb-icon" data-win="win-appstore"><picture><source srcset="icons/appstore.webp" type="image/webp"><img src="icons/appstore.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="as.short">App Store</span></button>
+    <button class="sb-icon" data-win="win-calendar"><picture><source srcset="icons/calendar.webp" type="image/webp"><img src="icons/calendar.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="cal.title">Календарь</span></button>
     <button class="sb-icon" data-win="win-agents"><picture><source srcset="icons/agents.webp" type="image/webp"><img src="icons/agents.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="agents.short">ИИ-агенты</span></button>
+    <button class="sb-icon" data-win="win-game"><picture><source srcset="icons/game.webp" type="image/webp"><img src="icons/game.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.game">Игра</span></button>
+    <button class="sb-icon" data-win="win-factory"><picture><source srcset="icons/factory.webp" type="image/webp"><img src="icons/factory.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.fab">Фабрика</span></button>
     <button class="sb-icon" data-win="win-call"><picture><source srcset="icons/call.webp" type="image/webp"><img src="icons/call.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="call.short">Позвонить</span></button>
     <button class="sb-icon" data-win="win-how"><picture><source srcset="icons/how.webp" type="image/webp"><img src="icons/how.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.how">Как работает</span></button>
     <button class="sb-icon" data-win="win-who"><picture><source srcset="icons/who.webp" type="image/webp"><img src="icons/who.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.who">Кому</span></button>
@@ -945,7 +1364,7 @@
     </div>
 
     <!-- 4. Календарь / демо -->
-    <button class="widget cal reveal" data-win="win-mail" aria-label="Записаться на демо">
+    <button class="widget cal reveal" data-win="win-calendar" aria-label="Записаться на демо">
       <span class="cal__mark" data-i18n="w.cal.mark">● Демо</span>
       <div class="cal__date" id="cal-date">--</div>
       <div class="cal__month" id="cal-month"></div>
@@ -987,7 +1406,7 @@
 </div>
 
 <!-- строка поиска над доком (мобильный) -->
-<button class="ios-search" id="iosSearch" type="button" data-win="win-assistant" aria-label="Спросить ассистента">
+<button class="ios-search" id="iosSearch" type="button" aria-label="Поиск по сайту">
   <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
     <circle cx="6.8" cy="6.8" r="4.6"/><line x1="10.4" y1="10.4" x2="14" y2="14"/>
   </svg>
@@ -1082,13 +1501,16 @@
 
 <!-- ================= ДОК ================= -->
 <nav class="dock reveal" aria-label="Панель приложений">
-  <button class="dock__app" data-win="win-assistant" data-name="Ассистент" data-name-i18n="sb.assistant" aria-label="Ассистент"><picture><source srcset="icons/assistant.webp" type="image/webp"><img src="icons/assistant.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app" data-win="win-assistant" data-name="Сообщения" data-name-i18n="sb.assistant" aria-label="Сообщения"><picture><source srcset="icons/assistant.webp" type="image/webp"><img src="icons/assistant.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-staff" data-name="Сотрудники" data-name-i18n="staff.title" aria-label="ИИ-сотрудники"><picture><source srcset="icons/staff.webp" type="image/webp"><img src="icons/staff.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-how" data-name="Как работает" data-name-i18n="sb.how" aria-label="Как работает"><picture><source srcset="icons/how.webp" type="image/webp"><img src="icons/how.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-who" data-name="Кому" data-name-i18n="who.title" aria-label="Кому"><picture><source srcset="icons/who.webp" type="image/webp"><img src="icons/who.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-pricing" data-name="Тарифы" data-name-i18n="menu.pricing" aria-label="Тарифы"><picture><source srcset="icons/pricing.webp" type="image/webp"><img src="icons/pricing.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app" data-win="win-services" data-name="Услуги" data-name-i18n="menu.services" aria-label="Услуги"><picture><source srcset="icons/services.webp" type="image/webp"><img src="icons/services.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-devices" data-name="Устройства" data-name-i18n="dev.title" aria-label="Устройства"><picture><source srcset="icons/devices.webp" type="image/webp"><img src="icons/devices.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-calc" data-name="Калькулятор" data-name-i18n="sb.calc" aria-label="Калькулятор проекта"><picture><source srcset="icons/calc.webp" type="image/webp"><img src="icons/calc.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-appstore" data-name="App Store" data-name-i18n="as.short" aria-label="App Store — витрина продуктов"><picture><source srcset="icons/appstore.webp" type="image/webp"><img src="icons/appstore.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-calendar" data-name="Календарь" data-name-i18n="cal.title" aria-label="Календарь — запись на демо"><picture><source srcset="icons/calendar.webp" type="image/webp"><img src="icons/calendar.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-faq" data-name="Вопросы" data-name-i18n="menu.faq" aria-label="Вопросы"><picture><source srcset="icons/faq.webp" type="image/webp"><img src="icons/faq.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <span class="dock__sep" aria-hidden="true"></span>
   <button class="dock__app" data-win="win-agents" data-name="ИИ-агенты" data-name-i18n="agents.short" aria-label="ИИ-агенты — 3D-офис"><picture><source srcset="icons/agents.webp" type="image/webp"><img src="icons/agents.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
@@ -1098,7 +1520,32 @@
   <button class="dock__app dock__mobhide" data-win="win-trash" data-name="Корзина" data-name-i18n="trash.title" aria-label="Корзина"><picture><source srcset="icons/trash.webp" type="image/webp"><img src="icons/trash.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
 </nav>
 
+<!-- ================= SPOTLIGHT-ПОИСК ================= -->
+<div class="spot" id="spot" hidden>
+  <div class="spot__panel" role="dialog" aria-modal="true" aria-label="Поиск">
+    <div class="spot__bar">
+      <svg class="spot__ic" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="6.8" cy="6.8" r="4.6"/><line x1="10.4" y1="10.4" x2="14" y2="14"/></svg>
+      <input class="spot__field" id="spotField" type="text" data-i18n-ph="spot.ph" placeholder="Поиск по сайту…" aria-label="Поиск" autocomplete="off" spellcheck="false">
+      <kbd class="spot__esc">esc</kbd>
+    </div>
+    <ul class="spot__results" id="spotResults" role="listbox" aria-label="Результаты"></ul>
+    <div class="spot__empty" id="spotEmpty" hidden data-i18n="spot.empty">Ничего не найдено</div>
+  </div>
+</div>
+
+<!-- ================= ПУШ-БАННЕР (вовлечение) ================= -->
+<button class="push" id="push" type="button" hidden aria-label="Открыть сообщение Документоведа">
+  <span class="push__ic" aria-hidden="true">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/></svg>
+  </span>
+  <span class="push__txt">
+    <span class="push__t"><span data-i18n="push.from">Документовед</span><span class="push__time" data-i18n="push.now">сейчас</span></span>
+    <span class="push__b" data-i18n="push.body">Нашёл ответ про 152-ФЗ — спросите меня →</span>
+  </span>
+</button>
+
 <script src="js/i18n.js" defer></script>
+<script src="js/localai.js" defer></script>
 <script src="js/os.js" defer></script>
 </body>
 </html>
