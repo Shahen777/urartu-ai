@@ -2630,3 +2630,12 @@ html.is-locked, html.is-locked body{overflow:hidden}
 /* во время распределения приглушаем непричастных сотрудников */
 .office.is-dispatch .office__pod:not(.is-active):not(.is-done){opacity:.42;transition:opacity .3s}
 .office.is-dispatch .office__pod:not(.is-active):not(.is-done) .office__bubble{opacity:0}
+
+/* --- 3D-офис (three.js) контейнер --- */
+.o3d{position:relative;width:100%;height:clamp(320px,52vh,520px);margin-top:12px;border-radius:20px;overflow:hidden;
+  background:radial-gradient(120% 100% at 50% 0%, #141a2b, #0a0c14 70%);
+  box-shadow:inset 0 0 0 .5px var(--ring-strong),inset 0 -40px 80px rgba(0,0,0,.5)}
+.o3d canvas{display:block}
+.o3d__loading{position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.7);font-size:14px}
+.o3d.is-failed::after{content:attr(data-fail);position:absolute;inset:0;display:grid;place-items:center;
+  color:rgba(255,255,255,.7);font-size:14px;padding:20px;text-align:center}

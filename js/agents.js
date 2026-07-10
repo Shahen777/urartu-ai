@@ -458,43 +458,97 @@
     return row;
   }
 
-  function runDispatch(text) {
-    if (dispatching) return;
-    var office = document.querySelector('#agpOfficeScene .office');
-    var log = document.getElementById('leadLog');
-    if (!office || !log) return;
+  /* Единый движок: синхронно управляет 2D-диаграммой и 3D-сценой + оба лога */
+  function dispatchAll(text) {
+    if (dispatching || !text) return;
     dispatching = true;
-    office.classList.add('is-dispatch');
-    office.querySelectorAll('.office__pod').forEach(function (p) { if (p.__reset) p.__reset(); });
-    log.innerHTML = '';
     var picks = route(text);
-    logLine(log, 'me', '<b>' + esc(L('Вы', 'You')) + ':</b> ' + esc(text));
-    var think = logLine(log, 'lead', esc(L('Разбираю задачу на шаги и распределяю…', 'Breaking the task into steps and delegating…')), null, false, true);
-    var base = reduceMotion() ? 0 : 750;
-    var step = reduceMotion() ? 0 : 620;
+    var office = document.querySelector('#agpOfficeScene .office');   // 2D (может отсутствовать)
+    var log = document.getElementById('leadLog');
+    var sceneLog = document.getElementById('o3dLog');
+    var has3d = window.Office3D && window.Office3D.ready && window.Office3D.ready();
+    if (office) { office.classList.add('is-dispatch'); office.querySelectorAll('.office__pod').forEach(function (p) { if (p.__reset) p.__reset(); }); }
+    if (has3d) window.Office3D.reset();
+    if (log) log.innerHTML = ''; if (sceneLog) sceneLog.innerHTML = '';
+    var thinkRows = [];
+    function logBoth(kind, html, id, ok, spin) {
+      var rows = [];
+      if (log) rows.push(logLine(log, kind, html, id, ok, spin));
+      if (sceneLog) rows.push(logLine(sceneLog, kind, html, id, ok, spin));
+      return rows;
+    }
+    logBoth('me', '<b>' + esc(L('Вы', 'You')) + ':</b> ' + esc(text));
+    thinkRows = logBoth('lead', esc(L('Разбираю задачу на шаги и распределяю…', 'Breaking the task into steps and delegating…')), null, false, true);
+    var base = reduceMotion() ? 0 : 750, step = reduceMotion() ? 0 : 620;
 
     picks.forEach(function (pk, i) {
       setTimeout(function () {
-        var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]');
-        if (pod && pod.__assign) pod.__assign(pk.sub);
-        logLine(log, 'assign', '<b>' + esc(tr(nameKeyOf(pk.id))) + '</b> — ' + esc(pk.sub), pk.id, false, true);
+        if (office) { var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]'); if (pod && pod.__assign) pod.__assign(pk.sub); }
+        if (has3d) window.Office3D.assign(pk.id, pk.sub);
+        logBoth('assign', '<b>' + esc(tr(nameKeyOf(pk.id))) + '</b> — ' + esc(pk.sub), pk.id, false, true);
       }, base + i * step);
     });
     var after = base + picks.length * step + step;
     picks.forEach(function (pk, i) {
       setTimeout(function () {
-        var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]');
-        if (pod && pod.__done) pod.__done(pk.res);
-        /* заменяем строку назначения на «готово»: просто добавляем итог */
-        logLine(log, 'done', '<b>' + esc(tr(nameKeyOf(pk.id))) + '</b> — ' + esc(pk.res), pk.id, true);
+        if (office) { var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]'); if (pod && pod.__done) pod.__done(pk.res); }
+        if (has3d) window.Office3D.done(pk.id, pk.res);
+        logBoth('done', '<b>' + esc(tr(nameKeyOf(pk.id))) + '</b> — ' + esc(pk.res), pk.id, true);
       }, after + i * step);
     });
     setTimeout(function () {
-      if (think && think.parentNode) think.remove();
-      logLine(log, 'lead', esc(L('Готово. Свёл результат — можно проверить и подтвердить.', 'Done. I combined the result — review and confirm.')), null, true);
-      office.classList.remove('is-dispatch');
+      thinkRows.forEach(function (r) { if (r && r.parentNode) r.remove(); });
+      logBoth('lead', esc(L('Готово. Свёл результат — можно проверить и подтвердить.', 'Done. I combined the result — review and confirm.')), null, true);
+      if (office) office.classList.remove('is-dispatch');
       dispatching = false;
     }, after + picks.length * step + step);
+  }
+  var runDispatch = dispatchAll;
+
+  /* ---------- вкладка «3D-офис»: наша сцена на three.js ---------- */
+  var sceneBuilt = false;
+  function rosterForScene() {
+    return ROSTER.map(function (a) { return { id: a.id, name: tr(nameKeyOf(a.id)), role: tr(roleKeyOf(a.id)), hue: a.hue, img: avaSrc(a.id) }; });
+  }
+  function renderScene() {
+    var pane = document.getElementById('agpScene');
+    if (!pane) return;
+    if (!sceneBuilt) {
+      sceneBuilt = true;
+      pane.innerHTML = '';
+      var head = el('div', 'agp__head');
+      head.innerHTML = '<div><h2 class="agp__h2">' + esc(L('3D-офис', '3D office')) + '</h2>' +
+        '<p class="agp__lead">' + esc(L('Ваша ИИ-команда за работой на вашем сервере. Дайте задачу — нужный сотрудник за столом подсветится и на его мониторе появится задача. Крутите сцену мышью.', 'Your AI team at work on your server. Give a task — the right employee’s desk lights up and the task shows on their monitor. Drag to rotate.')) + '</p></div>';
+      pane.appendChild(head);
+      /* консоль */
+      var cons = el('div', 'lead');
+      cons.innerHTML =
+        '<div class="lead__row">' +
+          '<span class="lead__ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a4 4 0 0 1 4 4v1a4 4 0 0 1-1 7.9V17a3 3 0 0 1-6 0v-1.1A4 4 0 0 1 8 8V7a4 4 0 0 1 4-4z"/><path d="M9 21h6"/></svg></span>' +
+          '<input class="lead__inp" id="o3dInp" type="text" autocomplete="off" placeholder="' + esc(L('Дайте задачу команде…', 'Give the team a task…')) + '">' +
+          '<button class="lead__send" id="o3dSend" type="button" aria-label="' + esc(L('Отправить', 'Send')) + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>' +
+        '</div>' +
+        '<div class="lead__ex" id="o3dEx"></div>';
+      pane.appendChild(cons);
+      var exWrap = cons.querySelector('#o3dEx');
+      EXAMPLES().forEach(function (x) { var c = el('button', 'lead__chip', esc(x.label)); c.type = 'button'; c.addEventListener('click', function () { dispatchAll(x.q); }); exWrap.appendChild(c); });
+      var inp = cons.querySelector('#o3dInp'), send = cons.querySelector('#o3dSend');
+      function go() { var v = (inp.value || '').trim(); if (v && !dispatching) { dispatchAll(v); inp.value = ''; } }
+      send.addEventListener('click', go);
+      inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+      /* контейнер сцены */
+      var box = el('div', 'o3d'); box.id = 'o3dBox';
+      box.innerHTML = '<div class="o3d__loading">' + esc(L('Загружаем 3D-офис…', 'Loading the 3D office…')) + '</div>';
+      pane.appendChild(box);
+      var log = el('div', 'leadlog'); log.id = 'o3dLog';
+      pane.appendChild(log);
+    }
+    if (window.Office3D) {
+      window.Office3D.ensure(document.getElementById('o3dBox'), rosterForScene()).then(function () {
+        var box = document.getElementById('o3dBox');
+        var ld = box && box.querySelector('.o3d__loading'); if (ld) ld.remove();
+      });
+    }
   }
 
   function reduceMotion() { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
@@ -551,6 +605,7 @@
         panel.querySelectorAll('.agp__pane').forEach(function (p) { p.classList.toggle('is-on', p.dataset.agpPane === name); });
         if (name === 'tasks') renderTasks();
         if (name === 'office') renderOffice();
+        if (name === 'scene') renderScene();
       }
       tab.addEventListener('click', activate);
       tab.addEventListener('keydown', function (e) {
@@ -586,6 +641,12 @@
     if (tasksPane && tasksPane.classList.contains('is-on')) renderTasks();
     var op = document.getElementById('agpOffice');
     if (officeBuilt) { officeBuilt = false; if (op && op.classList.contains('is-on')) renderOffice(); }
+    if (sceneBuilt) {
+      sceneBuilt = false;
+      if (window.Office3D && window.Office3D.dispose) window.Office3D.dispose();
+      var sp = document.getElementById('agpScene');
+      if (sp) { sp.innerHTML = ''; if (sp.classList.contains('is-on')) renderScene(); }
+    }
   });
 
   window.AgentsPanel = { ensure: ensure };

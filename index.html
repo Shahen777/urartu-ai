@@ -938,7 +938,8 @@
           <div class="agp__tabs" role="tablist" aria-label="ИИ-агенты">
             <button class="agp__tab is-on" role="tab" data-agp-tab="team" data-i18n="agents.tab.team">Команда</button>
             <button class="agp__tab" role="tab" data-agp-tab="tasks" data-i18n="agents.tab.tasks">Задачи</button>
-            <button class="agp__tab" role="tab" data-agp-tab="office" data-i18n="agents.tab.office">3D-офис</button>
+            <button class="agp__tab" role="tab" data-agp-tab="office" data-i18n="agents.tab.office">Руководитель</button>
+            <button class="agp__tab" role="tab" data-agp-tab="scene" data-i18n="agents.tab.scene">3D-офис</button>
           </div>
           <div class="agp__panes">
             <section class="agp__pane is-on" data-agp-pane="team" id="agpTeam" role="tabpanel" aria-labelledby="agpTab-team"></section>
@@ -946,6 +947,7 @@
             <section class="agp__pane" data-agp-pane="office" id="agpOffice" role="tabpanel" aria-labelledby="agpTab-office">
               <div id="agpOfficeScene"></div>
             </section>
+            <section class="agp__pane" data-agp-pane="scene" id="agpScene" role="tabpanel" aria-labelledby="agpTab-scene"></section>
           </div>
         </div>
       </div>
@@ -2212,6 +2214,8 @@
 <script src="js/os.js" defer></script>
 <script src="js/avatars.js" defer></script>
 <script src="js/agents.js" defer></script>
+<!-- 3D-офис (three.js r160, MIT) — сам three.js грузится лениво при первом открытии вкладки -->
+<script src="js/office3d.js" defer></script>
 <script src="js/lotj.js" defer></script>
 <!-- ЛОТ M: голосовое управление (~13 КБ, локально; распознавание включается только по клику) -->
 <script src="js/voicenav.js" defer></script>
