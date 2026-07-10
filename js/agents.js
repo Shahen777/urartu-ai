@@ -1,0 +1,359 @@
+/* ============================================================
+   agents.js — панель «Команда ИИ-агентов».
+   Те же сотрудники, что в CRM «Пульс» (documoved / support / secretary
+   / lawyer / content) — общий штат, общие имена/роли (i18n), общие аватары.
+   Три вкладки: Команда (карточки + создать агента), Задачи (живая лента),
+   3D-офис (ленивый WebGPU-стенд The Delegation).
+   Мобильно: одна колонка, крупные тапы, липкие вкладки.
+   Наружу: window.AgentsPanel { ensure() }
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.AgentsPanel) return;
+
+  function lang() { return (window.__lang === 'en') ? 'en' : 'ru'; }
+  function tr(k) { return (window.I18N && window.I18N.t) ? window.I18N.t(k, lang()) : k; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function avaSrc(id) { return (window.Avatars && window.Avatars.src) ? window.Avatars.src(id, 'real') : ('avatars/' + id + '-real.webp'); }
+
+  /* Двуязычные динамические строки (не через словарь — держим рядом) */
+  function L(ru, en) { return lang() === 'en' ? en : ru; }
+
+  /* ---------- ШТАТ: 5 ИИ, синхронизирован с CRM (js/pulse.js EMP) ---------- */
+  var ROSTER = [
+    {
+      id: 'documoved', hue: 210, done: 1240,
+      model: 'Qwen 14–32B', speed: L('~1 сек', '~1 s'),
+      equiv: L('уровень GPT-4o для документов', 'GPT-4o level for documents'),
+      demo: { chat: 'documoved' },
+      tasks: [
+        L('Проверил договор №442 — риск в п. 4.2', 'Checked contract #442 — risk in cl. 4.2'),
+        L('Нашёл ответ в регламенте закупок', 'Found the answer in the procurement policy'),
+        L('Сверил приложение с базой знаний', 'Matched the annex against the knowledge base'),
+        L('Ответил на вопрос по документообороту', 'Answered a document-flow question')
+      ]
+    },
+    {
+      id: 'lawyer', hue: 16, done: 156,
+      model: 'Qwen 32–70B', speed: L('~2 сек', '~2 s'),
+      equiv: L('уровень Claude Sonnet для проверки договоров', 'Claude Sonnet level for contract review'),
+      demo: { chat: 'lawyer' },
+      tasks: [
+        L('Проверил договор поставки по чек-листу', 'Reviewed a supply contract by checklist'),
+        L('Выделил 3 рискованных пункта с цитатами', 'Flagged 3 risky clauses with quotes'),
+        L('Сравнил редакцию с типовой формой', 'Compared the draft to the standard form'),
+        L('Подготовил протокол разногласий', 'Drafted a protocol of disagreements')
+      ]
+    },
+    {
+      id: 'support', hue: 150, done: 890,
+      model: 'Qwen 8–14B', speed: L('~0,8 сек', '~0.8 s'),
+      equiv: L('уровень раннего GPT-4 для типовой поддержки', 'early GPT-4 level for routine support'),
+      demo: { chat: 'support' },
+      tasks: [
+        L('Ответил клиенту в чате за 6 секунд', 'Answered a customer in chat in 6 seconds'),
+        L('Закрыл 12 обращений без оператора', 'Closed 12 tickets without an operator'),
+        L('Передал сложный случай человеку', 'Escalated a hard case to a human'),
+        L('Собрал заявку и завёл её в CRM', 'Captured a lead and logged it in the CRM')
+      ]
+    },
+    {
+      id: 'secretary', hue: 262, done: 320,
+      model: L('малая LLM + локальная речь', 'small LLM + on-device speech'),
+      speed: L('в реальном времени', 'real time'),
+      equiv: L('принимает звонки и говорит голосом', 'answers calls and talks by voice'),
+      demo: { win: 'win-call' }, canCall: true,
+      tasks: [
+        L('Приняла входящий звонок и записала обращение', 'Took an inbound call and logged the request'),
+        L('Назначила 3 демо на завтра', 'Booked 3 demos for tomorrow'),
+        L('Перезвонила по пропущенному', 'Called back a missed call'),
+        L('Отправила подтверждение встречи', 'Sent a meeting confirmation')
+      ]
+    },
+    {
+      id: 'content', hue: 330, done: 96,
+      model: 'Qwen 32B', speed: L('~3 сек', '~3 s'),
+      equiv: L('уровень GPT-4o для текстов', 'GPT-4o level for copy'),
+      demo: { win: 'win-factory' },
+      tasks: [
+        L('Написал пост в стиле бренд-гайда', 'Wrote a post in the brand-guide voice'),
+        L('Подготовил рассылку по базе', 'Drafted a newsletter for the base'),
+        L('Собрал статью по 4 источникам', 'Assembled an article from 4 sources'),
+        L('Сделал 5 вариантов заголовка', 'Produced 5 headline options')
+      ]
+    }
+  ];
+
+  /* Шаблоны ролей для «Создать агента» */
+  function templates() {
+    return [
+      { role: 'documoved', hue: 210, icon: '📄', title: L('Документовед', 'Document expert'), model: 'Qwen 14–32B', desc: L('отвечает по регламентам и базе', 'answers from your policies') },
+      { role: 'lawyer', hue: 16, icon: '⚖️', title: L('Юрист-проверяющий', 'Contract reviewer'), model: 'Qwen 32–70B', desc: L('проверяет договоры по чек-листу', 'reviews contracts by checklist') },
+      { role: 'support', hue: 150, icon: '💬', title: L('Оператор поддержки', 'Support operator'), model: 'Qwen 8–14B', desc: L('отвечает клиентам 24/7', 'answers customers 24/7') },
+      { role: 'secretary', hue: 262, icon: '📞', title: L('Секретарь-голос', 'Voice secretary'), model: L('малая + речь', 'small + speech'), desc: L('принимает звонки голосом', 'answers calls by voice') },
+      { role: 'content', hue: 330, icon: '✍️', title: L('Контент-менеджер', 'Content manager'), model: 'Qwen 32B', desc: L('пишет тексты в вашем стиле', 'writes copy in your voice') }
+    ];
+  }
+
+  var custom = [];   // созданные пользователем агенты (сессия)
+  var built = false;
+
+  /* ---------- карточка агента ---------- */
+  function card(a) {
+    var isCustom = !!a.custom;
+    var name = isCustom ? esc(a.name) : esc(tr(a.nameKey || nameKeyOf(a.id)));
+    var role = esc(isCustom ? a.roleTitle : tr(roleKeyOf(a.id)));
+    var c = el('article', 'agc');
+    c.style.setProperty('--hue', a.hue);
+    var callBtn = a.canCall
+      ? '<button type="button" class="agc__act agc__act--call" data-agc-call="1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11 11 0 0 0 3.4.55 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.3a1 1 0 0 1 1 1 11 11 0 0 0 .55 3.4 1 1 0 0 1-.25 1z"/></svg><span>' + esc(tr('agents.call')) + '</span></button>'
+      : '';
+    var chatBtn = (a.demo && (a.demo.chat || a.demo.win))
+      ? '<button type="button" class="agc__act agc__act--chat" data-agc-demo="1">' + esc(a.demo.chat ? tr('agents.chat') : tr('try.now') || 'Открыть') + '</button>'
+      : '';
+    c.innerHTML =
+      '<div class="agc__top">' +
+        '<span class="agc__ava"><img src="' + avaSrc(a.id) + '" alt="" width="96" height="96" loading="lazy" decoding="async"><i class="agc__pulse"></i></span>' +
+        '<div class="agc__id">' +
+          '<h3 class="agc__name">' + name + (isCustom ? ' <span class="agc__badge">' + esc(tr('agents.custom')) + '</span>' : '') + '</h3>' +
+          '<p class="agc__role">' + role + '</p>' +
+          '<span class="agc__status"><i></i>' + esc(tr('agents.online')) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<p class="agc__now"><span class="agc__nowdot"></span><span class="agc__nowtxt"></span></p>' +
+      '<div class="agc__meta">' +
+        '<div class="agc__mrow"><span class="agc__mk">' + esc(tr('agents.model')) + '</span><b>' + esc(a.model) + '</b></div>' +
+        '<div class="agc__mrow"><span class="agc__mk">' + esc(tr('agents.equiv')) + '</span><span class="agc__equiv">' + esc(a.equiv) + '</span></div>' +
+      '</div>' +
+      '<div class="agc__stats">' +
+        '<div class="agc__stat"><b>' + a.done.toLocaleString(lang() === 'en' ? 'en-US' : 'ru-RU') + '</b><span>' + esc(tr('agents.done.lbl')) + '</span></div>' +
+        '<div class="agc__stat"><b>' + esc(a.speed) + '</b><span>' + esc(tr('agents.speed.lbl')) + '</span></div>' +
+      '</div>' +
+      '<div class="agc__acts">' + callBtn + chatBtn + '</div>';
+    /* «сейчас в работе» строка — крутим задачи */
+    var nowtxt = c.querySelector('.agc__nowtxt');
+    var i = 0;
+    nowtxt.textContent = a.tasks[0];
+    c.__tick = function () { i = (i + 1) % a.tasks.length; nowtxt.textContent = a.tasks[i]; };
+    /* действия */
+    var demo = c.querySelector('[data-agc-demo]');
+    if (demo) demo.addEventListener('click', function () { runDemo(a); });
+    var call = c.querySelector('[data-agc-call]');
+    if (call) call.addEventListener('click', function () { if (window.OS) window.OS.open('win-call', call); });
+    return c;
+  }
+
+  function nameKeyOf(id) { return ({ documoved: 'msg.n.documoved', lawyer: 'msg.n.lawyer', support: 'msg.n.support', secretary: 'msg.n.secretary', content: 'staff.e5.role' })[id]; }
+  function roleKeyOf(id) { return ({ documoved: 'crm.rl.docs', lawyer: 'crm.rl.legal', support: 'crm.rl.sup', secretary: 'crm.rl.rec', content: 'crm.rl.content' })[id]; }
+
+  function runDemo(a) {
+    if (!a.demo) return;
+    if (a.demo.win) { if (window.OS) window.OS.open(a.demo.win, null); return; }
+    if (a.demo.chat) {
+      if (window.OS) window.OS.open('win-assistant', null);
+      setTimeout(function () { if (window.Messenger && window.Messenger.openConversation) window.Messenger.openConversation(a.demo.chat); }, 320);
+    }
+  }
+
+  /* ---------- вкладка «Команда» ---------- */
+  var cards = [];
+  function renderTeam() {
+    var pane = document.getElementById('agpTeam');
+    if (!pane) return;
+    pane.innerHTML = '';
+    cards = [];
+    var head = el('div', 'agp__head');
+    head.innerHTML = '<div><h2 class="agp__h2">' + esc(tr('agents.h1')) + '</h2><p class="agp__lead">' + esc(tr('agents.p')) + '</p></div>';
+    pane.appendChild(head);
+    var grid = el('div', 'agp__grid');
+    ROSTER.concat(custom).forEach(function (a) { var c = card(a); grid.appendChild(c); cards.push(c); });
+    /* карточка «создать агента» */
+    var add = el('button', 'agc agc--add');
+    add.type = 'button';
+    add.innerHTML = '<span class="agc-add__plus" aria-hidden="true">+</span><span class="agc-add__t">' + esc(tr('agents.new')) + '</span>';
+    add.addEventListener('click', openCreate);
+    grid.appendChild(add);
+    pane.appendChild(grid);
+  }
+
+  /* ---------- «Создать агента» ---------- */
+  function openCreate() {
+    var pane = document.getElementById('agpTeam');
+    if (!pane) return;
+    var ov = el('div', 'agcreate');
+    var opts = templates().map(function (t, i) {
+      return '<button type="button" class="agcreate__role' + (i === 0 ? ' is-on' : '') + '" data-role="' + t.role + '" style="--hue:' + t.hue + '">' +
+        '<span class="agcreate__ic">' + t.icon + '</span><b>' + esc(t.title) + '</b><span class="agcreate__rd">' + esc(t.desc) + '</span><span class="agcreate__rm">' + esc(t.model) + '</span></button>';
+    }).join('');
+    ov.innerHTML =
+      '<div class="agcreate__box" role="dialog" aria-label="' + esc(tr('agents.create.title')) + '">' +
+        '<h3 class="agcreate__h">' + esc(tr('agents.create.title')) + '</h3>' +
+        '<p class="agcreate__sub">' + esc(tr('agents.create.sub')) + '</p>' +
+        '<label class="agcreate__lbl">' + esc(tr('agents.create.role')) + '</label>' +
+        '<div class="agcreate__roles">' + opts + '</div>' +
+        '<label class="agcreate__lbl" for="agName">' + esc(tr('agents.create.name')) + '</label>' +
+        '<input id="agName" class="agcreate__inp" type="text" placeholder="' + esc(tr('agents.create.name.ph')) + '" maxlength="24" autocomplete="off">' +
+        '<label class="agcreate__lbl" for="agKb">' + esc(tr('agents.create.kb')) + '</label>' +
+        '<input id="agKb" class="agcreate__inp" type="text" value="' + esc(L('Регламенты и база знаний', 'Policies and knowledge base')) + '" maxlength="40" autocomplete="off">' +
+        '<div class="agcreate__foot">' +
+          '<button type="button" class="agcreate__cancel">' + esc(tr('agents.create.cancel')) + '</button>' +
+          '<button type="button" class="agcreate__go">' + esc(tr('agents.create.go')) + '</button>' +
+        '</div>' +
+      '</div>';
+    pane.appendChild(ov);
+    requestAnimationFrame(function () { ov.classList.add('is-in'); });
+    var chosen = templates()[0];
+    ov.querySelectorAll('.agcreate__role').forEach(function (b) {
+      b.addEventListener('click', function () {
+        ov.querySelectorAll('.agcreate__role').forEach(function (x) { x.classList.remove('is-on'); });
+        b.classList.add('is-on');
+        chosen = templates().filter(function (t) { return t.role === b.dataset.role; })[0];
+      });
+    });
+    function close() { ov.classList.remove('is-in'); setTimeout(function () { if (ov.parentNode) ov.remove(); }, 220); }
+    ov.querySelector('.agcreate__cancel').addEventListener('click', close);
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    ov.querySelector('.agcreate__go').addEventListener('click', function () {
+      var nm = (ov.querySelector('#agName').value || '').trim() || chosen.title;
+      var kb = (ov.querySelector('#agKb').value || '').trim();
+      hire(chosen, nm, kb);
+      close();
+    });
+    setTimeout(function () { var n = ov.querySelector('#agName'); if (n) n.focus(); }, 260);
+  }
+
+  function hire(tpl, name, kb) {
+    var src = ROSTER.filter(function (r) { return r.id === tpl.role; })[0] || ROSTER[0];
+    var a = {
+      custom: true, id: tpl.role, hue: tpl.hue, name: name,
+      roleTitle: tpl.title, model: tpl.model || src.model, speed: src.speed,
+      equiv: src.equiv, done: 0, canCall: tpl.role === 'secretary',
+      demo: src.demo, tasks: src.tasks.slice(),
+      kb: kb
+    };
+    custom.push(a);
+    renderTeam();
+    /* «разворачиваем на сервере» → лента */
+    pushFeed(a, tr('agents.deploying'), 'deploy');
+    setTimeout(function () {
+      pushFeed(a, (a.name) + ' — ' + tr('agents.hired'), 'hire');
+      /* лёгкая подсветка новой карточки */
+      var grid = document.querySelectorAll('#agpTeam .agc');
+      var last = grid[grid.length - 2]; // перед кнопкой «создать»
+      if (last) { last.classList.add('agc--fresh'); setTimeout(function () { last.classList.remove('agc--fresh'); }, 1600); }
+    }, 1400);
+    toast(name + ' — ' + tr('agents.hired'));
+  }
+
+  /* ---------- вкладка «Задачи» (живая лента) ---------- */
+  var feed = [];   // {agent, text, kind, t(ms since epoch-ish, relative counter)}
+  var feedSeed = 0;
+  function seedFeed() {
+    if (feed.length) return;
+    /* стартовые события: по 2 на агента, «раскиданы» во времени */
+    var mins = [1, 3, 6, 9, 12, 17, 22, 28, 35, 44];
+    var k = 0;
+    ROSTER.forEach(function (a) {
+      for (var j = 0; j < 2; j++) {
+        feed.push({ agent: a, text: a.tasks[j % a.tasks.length], kind: 'done', ago: mins[k % mins.length] });
+        k++;
+      }
+    });
+    feed.sort(function (x, y) { return x.ago - y.ago; });
+  }
+  function pushFeed(a, text, kind) {
+    feed.unshift({ agent: a, text: text, kind: kind || 'done', ago: 0 });
+    renderTasks();
+  }
+  var feedFilter = 'all';
+  function renderTasks() {
+    var pane = document.getElementById('agpTasks');
+    if (!pane) return;
+    seedFeed();
+    pane.innerHTML = '';
+    var head = el('div', 'agp__head');
+    head.innerHTML = '<div><h2 class="agp__h2">' + esc(tr('agents.feed.title')) + '</h2><p class="agp__lead">' + esc(tr('agents.feed.hint')) + '</p></div>';
+    pane.appendChild(head);
+    /* фильтры */
+    var chips = el('div', 'agfeed__chips');
+    var all = el('button', 'agfeed__chip' + (feedFilter === 'all' ? ' is-on' : ''), esc(tr('agents.filter.all')));
+    all.addEventListener('click', function () { feedFilter = 'all'; renderTasks(); });
+    chips.appendChild(all);
+    ROSTER.concat(custom).forEach(function (a) {
+      var nm = a.custom ? a.name : tr(nameKeyOf(a.id));
+      var chip = el('button', 'agfeed__chip' + (feedFilter === a ? ' is-on' : ''), esc(nm));
+      chip.style.setProperty('--hue', a.hue);
+      chip.addEventListener('click', function () { feedFilter = a; renderTasks(); });
+      chips.appendChild(chip);
+    });
+    pane.appendChild(chips);
+    /* список */
+    var list = el('div', 'agfeed');
+    var shown = feed.filter(function (f) { return feedFilter === 'all' || f.agent === feedFilter; });
+    if (!shown.length) { list.appendChild(el('p', 'agfeed__empty', esc(tr('agents.empty.tasks')))); }
+    shown.forEach(function (f) {
+      var a = f.agent;
+      var nm = a.custom ? esc(a.name) : esc(tr(nameKeyOf(a.id)));
+      var row = el('div', 'agfeed__row');
+      row.style.setProperty('--hue', a.hue);
+      var when = f.ago <= 0 ? tr('agents.online').split('·')[0].trim() : (f.ago + ' ' + L('мин назад', 'min ago'));
+      if (f.kind === 'deploy') when = '…';
+      row.innerHTML =
+        '<span class="agfeed__ava"><img src="' + avaSrc(a.id) + '" alt="" width="40" height="40" loading="lazy" decoding="async"></span>' +
+        '<div class="agfeed__body"><p class="agfeed__t"><b>' + nm + '</b> ' + esc(f.text) + '</p>' +
+        '<span class="agfeed__when">' + esc(when) + '</span></div>' +
+        (f.kind === 'deploy' ? '<span class="agfeed__spin" aria-hidden="true"></span>' : '<span class="agfeed__ok" aria-hidden="true">✓</span>');
+      list.appendChild(row);
+    });
+    pane.appendChild(list);
+  }
+
+  /* ---------- лёгкий тост ---------- */
+  function toast(msg) {
+    var t = el('div', 'agtoast', esc(msg));
+    document.body.appendChild(t);
+    requestAnimationFrame(function () { t.classList.add('is-in'); });
+    setTimeout(function () { t.classList.remove('is-in'); setTimeout(function () { if (t.parentNode) t.remove(); }, 300); }, 2600);
+  }
+
+  /* ---------- вкладки ---------- */
+  function initTabs() {
+    var panel = document.getElementById('agentsPanel');
+    if (!panel || panel.__tabs) return;
+    panel.__tabs = true;
+    panel.querySelectorAll('.agp__tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var name = tab.dataset.agpTab;
+        panel.querySelectorAll('.agp__tab').forEach(function (t) { t.classList.toggle('is-on', t === tab); });
+        panel.querySelectorAll('.agp__pane').forEach(function (p) { p.classList.toggle('is-on', p.dataset.agpPane === name); });
+        if (name === 'tasks') renderTasks();
+        if (name === 'office' && window.__ensureAgentsFrame) window.__ensureAgentsFrame();
+      });
+    });
+  }
+
+  /* тик «сейчас в работе» на карточках */
+  var timer = null;
+  function startTick() {
+    if (timer) return;
+    timer = setInterval(function () {
+      var win = document.getElementById('win-agents');
+      if (!win || !win.classList.contains('is-open') || document.hidden) return;
+      cards.forEach(function (c) { if (c.__tick) c.__tick(); });
+    }, 3200);
+  }
+
+  function ensure() {
+    if (!built) { built = true; initTabs(); renderTeam(); startTick(); }
+  }
+
+  document.addEventListener('i18n:change', function () {
+    if (!built) return;
+    renderTeam();
+    var tasksPane = document.getElementById('agpTasks');
+    if (tasksPane && tasksPane.classList.contains('is-on')) renderTasks();
+  });
+
+  window.AgentsPanel = { ensure: ensure };
+})();

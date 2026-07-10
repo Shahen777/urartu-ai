@@ -879,11 +879,23 @@
     <article class="win win--wide" id="win-agents" role="dialog" aria-label="ИИ-агенты">
       <span class="win__grab" aria-hidden="true"></span>
       <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="agents.title">ИИ-агенты — 3D-офис</span><button class="win-fs" id="agentsFs" type="button" aria-label="На весь экран"><svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5V3.5h4M17 7.5V3.5h-4M3 12.5v4h4M17 12.5v4h-4"/></svg><span data-i18n="agents.fs">На весь экран</span></button><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
-      <div class="win__body">
-        <h2 data-i18n="agents.h1">Команда ИИ-агентов за работой</h2>
-        <p data-i18n="agents.p">Так устроена многоагентная система: у каждого агента своя роль, они передают задачи друг другу и согласуют результат. Тот же принцип работает во внедрении: один агент ищет ответ в регламентах, второй проверяет договор по чек-листу, третий готовит черновик письма.</p>
-        <div class="agents" id="agentsStage"></div>
-        <p class="note mono agents__credit"><span data-i18n="agents.credit">Симуляция: открытый проект The Delegation, лицензия MIT</span> · <a href="https://github.com/arturitu/the-delegation" target="_blank" rel="noopener">github.com/arturitu/the-delegation</a></p>
+      <div class="win__body win__body--flush">
+        <div class="agp" id="agentsPanel">
+          <div class="agp__tabs" role="tablist" aria-label="ИИ-агенты">
+            <button class="agp__tab is-on" role="tab" data-agp-tab="team" data-i18n="agents.tab.team">Команда</button>
+            <button class="agp__tab" role="tab" data-agp-tab="tasks" data-i18n="agents.tab.tasks">Задачи</button>
+            <button class="agp__tab" role="tab" data-agp-tab="office" data-i18n="agents.tab.office">3D-офис</button>
+          </div>
+          <div class="agp__panes">
+            <section class="agp__pane is-on" data-agp-pane="team" id="agpTeam"></section>
+            <section class="agp__pane" data-agp-pane="tasks" id="agpTasks"></section>
+            <section class="agp__pane" data-agp-pane="office" id="agpOffice">
+              <p class="agp__officehint" data-i18n="agents.office.hint">Так многоагентная система выглядит «изнутри»: агенты передают задачи друг другу.</p>
+              <div class="agents" id="agentsStage"></div>
+              <p class="note mono agents__credit"><span data-i18n="agents.credit">Симуляция: открытый проект The Delegation, лицензия MIT</span> · <a href="https://github.com/arturitu/the-delegation" target="_blank" rel="noopener">github.com/arturitu/the-delegation</a></p>
+            </section>
+          </div>
+        </div>
       </div>
     </article>
 
@@ -2146,6 +2158,7 @@
 <!-- js/localai.js (41 КБ) грузится лениво из os.js при первом открытии окна с агентом (Сообщения / Звонок / Фабрика) -->
 <script src="js/os.js" defer></script>
 <script src="js/avatars.js" defer></script>
+<script src="js/agents.js" defer></script>
 <script src="js/lotj.js" defer></script>
 <!-- ЛОТ M: голосовое управление (~13 КБ, локально; распознавание включается только по клику) -->
 <script src="js/voicenav.js" defer></script>

@@ -192,6 +192,7 @@
     retry.onclick = function () { loadAgentsFrame(stage); };
   }
 
+  window.__ensureAgentsFrame = ensureAgentsFrame;
   function ensureAgentsFrame() {
     var stage = document.getElementById('agentsStage');
     if (!stage || stage.querySelector('iframe') || stage.querySelector('.agents__poster')) return;
@@ -442,7 +443,7 @@
     var win = document.getElementById(id);
     if (!win) return;
     hydrateImages(win);
-    if (id === 'win-agents') ensureAgentsFrame();
+    if (id === 'win-agents') { if (window.AgentsPanel) window.AgentsPanel.ensure(); }
     if (id === 'win-game') ensureGameFrame();
     if (id === 'win-pulse') ensurePulse();
     if (id === 'win-devices') ensureDevices();
