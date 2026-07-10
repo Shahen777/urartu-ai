@@ -319,9 +319,53 @@
     pane.appendChild(list);
   }
 
-  /* ---------- вкладка «Офис»: наши сотрудники в перспективной сцене ---------- */
-  var officeBuilt = false, officeRO = null, officeTick = null;
-  var POS = ['tl', 'tr', 'ml', 'mr', 'bc']; // раскладка подов вокруг сервера (десктоп)
+  /* ---------- вкладка «Руководитель»: пишете задачу — он распределяет ---------- */
+  var officeBuilt = false, officeRO = null, officeTick = null, dispatching = false;
+  var POS = ['tl', 'tr', 'ml', 'mr', 'bc']; // раскладка сотрудников вокруг руководителя (десктоп)
+
+  function EXAMPLES() {
+    return [
+      { label: L('Проверить договор', 'Review a contract'), q: L('Проверьте договор поставки на риски', 'Review the supply contract for risks') },
+      { label: L('Ответить клиенту', 'Answer a client'), q: L('Ответьте клиенту на вопрос по заказу', 'Answer a client question about an order') },
+      { label: L('Записать на встречу', 'Book a meeting'), q: L('Запишите клиента на встречу и подтвердите', 'Book a client meeting and confirm it') },
+      { label: L('Написать пост', 'Write a post'), q: L('Напишите пост для соцсетей о новой услуге', 'Write a social post about a new service') }
+    ];
+  }
+
+  /* маршрутизация задачи руководителем → нужные сотрудники + шаг + результат.
+     Разбор по словам с совпадением по НАЧАЛУ слова (не подстрокой), чтобы
+     «поставки»≠«пост» и «запишите»≠«пиши». */
+  function route(text) {
+    var words = (text || '').toLowerCase().split(/[^a-zа-яё0-9]+/i).filter(Boolean);
+    function has(stems) {
+      for (var i = 0; i < words.length; i++) for (var j = 0; j < stems.length; j++) if (words[i].indexOf(stems[j]) === 0) return true;
+      return false;
+    }
+    var picks = [];
+    function add(id, sub, res) { for (var i = 0; i < picks.length; i++) if (picks[i].id === id) return; picks.push({ id: id, sub: sub, res: res }); }
+    if (has(['договор', 'контракт', 'риск', 'соглашен', 'претенз', 'contract', 'risk', 'agreement'])) {
+      add('documoved', L('найти нужные пункты и приложения', 'find the relevant clauses and annexes'), L('нашёл пункт 4.2 и приложение №2', 'found clause 4.2 and annex 2'));
+      add('lawyer', L('проверить риски по чек-листу', 'check risks against the checklist'), L('отметил 2 риска, готовит протокол разногласий', 'flagged 2 risks, drafting a protocol'));
+    }
+    if (has(['клиент', 'поддержк', 'ответ', 'обращен', 'заказ', 'жалоб', 'client', 'support', 'reply', 'ticket', 'order', 'complaint'])) {
+      add('support', L('ответить клиенту и оформить заявку', 'answer the client and log the request'), L('ответил за 6 сек и завёл заявку в CRM', 'replied in 6s and logged the lead in CRM'));
+    }
+    if (has(['звон', 'встреч', 'запиш', 'назнач', 'перезвон', 'календар', 'ресепш', 'call', 'meeting', 'schedul', 'book', 'calendar', 'appointment'])) {
+      add('secretary', L('назначить встречу и подтвердить', 'book the meeting and confirm'), L('назначила демо на завтра, отправила подтверждение', 'booked a demo for tomorrow, sent confirmation'));
+    }
+    if (has(['напиш', 'публикац', 'соцсет', 'текст', 'стать', 'рассылк', 'контент', 'копирайт', 'пресс', 'post', 'article', 'newsletter', 'content', 'caption', 'copywrit'])) {
+      add('content', L('подготовить текст в стиле бренда', 'draft copy in the brand voice'), L('сделал 3 варианта и рассылку', 'produced 3 variants and a newsletter'));
+    }
+    if (has(['регламент', 'документ', 'инструкц', 'политик', 'приказ', 'policy', 'document', 'knowledge', 'manual', 'regulation'])) {
+      add('documoved', L('найти ответ в регламентах', 'find the answer in the policies'), L('ответил со ссылкой на пункт', 'answered with a clause reference'));
+    }
+    if (!picks.length) {
+      add('documoved', L('разобрать задачу по базе знаний', 'study the task against the knowledge base'), L('собрал вводные и контекст', 'gathered the inputs and context'));
+      add('support', L('подготовить черновик ответа', 'prepare a draft reply'), L('подготовил черновик ответа', 'drafted a reply'));
+    }
+    return picks;
+  }
+
   function renderOffice() {
     var pane = document.getElementById('agpOfficeScene');
     if (!pane) return;
@@ -329,16 +373,38 @@
     officeBuilt = true;
     pane.innerHTML = '';
     var head = el('div', 'agp__head');
-    head.innerHTML = '<div><h2 class="agp__h2">' + esc(L('Офис в работе', 'The office at work')) + '</h2>' +
-      '<p class="agp__lead">' + esc(L('Те же сотрудники, что в команде. Все живут на вашем сервере и передают задачи друг другу — данные не уходят наружу.', 'The same team as above. They all run on your server and hand tasks to each other — data never leaves.')) + '</p></div>';
+    head.innerHTML = '<div><h2 class="agp__h2">' + esc(L('Руководитель ИИ-команды', 'AI team lead')) + '</h2>' +
+      '<p class="agp__lead">' + esc(L('Напишите задачу руководителю — он сам разберёт её на шаги и раздаст нужным сотрудникам. Все работают на вашем сервере.', 'Write a task to the lead — it breaks it into steps and hands them to the right employees. Everyone runs on your server.')) + '</p></div>';
     pane.appendChild(head);
 
+    /* консоль руководителя */
+    var cons = el('div', 'lead');
+    cons.innerHTML =
+      '<div class="lead__row">' +
+        '<span class="lead__ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a4 4 0 0 1 4 4v1a4 4 0 0 1-1 7.9V17a3 3 0 0 1-6 0v-1.1A4 4 0 0 1 8 8V7a4 4 0 0 1 4-4z"/><path d="M9 21h6"/></svg></span>' +
+        '<input class="lead__inp" id="leadInp" type="text" autocomplete="off" placeholder="' + esc(L('Опишите задачу — распределю по команде…', 'Describe a task — I’ll delegate it…')) + '">' +
+        '<button class="lead__send" id="leadSend" type="button" aria-label="' + esc(L('Отправить руководителю', 'Send to lead')) + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>' +
+      '</div>' +
+      '<div class="lead__ex" id="leadEx"></div>';
+    pane.appendChild(cons);
+    var exWrap = cons.querySelector('#leadEx');
+    EXAMPLES().forEach(function (x) {
+      var c = el('button', 'lead__chip', esc(x.label)); c.type = 'button';
+      c.addEventListener('click', function () { runDispatch(x.q); });
+      exWrap.appendChild(c);
+    });
+    var inp = cons.querySelector('#leadInp'), send = cons.querySelector('#leadSend');
+    function go() { var v = (inp.value || '').trim(); if (v && !dispatching) { runDispatch(v); inp.value = ''; } }
+    send.addEventListener('click', go);
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+
+    /* сцена: руководитель в центре, сотрудники вокруг */
     var office = el('div', 'office');
     office.innerHTML = '<div class="office__floor" aria-hidden="true"></div>' +
       '<svg class="office__wires" aria-hidden="true"></svg>' +
-      '<div class="office__hub"><span class="office__hubglow"></span>' +
-        '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><line x1="7" y1="7" x2="7" y2="7"/><line x1="7" y1="17" x2="7" y2="17"/></svg>' +
-        '<b>' + esc(L('Ваш сервер', 'Your server')) + '</b><span>' + esc(L('локально · 152-ФЗ', 'on-prem · local')) + '</span></div>';
+      '<div class="office__hub office__hub--lead"><span class="office__hubglow"></span>' +
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a4 4 0 0 1 4 4v1a4 4 0 0 1-1 7.9V17a3 3 0 0 1-6 0v-1.1A4 4 0 0 1 8 8V7a4 4 0 0 1 4-4z"/><path d="M9 21h6"/></svg>' +
+        '<b>' + esc(L('Руководитель', 'Team lead')) + '</b><span>' + esc(L('на вашем сервере', 'on your server')) + '</span></div>';
     ROSTER.forEach(function (a, i) {
       var nm = esc(tr(nameKeyOf(a.id)));
       var pod = el('div', 'office__pod office__pod--' + POS[i]);
@@ -354,22 +420,18 @@
         '<span class="office__desk" aria-hidden="true"></span>';
       office.appendChild(pod);
       var sp = pod.querySelector('.office__bubble span');
+      var bub = pod.querySelector('.office__bubble');
       var ix = 0; sp.textContent = a.tasks[0];
-      pod.__tick = function () { ix = (ix + 1) % a.tasks.length; sp.textContent = a.tasks[ix]; };
+      pod.__idle = function () { if (pod.classList.contains('is-active') || pod.classList.contains('is-done')) return; ix = (ix + 1) % a.tasks.length; sp.textContent = a.tasks[ix]; };
+      pod.__assign = function (txt) { pod.classList.remove('is-done'); pod.classList.add('is-active'); bub.classList.add('is-live'); sp.textContent = txt; };
+      pod.__done = function (txt) { pod.classList.remove('is-active'); pod.classList.add('is-done'); bub.classList.remove('is-live'); sp.textContent = txt; };
+      pod.__reset = function () { pod.classList.remove('is-active', 'is-done'); bub.classList.remove('is-live'); ix = 0; sp.textContent = a.tasks[0]; };
     });
     pane.appendChild(office);
 
-    /* кнопка «показать 3D» */
-    var btn = el('button', 'office__3dbtn');
-    btn.type = 'button';
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg><span>' + esc(tr('agents.office.open')) + '</span>';
-    btn.addEventListener('click', function () {
-      var box = document.getElementById('agp3d');
-      if (box) { box.hidden = false; box.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); }
-      if (window.__ensureAgentsFrame) window.__ensureAgentsFrame();
-      btn.disabled = true; btn.classList.add('is-loaded');
-    });
-    pane.appendChild(btn);
+    /* лог распределения */
+    var log = el('div', 'leadlog'); log.id = 'leadLog';
+    pane.appendChild(log);
 
     requestAnimationFrame(drawWires);
     if (window.ResizeObserver && !officeRO) {
@@ -379,10 +441,62 @@
     if (!officeTick) officeTick = setInterval(function () {
       var win = document.getElementById('win-agents');
       var op = document.getElementById('agpOffice');
-      if (!win || !win.classList.contains('is-open') || document.hidden || !op || !op.classList.contains('is-on')) return;
-      pane.querySelectorAll('.office__pod').forEach(function (p) { if (p.__tick) p.__tick(); });
+      if (dispatching || !win || !win.classList.contains('is-open') || document.hidden || !op || !op.classList.contains('is-on')) return;
+      pane.querySelectorAll('.office__pod').forEach(function (p) { if (p.__idle) p.__idle(); });
     }, 3400);
   }
+
+  function logLine(log, kind, html, id, ok, spin) {
+    var row = el('div', 'leadlog__row leadlog__row--' + kind);
+    if (id) { var a = ROSTER.filter(function (r) { return r.id === id; })[0]; if (a) row.style.setProperty('--hue', a.hue); }
+    var ava = id ? '<span class="leadlog__ava"><img src="' + avaSrc(id) + '" alt="" width="26" height="26" loading="lazy" decoding="async"></span>'
+                 : '<span class="leadlog__lead" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a4 4 0 0 1 4 4v1a4 4 0 0 1-1 7.9V17a3 3 0 0 1-6 0v-1.1A4 4 0 0 1 8 8V7a4 4 0 0 1 4-4z"/><path d="M9 21h6"/></svg></span>';
+    var mark = spin ? '<span class="leadlog__spin" aria-hidden="true"></span>' : (ok ? '<span class="leadlog__ok" aria-hidden="true">✓</span>' : '');
+    row.innerHTML = ava + '<p class="leadlog__t">' + html + '</p>' + mark;
+    log.appendChild(row);
+    log.scrollTop = log.scrollHeight;
+    return row;
+  }
+
+  function runDispatch(text) {
+    if (dispatching) return;
+    var office = document.querySelector('#agpOfficeScene .office');
+    var log = document.getElementById('leadLog');
+    if (!office || !log) return;
+    dispatching = true;
+    office.classList.add('is-dispatch');
+    office.querySelectorAll('.office__pod').forEach(function (p) { if (p.__reset) p.__reset(); });
+    log.innerHTML = '';
+    var picks = route(text);
+    logLine(log, 'me', '<b>' + esc(L('Вы', 'You')) + ':</b> ' + esc(text));
+    var think = logLine(log, 'lead', esc(L('Разбираю задачу на шаги и распределяю…', 'Breaking the task into steps and delegating…')), null, false, true);
+    var base = reduceMotion() ? 0 : 750;
+    var step = reduceMotion() ? 0 : 620;
+
+    picks.forEach(function (pk, i) {
+      setTimeout(function () {
+        var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]');
+        if (pod && pod.__assign) pod.__assign(pk.sub);
+        logLine(log, 'assign', '<b>' + esc(tr(nameKeyOf(pk.id))) + '</b> — ' + esc(pk.sub), pk.id, false, true);
+      }, base + i * step);
+    });
+    var after = base + picks.length * step + step;
+    picks.forEach(function (pk, i) {
+      setTimeout(function () {
+        var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]');
+        if (pod && pod.__done) pod.__done(pk.res);
+        /* заменяем строку назначения на «готово»: просто добавляем итог */
+        logLine(log, 'done', '<b>' + esc(tr(nameKeyOf(pk.id))) + '</b> — ' + esc(pk.res), pk.id, true);
+      }, after + i * step);
+    });
+    setTimeout(function () {
+      if (think && think.parentNode) think.remove();
+      logLine(log, 'lead', esc(L('Готово. Свёл результат — можно проверить и подтвердить.', 'Done. I combined the result — review and confirm.')), null, true);
+      office.classList.remove('is-dispatch');
+      dispatching = false;
+    }, after + picks.length * step + step);
+  }
+
   function reduceMotion() { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
   function drawWires() {
     var office = document.querySelector('#agpOfficeScene .office');
@@ -390,6 +504,7 @@
     var hub = office && office.querySelector('.office__hub');
     if (!svg || !hub) return;
     var ob = office.getBoundingClientRect();
+    if (!ob.width) return;
     svg.setAttribute('viewBox', '0 0 ' + ob.width + ' ' + ob.height);
     var hb = hub.getBoundingClientRect();
     var hx = hb.left - ob.left + hb.width / 2, hy = hb.top - ob.top + hb.height / 2;
@@ -401,7 +516,7 @@
       var mx = (px + hx) / 2, my = (py + hy) / 2 - 14;
       paths += '<path d="M' + px + ' ' + py + ' Q' + mx + ' ' + my + ' ' + hx + ' ' + hy + '" ' +
         'fill="none" stroke="hsl(' + hue + ' 80% 60%)" stroke-width="1.6" stroke-linecap="round" ' +
-        'stroke-dasharray="4 8" opacity=".55" class="office__wire"/>';
+        'stroke-dasharray="4 8" opacity=".5" class="office__wire"/>';
     });
     svg.innerHTML = paths;
   }

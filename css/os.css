@@ -2529,6 +2529,10 @@ html.is-locked, html.is-locked body{overflow:hidden}
   .office__pod--ml{top:44%;left:1%}
   .office__pod--mr{top:44%;right:1%}
   .office__pod--bc{bottom:5%;left:50%;transform:translateX(-50%)}
+  /* нижний под под руководителем: реплику показываем СНИЗУ, чтобы не налезала на центр */
+  .office__pod--bc .office__seat{order:1}
+  .office__pod--bc .office__desk{order:2}
+  .office__pod--bc .office__bubble{order:3;margin-bottom:0;margin-top:8px;border-radius:3px 13px 13px 13px}
 }
 .office__seat{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 12px 12px;border-radius:16px;
   background:var(--glass-window);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);
@@ -2543,13 +2547,13 @@ html.is-locked, html.is-locked body{overflow:hidden}
 .office__role{font-size:11px;color:var(--text-dim)}
 .office__desk{width:96px;height:12px;margin-top:-2px;border-radius:0 0 40px 40px;
   background:linear-gradient(hsl(var(--hue) 30% 50% / .35),transparent);filter:blur(1px)}
-/* «реплика» задачи над головой */
-.office__bubble{max-width:170px;margin-bottom:8px;padding:7px 11px;border-radius:13px 13px 13px 3px;
+/* «реплика» задачи над головой — видна только когда руководитель назначил задачу */
+.office__bubble{max-width:180px;margin-bottom:8px;padding:7px 11px;border-radius:13px 13px 13px 3px;
   background:hsl(var(--hue) 70% 55% / .16);color:var(--text);font-size:11.5px;line-height:1.3;text-align:center;
   box-shadow:inset 0 0 0 .5px hsl(var(--hue) 70% 60% / .4);min-height:16px;
-  animation:bubbleIn .4s cubic-bezier(.23,1,.32,1)}
+  opacity:0;visibility:hidden;transform:translateY(6px) scale(.96);transition:opacity .3s,transform .3s cubic-bezier(.23,1,.32,1)}
+.office__pod.is-active .office__bubble,.office__pod.is-done .office__bubble{opacity:1;visibility:visible;transform:none}
 .office__bubble span{display:block}
-@keyframes bubbleIn{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
 
 .office__3dbtn{display:inline-flex;align-items:center;gap:8px;margin:16px auto 4px;appearance:none;border:0;cursor:pointer;
   font:inherit;font-size:13.5px;font-weight:600;color:var(--text);padding:11px 18px;border-radius:12px;
@@ -2568,3 +2572,61 @@ html.is-locked, html.is-locked body{overflow:hidden}
 @media(prefers-reduced-transparency:reduce){
   .office__seat,.office__hub,.agc,.agp__tab.is-on,.agcreate__box{backdrop-filter:none;-webkit-backdrop-filter:none}
 }
+
+/* --- Руководитель: консоль ввода задачи --- */
+.lead{margin:2px 0 14px}
+.lead__row{display:flex;gap:8px;align-items:center;padding:6px 6px 6px 14px;border-radius:16px;
+  background:var(--glass-window);-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);
+  box-shadow:inset 0 0 0 .5px var(--ring-strong)}
+.lead__ico{flex:0 0 auto;color:#0a84ff;display:grid;place-items:center}
+.lead__inp{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:15px;color:var(--text);padding:10px 0}
+.lead__inp:focus{outline:none}
+.lead__inp::placeholder{color:var(--text-dim)}
+.lead__send{flex:0 0 auto;width:44px;height:44px;border-radius:12px;border:0;cursor:pointer;display:grid;place-items:center;
+  background:#0a84ff;color:#fff;transition:transform .14s ease-out,filter .16s}
+.lead__send:hover{filter:brightness(1.08)}
+.lead__send:active{transform:scale(.95)}
+.lead__send:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+.lead__ex{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.lead__chip{appearance:none;border:0;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;color:var(--text-mid);
+  min-height:36px;padding:6px 13px;border-radius:999px;background:var(--glass);box-shadow:inset 0 0 0 .5px var(--ring);
+  transition:color .16s,box-shadow .16s}
+.lead__chip:hover{color:var(--text);box-shadow:inset 0 0 0 1px var(--ring-strong)}
+
+/* центральный узел = руководитель */
+.office__hub--lead{box-shadow:inset 0 0 0 1px hsl(222 90% 58% / .55),0 8px 30px rgba(0,0,0,.28)}
+.office__hub--lead .office__hubglow{background:radial-gradient(circle, hsl(222 90% 58% / .32), transparent 70%)}
+
+/* состояния сотрудников при распределении */
+.office__pod .office__seat{transition:box-shadow .25s,transform .2s cubic-bezier(.23,1,.32,1)}
+.office__pod.is-active .office__seat{box-shadow:inset 0 0 0 2px hsl(var(--hue) 82% 58%),0 8px 26px hsl(var(--hue) 70% 45% / .3);transform:translateY(-2px)}
+.office__pod.is-active .office__ava{box-shadow:inset 0 0 0 2px hsl(var(--hue) 82% 58%)}
+.office__pod.is-done .office__seat{box-shadow:inset 0 0 0 1.5px #30d158,0 6px 20px rgba(48,209,88,.2)}
+.office__pod.is-done .office__seat::after{content:"✓";position:absolute;top:8px;right:10px;width:20px;height:20px;
+  border-radius:50%;background:#30d158;color:#fff;font-size:12px;display:grid;place-items:center}
+.office__bubble.is-live{background:hsl(var(--hue) 78% 55% / .24);box-shadow:inset 0 0 0 1px hsl(var(--hue) 78% 60% / .6);font-weight:600}
+
+/* лог распределения */
+.leadlog{margin-top:16px;display:flex;flex-direction:column;gap:2px;max-height:220px;overflow-y:auto}
+.leadlog:empty{display:none}
+.leadlog__row{display:flex;gap:10px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--ring);
+  animation:agpIn .3s cubic-bezier(.23,1,.32,1)}
+.leadlog__row:last-child{border-bottom:0}
+.leadlog__ava,.leadlog__lead{flex:0 0 auto;width:28px;height:28px;border-radius:50%;overflow:hidden;display:grid;place-items:center}
+.leadlog__ava{box-shadow:inset 0 0 0 1.5px hsl(var(--hue) 70% 60% / .5)}
+.leadlog__ava img{width:100%;height:100%;object-fit:cover}
+.leadlog__lead{background:hsl(222 80% 55% / .16);color:#0a84ff}
+.leadlog__row--me .leadlog__lead,.leadlog__row--me::before{}
+.leadlog__row--me{background:var(--glass);border-radius:12px;border-bottom:0;padding:9px 12px;margin-bottom:4px}
+.leadlog__row--me .leadlog__t{color:var(--text)}
+.leadlog__row--lead .leadlog__t{color:var(--text-mid);font-style:italic}
+.leadlog__t{flex:1;min-width:0;font-size:13.5px;color:var(--text-mid);margin:0;line-height:1.4}
+.leadlog__t b{color:var(--text);font-weight:650;font-style:normal}
+.leadlog__ok{flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#30d158;background:rgba(48,209,88,.14)}
+.leadlog__spin{flex:0 0 auto;width:15px;height:15px;border-radius:50%;border:2px solid var(--ring-strong);border-top-color:#0a84ff;animation:agSpin .8s linear infinite}
+@media(max-width:719px){.leadlog{max-height:none}}
+@media(prefers-reduced-motion:reduce){.leadlog__row{animation:none}}
+
+/* во время распределения приглушаем непричастных сотрудников */
+.office.is-dispatch .office__pod:not(.is-active):not(.is-done){opacity:.42;transition:opacity .3s}
+.office.is-dispatch .office__pod:not(.is-active):not(.is-done) .office__bubble{opacity:0}
