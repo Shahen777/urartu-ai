@@ -311,6 +311,13 @@
     <button class="menubar__toggle menubar__prvc" id="prvcBtn" aria-haspopup="true" aria-expanded="false" aria-label="Счётчик внешних запросов" data-tip="внешних запросов" data-tip-i18n="prvc.count">
       <span class="menubar__prvc-a" aria-hidden="true">⇡</span><span class="menubar__prvc-n" id="prvcNum">0</span>
     </button>
+    <button class="menubar__toggle menubar__mic" id="vnBtn" aria-label="Голосовое управление" aria-pressed="false" title="Голосовое управление">
+      <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5.4" y="1.2" width="5.2" height="8.4" rx="2.6"/>
+        <path d="M2.8 7.4a5.2 5.2 0 0 0 10.4 0M8 12.6v2.2"/>
+      </svg>
+      <span class="vn-dot" aria-hidden="true"></span>
+    </button>
     <button class="menubar__toggle menubar__spot" id="spotBtn" aria-label="Поиск" title="Поиск (⌘K)">
       <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="6.8" cy="6.8" r="4.6"/><line x1="10.4" y1="10.4" x2="14" y2="14"/></svg>
     </button>
@@ -380,6 +387,7 @@
         <p class="hero-proof" data-i18n="readme.badge">Каждый ответ — со ссылкой на пункт документа. Можно проверить.</p>
         <button class="readme-touch" type="button" data-win="win-appstore"><span aria-hidden="true">▶</span> <span data-i18n="readme.try">Всё на этом сайте можно потрогать: чат, проверка договора, голос, генератор →</span></button>
         <button class="readme-touch" type="button" data-win="win-pulse"><span aria-hidden="true">▶</span> <span data-i18n="readme.pulse">Посмотреть дашборд «Пульс компании» →</span></button>
+        <button class="readme-touch" type="button" data-act="vn-open"><span aria-hidden="true">🎙</span> <span data-i18n="readme.voice">Управляйте сайтом голосом — скажите «открой тарифы» →</span></button>
         <button class="readme-touch readme-touch--tour" type="button" data-act="tour"><span aria-hidden="true">▶</span> <span data-i18n="tour.readme">Пройти экскурсию по системе</span></button>
       </div>
     </article>
@@ -763,10 +771,10 @@
               <span class="aicall__wave" aria-hidden="true"></span>
               <span class="aicall__wave aicall__wave--2" aria-hidden="true"></span>
               <span class="aicall__ava" aria-hidden="true"><svg viewBox="0 0 32 32" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="16" height="13" rx="4"/><circle cx="13" cy="16" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="16" r="1.6" fill="currentColor" stroke="none"/><path d="M13 20h6"/><line x1="16" y1="10" x2="16" y2="6"/><circle cx="16" cy="5" r="1.4"/><path d="M8 15H5.5M24 15h2.5"/></svg></span>
+              <!-- ЛОТ L: живой 2D-аватар сотрудника (canvas/SVG, лениво) -->
+              <div class="aicall__ava2" id="aiAvatar" aria-hidden="true"></div>
             </div>
-            <!-- H2: контейнер 3D-аватара (three.js, лениво) -->
-            <div class="aicall__face" id="aiFaceBox" hidden aria-hidden="true"></div>
-            <h3 class="aicall__name" data-i18n="ai.name">ИИ-секретарь Урарту</h3>
+            <h3 class="aicall__name" id="aiCallName" data-i18n="ai.name">ИИ-секретарь Урарту</h3>
             <div class="aicall__timer" id="aiTimer" aria-hidden="true">00:00</div>
             <div class="aicall__status" id="aiStatus">…</div>
             <!-- H1/H3: честные индикаторы голоса и слуха -->
@@ -790,16 +798,25 @@
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
               <span id="aiVoiceName" data-i18n="ai.voice">Голос</span>
             </button>
-            <button class="aicall__ctl" id="aiFace" type="button" hidden aria-pressed="false">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="15" cy="10.5" r="0.6" fill="currentColor" stroke="none"/><path d="M9 15q3 2.2 6 0"/></svg>
-              <span data-i18n="ai.face">Аватар</span>
+            <button class="aicall__ctl" id="aiAvaPick" type="button" aria-expanded="false">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.6"/><path d="M14.8 14.6a4.6 4.6 0 0 1 5.7 4.4"/></svg>
+              <span data-i18n="ava.pick">Сотрудник</span>
             </button>
             <button class="aicall__end" id="aiEnd" type="button">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 9c-2.6 0-5 .5-7.1 1.5-.6.3-1 .9-.9 1.6l.3 2.2c.1.6.6 1 1.2.9l3-.4c.5-.1.9-.5 1-1l.3-1.6c.7-.2 1.4-.2 2.2-.2s1.5.1 2.2.2l.3 1.6c.1.5.5.9 1 1l3 .4c.6.1 1.1-.3 1.2-.9l.3-2.2c.1-.7-.3-1.3-.9-1.6C17 9.5 14.6 9 12 9z"/></svg>
               <span data-i18n="ai.end">Завершить</span>
             </button>
           </div>
-          <p class="aicall__hint" id="aiFaceHint" hidden data-i18n="ai.face.hint">Видео-аватар: ~0,75 МБ, 3D-рендер на вашем устройстве — наружу ничего не уходит.</p>
+          <!-- ЛОТ L: галерея сотрудников и стилей лица -->
+          <div class="aicall__picker" id="avaPicker" hidden>
+            <p class="aicall__picker-h" data-i18n="ava.pick.h">Кто отвечает на звонке</p>
+            <div class="aicall__picker-grid" id="avaPickGrid"></div>
+            <div class="aicall__picker-styles" role="radiogroup" aria-label="Стиль лица">
+              <button class="aicall__style" id="avaStyleReal" type="button" role="radio" aria-checked="true" data-i18n="ava.style.real">Реалистичный</button>
+              <button class="aicall__style" id="avaStyleToon" type="button" role="radio" aria-checked="false" data-i18n="ava.style.toon">Рисованный</button>
+            </div>
+          </div>
+          <p class="aicall__hint" data-i18n="ava.plaque">Лицо и голос — витрина. Настоящий сотрудник работает на вашем сервере, лицо и голос настраиваются под ваш бренд.</p>
           <p class="aicall__hint" id="aiVoiceHint" hidden data-i18n="ai.voicehint">Голос звучит роботом? Нажмите «Живой голос» на экране вызова — нейросетевой голос считается прямо на вашем устройстве. Или в macOS загрузите «Милена (улучшенный)».</p>
           <p class="aicall__honest" data-i18n="ai.note">Это демо в вашем браузере. Настоящий Секретарь работает на сервере компании, звонит по телефону и знает вашу базу — от 200 000 ₽.</p>
         </div>
@@ -1281,6 +1298,13 @@
               <button class="as-pill" data-win="win-factory" data-i18n="try.now">Попробовать сейчас</button>
             </div>
           </article>
+          <article class="as-card">
+            <span class="as-card__shot as-card__shot--ic vn-shot" aria-hidden="true">🎙</span>
+            <div class="as-card__row">
+              <div class="as-card__meta"><h4 class="as-card__name" data-i18n="as.try.vn.n">Голосовое управление</h4><p class="as-card__sub" data-i18n="as.try.vn.s">Скажите «открой тарифы» — сайт послушается</p></div>
+              <button class="as-pill" data-act="vn-open" data-i18n="try.now">Попробовать сейчас</button>
+            </div>
+          </article>
         </div>
 
         <!-- Документы -->
@@ -1676,6 +1700,20 @@
         </span>
       </button>
 
+      <!-- ЛОТ M: голосовое управление (тач-цель ≥44px) -->
+      <button class="ccx__tile" id="ccxVn" type="button" data-act="vn-open">
+        <span class="ccx__tile-ic" aria-hidden="true" style="background:#0A84FF">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5.4" y="1.2" width="5.2" height="8.4" rx="2.6"/>
+            <path d="M2.8 7.4a5.2 5.2 0 0 0 10.4 0M8 12.6v2.2"/>
+          </svg>
+        </span>
+        <span class="ccx__tile-txt">
+          <span class="ccx__tile-t" data-i18n="vn.btn">Голосовое управление</span>
+          <span class="ccx__tile-v" data-i18n="vn.ccHint">Скажите «открой тарифы»</span>
+        </span>
+      </button>
+
       <!-- H1: живой голос из Пункта управления -->
       <button class="ccx__tile" id="ccxVoice" type="button" hidden>
         <span class="ccx__tile-ic" aria-hidden="true" style="background:#BF5AF2">
@@ -1737,9 +1775,43 @@
   </span>
 </button>
 
+<!-- ============ ЛОТ M: панель голосового управления (VoiceNav) ============ -->
+<div class="vnp" id="vnPanel" role="dialog" aria-label="Голосовое управление" hidden>
+  <div class="vnp__head">
+    <span class="vnp__dot" id="vnDot" aria-hidden="true"></span>
+    <span class="vnp__title" data-i18n="vn.title">Голосовое управление</span>
+    <span class="vnp__state" id="vnState" data-i18n="vn.off">Микрофон выключен</span>
+    <button class="vnp__x" id="vnClose" type="button" aria-label="Закрыть">
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+    </button>
+  </div>
+  <div class="vnp__heard" id="vnHeard" role="status" aria-live="polite"></div>
+  <div class="vnp__act" id="vnAct" role="status" aria-live="polite"></div>
+  <p class="vnp__note" id="vnNote" hidden></p>
+  <div class="vnp__ex">
+    <span class="vnp__ex-l" data-i18n="vn.say">Скажите:</span>
+    <button class="vnp__chip" type="button" data-i18n="vn.ex1">«открой тарифы»</button>
+    <button class="vnp__chip" type="button" data-i18n="vn.ex2">«позвони секретарю»</button>
+    <button class="vnp__chip" type="button" data-i18n="vn.ex3">«тёмная тема»</button>
+    <button class="vnp__chip" type="button" data-i18n="vn.ex4">«запиши меня на демо»</button>
+    <button class="vnp__chip" type="button" data-i18n="vn.ex5">«проверь договор»</button>
+    <button class="vnp__chip" type="button" data-i18n="vn.ex6">«открой дашборд»</button>
+  </div>
+  <form class="vnp__form" id="vnForm">
+    <input class="vnp__in" id="vnInput" type="text" data-i18n-ph="vn.type.ph" placeholder="Или введите команду текстом…" autocomplete="off" aria-label="Команда текстом">
+    <button class="vnp__go" type="submit" data-i18n="vn.go">Выполнить</button>
+    <button class="vnp__stopb" id="vnStop" type="button" data-i18n="vn.stop">Стоп</button>
+  </form>
+  <p class="vnp__meta"><span class="vnp__hear" data-i18n="vn.hear">Слух: браузерный (звук уходит в Google)</span></p>
+  <p class="vnp__sale" data-i18n="vn.sale">Так ваш ИИ-секретарь принимает команды и звонки. У вас — на своём сервере, от 200 000 ₽.</p>
+</div>
+
 <script src="js/i18n.js" defer></script>
 <!-- js/localai.js (41 КБ) грузится лениво из os.js при первом открытии окна с агентом (Сообщения / Звонок / Фабрика) -->
 <script src="js/os.js" defer></script>
+<script src="js/avatars.js" defer></script>
 <script src="js/lotj.js" defer></script>
+<!-- ЛОТ M: голосовое управление (~13 КБ, локально; распознавание включается только по клику) -->
+<script src="js/voicenav.js" defer></script>
 </body>
 </html>

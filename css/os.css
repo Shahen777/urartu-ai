@@ -1461,6 +1461,9 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
 .msg__av--support{background:linear-gradient(160deg,#31c05a,#1f9c44)}
 .msg__av--secretary{background:linear-gradient(160deg,#ff9f43,#f0762a)}
 .msg__av--live{background:linear-gradient(160deg,#4a5568,#2d3748)}
+/* ЛОТ L — фото/иллюстрация сотрудника в кружке диалога */
+.msg__av{overflow:hidden}
+.msg__avimg{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .msg__conv-txt{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
 .msg__conv-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .msg__conv-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1665,9 +1668,17 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
   border-radius:16px;background:#0b0f1d;color:#F5F5F7;padding:26px 18px 14px;min-height:380px;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
 .aicall__stage{display:flex;flex-direction:column;align-items:center;flex:1 1 auto;width:100%}
-.aicall__ava-wrap{position:relative;width:96px;height:96px;margin-bottom:12px}
+.aicall__ava-wrap{position:relative;width:116px;height:116px;margin-bottom:12px}
 .aicall__ava{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;
   background:linear-gradient(160deg,#2b8a52,#1f6ea8);color:#fff;z-index:1}
+/* ЛОТ L — живой 2D-аватар сотрудника (canvas — фото, svg — рисованный) */
+.aicall__ava2{position:absolute;inset:0;border-radius:50%;overflow:hidden;z-index:2;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.22)}
+.aicall__ava2:empty{display:none}
+.aicall__ava2 canvas,.aicall__ava2 svg,.aicall__ava2 img{display:block;width:100%;height:100%}
+.ava-breathe{animation:avaBreathe 4.8s ease-in-out infinite}
+@keyframes avaBreathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(1.5px) scale(1.013)}}
+@media (prefers-reduced-motion:reduce){.ava-breathe{animation:none}}
 .aicall__wave{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(50,215,75,.55);
   opacity:0;z-index:0}
 .is-talk .aicall__wave{animation:aiwave 1.6s ease-out infinite}
@@ -1730,10 +1741,27 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
 .aicall__hearsoon{display:block;margin-top:8px;padding:6px 10px;border-radius:9px;border:1px dashed rgba(255,255,255,.3);
   background:none;color:rgba(255,255,255,.6);font:inherit;font-size:10.5px;cursor:default}
 
-/* H2 — 3D-аватар */
-.aicall__face{display:grid;place-items:center;margin-bottom:6px;min-height:200px}
-.aicall__face canvas{display:block;border-radius:18px}
-.aicall__ctl.is-on svg{background:#32D74B;color:#08300f}
+/* ЛОТ L — галерея «Сотрудник»: 5 карточек + стиль лица */
+.aicall__picker{margin:12px auto 0;max-width:430px;width:100%;padding:12px;border-radius:14px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.aicall__picker-h{margin:0 0 10px;font-size:11.5px;font-weight:700;letter-spacing:.02em;
+  color:rgba(255,255,255,.75);text-align:center}
+.aicall__picker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.ava-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 2px 7px;
+  border:0;border-radius:11px;background:rgba(255,255,255,.06);cursor:pointer;font:inherit;
+  color:rgba(255,255,255,.82);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);
+  transition:background .15s ease}
+.ava-card:hover{background:rgba(255,255,255,.14)}
+.ava-card.is-on{box-shadow:inset 0 0 0 2px #32D74B;background:rgba(50,215,75,.12);color:#fff}
+.ava-card img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.1)}
+.ava-card span{font-size:9.5px;line-height:1.15;text-align:center;min-height:22px;display:flex;align-items:center}
+.aicall__picker-styles{display:flex;gap:8px;margin-top:10px;justify-content:center}
+.aicall__style{flex:0 1 auto;padding:7px 14px;border:0;border-radius:999px;cursor:pointer;font:inherit;
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,.8);background:rgba(255,255,255,.1);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.aicall__style:hover{background:rgba(255,255,255,.18)}
+.aicall__style.is-on{background:rgba(50,215,75,.18);color:#fff;box-shadow:inset 0 0 0 2px #32D74B}
+@media (max-width:480px){.aicall__picker-grid{grid-template-columns:repeat(3,1fr)}}
 
 /* ============================================================
    G5 — фабрика контента
@@ -1951,3 +1979,83 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
 .driver-popover-navigation-btns button.driver-popover-next-btn{background:var(--red-btn)!important;color:#fff!important;border-color:transparent!important}
 .driver-popover-close-btn{color:var(--text-dim)!important}
 .driver-popover-arrow{border-color:var(--glass-window)!important}
+
+/* ============================================================
+   ЛОТ M — голосовое управление (VoiceNav)
+   ============================================================ */
+/* кнопка-микрофон в меню-баре */
+.menubar__mic{position:relative}
+.menubar__mic .vn-dot{position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;
+  background:var(--red);opacity:0;transition:opacity .2s}
+.menubar__mic.is-on{color:var(--green)}
+.menubar__mic.is-on .vn-dot{opacity:1;animation:vnPulse 1.6s ease-in-out infinite}
+@keyframes vnPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.45}}
+
+/* плавающая панель-ассистент */
+.vnp{position:fixed;left:50%;bottom:104px;transform:translate(-50%,14px);
+  width:min(560px,calc(100vw - 24px));z-index:9600;
+  background:var(--glass-window);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  border-radius:var(--r-window);box-shadow:var(--sh-deep);
+  padding:12px 16px 12px;opacity:0;pointer-events:none;
+  transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.vnp.is-in{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.vnp[hidden]{display:none}
+
+.vnp__head{display:flex;align-items:center;gap:8px;min-height:24px}
+.vnp__dot{width:9px;height:9px;border-radius:50%;background:var(--text-dim);flex:none;transition:background .2s}
+.vnp.is-listening .vnp__dot{background:var(--green);animation:vnPulse 1.4s ease-in-out infinite}
+.vnp.is-speaking .vnp__dot{background:var(--yellow)}
+.vnp__title{font-size:13px;font-weight:700;color:var(--text)}
+.vnp__state{font-size:12px;color:var(--text-dim);margin-left:auto}
+.vnp__x{flex:none;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+  border:0;border-radius:8px;background:transparent;color:var(--text-dim);cursor:pointer}
+.vnp__x:hover{background:var(--surface-hover);color:var(--text)}
+
+.vnp__heard{min-height:20px;margin-top:6px;font-size:14px;color:var(--text-dim);font-style:italic}
+.vnp__heard.is-final{color:var(--text);font-style:normal;font-weight:600}
+.vnp__act{min-height:0;margin-top:2px;font-size:13px;line-height:1.45;color:var(--text-mid)}
+.vnp__act:not(:empty){margin-top:6px}
+.vnp__note{margin:8px 0 0;font-size:12px;line-height:1.4;color:var(--yellow)}
+
+.vnp__ex{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.vnp__ex-l{font-size:12px;color:var(--text-dim);margin-right:2px}
+.vnp__chip{border:0;border-radius:999px;background:var(--surface-btn);color:var(--text-mid);
+  font-size:12px;font-family:inherit;padding:5px 10px;cursor:pointer;min-height:26px}
+.vnp__chip:hover{background:var(--surface-btn-hover);color:var(--text)}
+
+.vnp__form{display:flex;gap:8px;margin-top:10px}
+.vnp__in{flex:1;min-width:0;border:1px solid var(--ring);border-radius:10px;background:var(--surface-soft);
+  color:var(--text);font:inherit;font-size:13px;padding:8px 10px}
+.vnp__in:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+.vnp__go,.vnp__stopb{flex:none;border:0;border-radius:10px;font:inherit;font-size:13px;font-weight:600;
+  padding:8px 13px;cursor:pointer;background:var(--surface-btn);color:var(--text)}
+.vnp__go:hover,.vnp__stopb:hover{background:var(--surface-btn-hover)}
+.vnp__stopb{background:var(--red-btn);color:#fff}
+.vnp__stopb:hover{background:var(--red-btn-hover)}
+
+.vnp__meta{margin:9px 0 0;font-size:11px;color:var(--text-dim)}
+.vnp__sale{margin:5px 0 0;font-size:11px;line-height:1.4;color:var(--text-dim);opacity:.85}
+
+/* подсветка окна-цели после команды */
+.win.vn-hi{animation:vnHi 1.15s var(--ease)}
+@keyframes vnHi{0%{box-shadow:0 0 0 3px rgba(50,215,75,.85),var(--sh-deep)}
+  70%{box-shadow:0 0 0 12px rgba(50,215,75,0),var(--sh-deep)}
+  100%{box-shadow:var(--sh-deep)}}
+
+/* карточка App Store — эмодзи-«иконка» */
+.vn-shot{display:flex;align-items:center;justify-content:center;font-size:44px;line-height:1}
+
+/* мобильный: панель над строкой поиска, тач-цели ≥44px */
+@media (max-width:1023px){
+  .vnp{bottom:calc(148px + env(safe-area-inset-bottom,0px))}
+  .vnp__chip{min-height:34px;padding:7px 12px}
+  .vnp__in,.vnp__go,.vnp__stopb{min-height:44px}
+  .vnp__x{width:44px;height:44px}
+}
+
+/* reduced-motion: без пульсаций и полётов */
+@media (prefers-reduced-motion: reduce){
+  .vnp{transition:none;transform:translate(-50%,0)}
+  .menubar__mic.is-on .vn-dot,.vnp.is-listening .vnp__dot{animation:none}
+  .win.vn-hi{animation:none;outline:2px solid var(--green);outline-offset:2px}
+}

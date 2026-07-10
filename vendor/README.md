@@ -12,7 +12,6 @@
 | `vits/vits-worker.mjs` | наш module-worker для синтеза | — | MIT | своё |
 | `vits/piper_phonemize.{mjs,wasm,data}` | фонемизатор espeak-ng (wasm 0.6 МБ + данные 18 МБ) | 1.0.0 | MIT | npm @diffusionstudio/piper-wasm (+ESM-глю из vits-web) |
 | `ort/ort.wasm.bundle.min.mjs` + `ort-wasm-simd-threaded.{wasm,mjs}` | onnxruntime-web (wasm-бэкенд, 13,5 МБ) | 1.27.0 | MIT | npm onnxruntime-web |
-| `three/three.module.min.js` + `three.core.min.js` | three.js для 3D-лица (~0,75 МБ) | 0.185.1 | MIT | npm three |
 | `purify.min.js` | DOMPurify — санитайзер HTML перед innerHTML (ЛОТ J, ~28 КБ, эагерно) | 3.4.11 | Apache-2.0 / MPL-2.0 | npm dompurify |
 | `markdown-it.min.js` | markdown-it — ответы живой модели markdown → DOMPurify → DOM (~125 КБ, лениво при первом ответе WebLLM) | 14.3.0 | MIT | npm markdown-it |
 | `driver.iife.js` + `driver.css` | driver.js — «Экскурсия по системе», 8 шагов (~24 КБ, лениво по кнопке) | 1.6.0 | MIT | npm driver.js |
@@ -26,6 +25,6 @@
 качается по кнопке с huggingface (rhasspy/piper-voices) и кешируется
 в CacheStorage `vits-voice-v1` — второй раз работает офлайн.
 
-3D-лицо — собственная процедурная голова на three.js (js/face3d.mjs).
-Ready Player Me GLB не используется: лицензия RPM разрешает аватары только
-внутри приложений, интегрированных с их платформой по Developer Agreement.
+ЛОТ L (V7.3): 3D-лицо (three.js + js/face3d.mjs) удалено — заменено на
+2D-аватары сотрудников (avatars/*.webp + avatars/*-toon.svg, js/avatars.js):
+липсинк canvas-деформацией/SVG-морфом, всё локально, −0,75 МБ из репо.

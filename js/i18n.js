@@ -544,10 +544,12 @@
       'ai.mode.sys': 'Голос: системный',
       'ai.mode.neural': 'Голос: нейросетевой, локально',
 
-      /* H2 — 3D-аватар */
-      'ai.face': 'Аватар',
-      'ai.face.hint': 'Видео-аватар: ~0,75 МБ, 3D-рендер на вашем устройстве — наружу ничего не уходит.',
-      'ai.face.weak': 'Видео-аватар отключён: устройству не хватает мощности (меньше 30 кадров/с). Пульсирующий аватар остаётся.',
+      /* ЛОТ L — сменные аватары сотрудников */
+      'ava.pick': 'Сотрудник',
+      'ava.pick.h': 'Кто отвечает на звонке',
+      'ava.style.real': 'Реалистичный',
+      'ava.style.toon': 'Рисованный',
+      'ava.plaque': 'Лицо и голос — витрина. Настоящий сотрудник работает на вашем сервере, лицо и голос настраиваются под ваш бренд.',
 
       /* H3 — честный индикатор слуха */
       'ai.hear.browser': 'Слух: браузерный — звук уходит в Google',
@@ -649,7 +651,50 @@
       'hv.perYear': '₽/год',
       'hv.payback': 'окупаемость',
       'hv.months': 'мес',
-      'hv.cta': 'Посчитать под мою задачу →'
+      'hv.cta': 'Посчитать под мою задачу →',
+
+      /* ЛОТ M — голосовое управление (VoiceNav) */
+      'vn.btn': 'Голосовое управление',
+      'vn.title': 'Голосовое управление',
+      'vn.ccHint': 'Скажите «открой тарифы»',
+      'vn.hear': 'Слух: браузерный (звук уходит в Google)',
+      'vn.listen': 'Слушаю…',
+      'vn.speak': 'Говорю…',
+      'vn.off': 'Микрофон выключен',
+      'vn.say': 'Скажите:',
+      'vn.ex1': '«открой тарифы»',
+      'vn.ex2': '«позвони секретарю»',
+      'vn.ex3': '«тёмная тема»',
+      'vn.ex4': '«запиши меня на демо»',
+      'vn.ex5': '«проверь договор»',
+      'vn.ex6': '«открой дашборд»',
+      'vn.type.ph': 'Или введите команду текстом…',
+      'vn.go': 'Выполнить',
+      'vn.stop': 'Стоп',
+      'vn.start': 'Слушать',
+      'vn.nosr': 'Голос понимает Chrome и Safari. Здесь то же самое работает текстом — парсер один.',
+      'vn.denied': 'Микрофон запрещён. Разрешите доступ в настройках браузера или введите команду текстом.',
+      'vn.sale': 'Так ваш ИИ-секретарь принимает команды и звонки. У вас — на своём сервере, от 200 000 ₽.',
+      'vn.open': 'Открываю:',
+      'vn.close.win': 'Закрываю:',
+      'vn.close.all': 'Закрываю все окна',
+      'vn.none': 'Сейчас нет открытых окон',
+      'vn.min': 'Сворачиваю',
+      'vn.max': 'Разворачиваю на весь экран',
+      'vn.theme.dark': 'Включаю тёмную тему',
+      'vn.theme.light': 'Включаю светлую тему',
+      'vn.lang.en': 'Switching to English',
+      'vn.lang.ru': 'Переключаю на русский',
+      'vn.cc': 'Открываю пункт управления',
+      'vn.search': 'Ищу:',
+      'vn.call': 'Соединяю с секретарём',
+      'vn.demo': 'Открываю календарь — выберите удобное время',
+      'vn.contract': 'Открываю юриста — пришлите текст договора',
+      'vn.page': 'Листаю',
+      'vn.think': 'Секунду, думаю…',
+      'readme.voice': 'Управляйте сайтом голосом — скажите «открой тарифы» →',
+      'as.try.vn.n': 'Голосовое управление',
+      'as.try.vn.s': 'Скажите «открой тарифы» — сайт послушается'
     },
 
     en: {
@@ -1190,10 +1235,12 @@
       'ai.mode.sys': 'Voice: system',
       'ai.mode.neural': 'Voice: neural, on-device',
 
-      /* H2 — 3D avatar */
-      'ai.face': 'Avatar',
-      'ai.face.hint': 'Video avatar: ~0.75 MB, 3D rendered on your device — nothing leaves it.',
-      'ai.face.weak': 'Video avatar turned off: the device can’t keep 30 fps. The pulsing avatar stays on.',
+      /* LOT L — switchable employee avatars */
+      'ava.pick': 'Employee',
+      'ava.pick.h': 'Who answers the call',
+      'ava.style.real': 'Realistic',
+      'ava.style.toon': 'Illustrated',
+      'ava.plaque': 'The face and voice are a showcase. Your real employee runs on your server — face and voice are tailored to your brand.',
 
       /* H3 — honest hearing indicator */
       'ai.hear.browser': 'Hearing: browser — audio goes to Google',
@@ -1295,7 +1342,50 @@
       'hv.perYear': '₽/yr',
       'hv.payback': 'payback',
       'hv.months': 'mo',
-      'hv.cta': 'Estimate for my case →'
+      'hv.cta': 'Estimate for my case →',
+
+      /* LOT M — voice control (VoiceNav) */
+      'vn.btn': 'Voice control',
+      'vn.title': 'Voice control',
+      'vn.ccHint': 'Say “open pricing”',
+      'vn.hear': 'Hearing: browser (audio goes to Google)',
+      'vn.listen': 'Listening…',
+      'vn.speak': 'Speaking…',
+      'vn.off': 'Microphone is off',
+      'vn.say': 'Say:',
+      'vn.ex1': '“open pricing”',
+      'vn.ex2': '“call the secretary”',
+      'vn.ex3': '“dark theme”',
+      'vn.ex4': '“book me a demo”',
+      'vn.ex5': '“check a contract”',
+      'vn.ex6': '“open the dashboard”',
+      'vn.type.ph': 'Or type a command…',
+      'vn.go': 'Run',
+      'vn.stop': 'Stop',
+      'vn.start': 'Listen',
+      'vn.nosr': 'Voice works in Chrome and Safari. The same commands work here as text — one parser.',
+      'vn.denied': 'Microphone blocked. Allow access in browser settings or type the command.',
+      'vn.sale': 'This is how your AI secretary takes commands and calls. Yours runs on your own server — from ₽200,000.',
+      'vn.open': 'Opening:',
+      'vn.close.win': 'Closing:',
+      'vn.close.all': 'Closing all windows',
+      'vn.none': 'No open windows right now',
+      'vn.min': 'Minimizing',
+      'vn.max': 'Maximizing',
+      'vn.theme.dark': 'Dark theme on',
+      'vn.theme.light': 'Light theme on',
+      'vn.lang.en': 'Switching to English',
+      'vn.lang.ru': 'Переключаю на русский',
+      'vn.cc': 'Opening Control Center',
+      'vn.search': 'Searching for:',
+      'vn.call': 'Connecting you to the secretary',
+      'vn.demo': 'Opening the calendar — pick a time',
+      'vn.contract': 'Opening the legal reviewer — paste your contract text',
+      'vn.page': 'Turning the page',
+      'vn.think': 'One second…',
+      'readme.voice': 'Control the site by voice — say “open pricing” →',
+      'as.try.vn.n': 'Voice control',
+      'as.try.vn.s': 'Say “open pricing” — the site obeys'
     }
   };
 

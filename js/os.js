@@ -104,8 +104,21 @@
 
   /* Автозапуск 3D-офиса: iframe создаётся при ПЕРВОМ открытии окна агентов
      (не при загрузке страницы) */
-  /* The Delegation рендерит через WebGPU; без него холст пустой */
+  /* The Delegation рендерит через WebGPU; без него холст пустой.
+     navigator.gpu бывает и там, где адаптера нет (headless, старые GPU,
+     блок-листы) — тогда three сыплет ошибки в пустой холст. Поэтому
+     проверяем настоящий адаптер, один раз, с кешем. */
+  var agentsGpuProbe = null;
   function agentsSupported() { return !!navigator.gpu; }
+  function agentsAdapterOk() {
+    if (agentsGpuProbe) return agentsGpuProbe;
+    agentsGpuProbe = (navigator.gpu && typeof navigator.gpu.requestAdapter === 'function')
+      ? navigator.gpu.requestAdapter().then(
+          function (a) { return !!a; },
+          function () { return false; })
+      : Promise.resolve(false);
+    return agentsGpuProbe;
+  }
   function showAgentsFallback(stage) {
     if (stage.querySelector('.agents__poster')) return;
     var label = tr('agents.fallback');
@@ -183,7 +196,11 @@
     var stage = document.getElementById('agentsStage');
     if (!stage || stage.querySelector('iframe') || stage.querySelector('.agents__poster')) return;
     if (!agentsSupported()) { showAgentsFallback(stage); return; }
-    loadAgentsFrame(stage);
+    agentsAdapterOk().then(function (okGpu) {
+      if (!stage.isConnected || stage.querySelector('iframe') || stage.querySelector('.agents__poster')) return;
+      if (!okGpu) { showAgentsFallback(stage); return; }
+      loadAgentsFrame(stage);
+    });
   }
 
   /* «На весь экран» для 3D-офиса: нативный Fullscreen API по контейнеру,
@@ -1293,6 +1310,8 @@
       window.setTimeout(function () { if (!open) ccx.hidden = true; }, 240);
     }
     function toggle() { open ? hide() : show(); }
+    /* ЛОТ M: VoiceNav закрывает шторку, открывая свою панель с плитки */
+    window.CCX = { hide: hide, show: show };
 
     /* --- жест: тянем вниз из правого верхнего угла ---
        Тач — через touch events (passive:false + preventDefault):
@@ -2197,6 +2216,15 @@
     function el(id) { return document.getElementById(id); }
     function textOf(m) { return (m.key != null) ? tr(m.key) : m.text; }
 
+    /* ЛОТ L: лицо сотрудника вместо пиктограммы. До первого открытия окна —
+       data-src (лениво, hydrateImages подставит src при открытии). */
+    function avaHTML(id) {
+      if (!window.Avatars) return AVA[id];
+      var w = el('win-assistant');
+      var attr = (w && w.classList.contains('is-open')) ? 'src' : 'data-src';
+      return '<img class="msg__avimg" ' + attr + '="' + window.Avatars.src(id, window.Avatars.sel().style) + '" alt="" width="38" height="38" decoding="async">';
+    }
+
     function buildList() {
       var wrap = el('msgConvs'); if (!wrap) return;
       wrap.innerHTML = '';
@@ -2205,7 +2233,7 @@
         b.type = 'button'; b.className = 'msg__conv'; b.setAttribute('role', 'tab');
         b.dataset.agent = c.id;
         b.innerHTML =
-          '<span class="msg__av msg__av--' + c.id + '" aria-hidden="true">' + AVA[c.id] + '</span>' +
+          '<span class="msg__av msg__av--' + c.id + '" aria-hidden="true">' + avaHTML(c.id) + '</span>' +
           '<span class="msg__conv-txt"><span class="msg__conv-top"><span class="msg__conv-name"></span>' +
           '<span class="msg__conv-time">' + c.time + '</span></span>' +
           '<span class="msg__conv-last"></span></span>';
@@ -2260,7 +2288,11 @@
 
     function setHead() {
       var c = find(cur); if (!c) return;
-      var av = el('msgHeadAv'); if (av) av.innerHTML = AVA[cur];
+      var av = el('msgHeadAv');
+      if (av) {
+        if (window.Avatars) av.innerHTML = '<img class="msg__avimg" src="' + window.Avatars.src(cur, window.Avatars.sel().style) + '" alt="" width="30" height="30" decoding="async">';
+        else av.innerHTML = AVA[cur];
+      }
       var nm = el('msgHeadName'); if (nm) nm.textContent = tr(c.nameKey);
     }
     function find(id) { for (var i = 0; i < CONVS.length; i++) if (CONVS[i].id === id) return CONVS[i]; return null; }
@@ -2351,6 +2383,11 @@
       document.addEventListener('i18n:change', function () {
         if (!inited) return;
         buildListPreservePrev(); setHead(); renderThread();
+      });
+      /* ЛОТ L: смена сотрудника/стиля в звонке обновляет лица в чате */
+      document.addEventListener('ava:change', function () {
+        if (!inited) return;
+        buildListPreservePrev(); setHead();
       });
       initTools();
       cur = 'documoved';
@@ -2647,9 +2684,15 @@
       var ios = document.getElementById('iosSearch');
       if (ios) ios.addEventListener('click', function (e) { e.preventDefault(); show(); });
     }
-    return { init: init, show: show, hide: hide };
+    /* ЛОТ M: голосовая команда «поиск X» открывает Spotlight с запросом */
+    function search(q) {
+      show();
+      if (field) { field.value = q || ''; render(); }
+    }
+    return { init: init, show: show, hide: hide, search: search };
   })();
   Spotlight.init();
+  window.Spotlight = Spotlight; /* стабильный API для VoiceNav (ЛОТ M) */
 
   /* ============================================================
      F4 — ПУШ-БАННЕР (через 25с, один раз за сессию)
@@ -2817,8 +2860,8 @@
      системных голосов ОС. Честные фолбэки: нет распознавания (Firefox),
      нет микрофона, нет русского голоса (тогда субтитры).
 
-     H1/H2/H3: приоритет речи VITS → системный; 3D-лицо с липсинком
-     (лениво, three.js); честные индикаторы «Голос» и «Слух».
+     H1/H2/H3: приоритет речи VITS → системный; ЛОТ L — 2D-аватар
+     сотрудника с липсинком (js/avatars.js, лениво); честные индикаторы.
      ============================================================ */
   var VoiceCall = (function () {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2826,15 +2869,11 @@
     var stream = null, actx = null, analyser = null, raf = 0;
     var rec = null, recWanted = false;
     var t0 = 0, tInt = 0, silT = 0, iosT = 0;
-    var face = null, faceLoading = false, sysPulse = 0;
+    var sysPulse = 0, avaCtl = null;
 
     function $(id) { return document.getElementById(id); }
     function setStatus(key) {
       var s = $('aiStatus'); if (s) s.textContent = tr(key);
-      if (face) {
-        var m = { 'ai.st.listen': 'listen', 'ai.st.think': 'think', 'ai.st.speak': 'speak' };
-        try { face.setState(m[key] || 'idle'); } catch (e) {}
-      }
     }
 
     /* H1/H3 — честные индикаторы: чем говорит и чем слушает демо */
@@ -2857,61 +2896,68 @@
       return 0;
     }
 
-    function faceFlag() { try { return localStorage.getItem('faceOn') === '1'; } catch (e) { return false; } }
-    function setFaceFlag(v) { try { localStorage.setItem('faceOn', v ? '1' : '0'); } catch (e) {} }
-
-    /* бюджет: на слабом мобильном 3D-лицо не предлагаем вовсе */
-    function faceCapable() {
-      try {
-        if (!('noModule' in HTMLScriptElement.prototype)) return false;
-        var coarse = window.matchMedia('(pointer: coarse)').matches;
-        if (coarse && (navigator.deviceMemory || 8) < 4) return false;
-        var c = document.createElement('canvas');
-        var gl = c.getContext('webgl2');
-        if (!gl) return false;
-        var lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext();
-        return true;
-      } catch (e) { return false; }
+    /* ЛОТ L — 2D-аватар сотрудника: монтируем при начале разговора,
+       липсинк питается faceLevel() (RMS VITS или пульс системного голоса) */
+    function mountAvatar() {
+      if (!window.Avatars) return;
+      var box = $('aiAvatar'); if (!box) return;
+      if (avaCtl) { try { avaCtl.destroy(); } catch (e) {} avaCtl = null; }
+      avaCtl = window.Avatars.mount(box, { getLevel: faceLevel });
+      var wrap = $('aiAvaWrap'); if (wrap) wrap.classList.add('has-ava');
+      var nm = $('aiCallName');
+      if (nm) {
+        var k = window.Avatars.nameKey(window.Avatars.sel().id);
+        nm.setAttribute('data-i18n', k);
+        nm.textContent = tr(k);
+      }
+    }
+    function unmountAvatar() {
+      if (avaCtl) { try { avaCtl.destroy(); } catch (e) {} avaCtl = null; }
     }
 
-    function faceOn() {
-      if (face || faceLoading) return;
-      faceLoading = true;
-      var box = $('aiFaceBox'), ava = $('aiAvaWrap'), btn = $('aiFace'), hint = $('aiFaceHint');
-      var url = new URL('js/face3d.mjs', location.href).href;
-      (new Function('u', 'return import(u)'))(url).then(function (mod) {
-        return mod.init({
-          container: box,
-          getLevel: faceLevel,
-          onWeak: function () {
-            faceOff();
-            var h = $('aiFaceHint'), b = $('aiFace');
-            if (h) { h.setAttribute('data-i18n', 'ai.face.weak'); h.textContent = tr('ai.face.weak'); h.hidden = false; }
-            if (b) b.hidden = true;
-          }
-        }).then(function () { return mod; });
-      }).then(function (mod) {
-        faceLoading = false;
-        face = mod;
-        if (box) box.hidden = false;
-        if (ava) ava.hidden = true;
-        if (btn) { btn.classList.add('is-on'); btn.setAttribute('aria-pressed', 'true'); }
-        if (hint) hint.hidden = true;
-        setFaceFlag(true);
-        try { face.setState(speakingNow ? 'speak' : 'idle'); } catch (e) {}
-      }, function (err) {
-        faceLoading = false;
-        try { console.warn('[Face3D] load failed:', err); } catch (e) {}
+    /* галерея: выбрать сотрудника (5) и стиль (Реалистичный/Рисованный) */
+    function initPicker() {
+      var btn = $('aiAvaPick'), pop = $('avaPicker'), grid = $('avaPickGrid');
+      if (!btn || !pop || !grid) return;
+      function build() {
+        if (!window.Avatars) return;
+        var s = window.Avatars.sel();
+        grid.innerHTML = '';
+        window.Avatars.list().forEach(function (emp) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'ava-card' + (emp.id === s.id ? ' is-on' : '');
+          b.setAttribute('aria-pressed', emp.id === s.id ? 'true' : 'false');
+          var im = document.createElement('img');
+          im.src = window.Avatars.src(emp.id, s.style);
+          im.alt = ''; im.width = 44; im.height = 44; im.decoding = 'async';
+          var nm = document.createElement('span');
+          nm.setAttribute('data-i18n', emp.nameKey);
+          nm.textContent = tr(emp.nameKey);
+          b.appendChild(im); b.appendChild(nm);
+          b.addEventListener('click', function () {
+            window.Avatars.setSel(emp.id, window.Avatars.sel().style);
+            build(); mountAvatar();
+          });
+          grid.appendChild(b);
+        });
+        var r = $('avaStyleReal'), t = $('avaStyleToon');
+        if (r) { r.classList.toggle('is-on', s.style === 'real'); r.setAttribute('aria-checked', s.style === 'real' ? 'true' : 'false'); }
+        if (t) { t.classList.toggle('is-on', s.style === 'toon'); t.setAttribute('aria-checked', s.style === 'toon' ? 'true' : 'false'); }
+      }
+      btn.addEventListener('click', function () {
+        pop.hidden = !pop.hidden;
+        btn.setAttribute('aria-expanded', pop.hidden ? 'false' : 'true');
+        if (!pop.hidden) build();
       });
-    }
-
-    function faceOff(keepPref) {
-      var box = $('aiFaceBox'), ava = $('aiAvaWrap'), btn = $('aiFace');
-      if (face) { try { face.dispose(); } catch (e) {} face = null; }
-      if (box) { box.hidden = true; box.innerHTML = ''; }
-      if (ava) ava.hidden = false;
-      if (btn) { btn.classList.remove('is-on'); btn.setAttribute('aria-pressed', 'false'); }
-      if (!keepPref) setFaceFlag(false);
+      function setStyle(st) {
+        if (!window.Avatars) return;
+        window.Avatars.setSel(window.Avatars.sel().id, st);
+        build(); mountAvatar();
+      }
+      var r = $('avaStyleReal'), t = $('avaStyleToon');
+      if (r) r.addEventListener('click', function () { setStyle('real'); });
+      if (t) t.addEventListener('click', function () { setStyle('toon'); });
     }
     function fmt(sec) { var m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
 
@@ -2967,7 +3013,6 @@
         window.NeuralVoice.speak(text, function () {
           speakingNow = false;
           if (wn) wn.classList.remove('is-talk');
-          if (face) { try { face.setState('idle'); } catch (e) {} }
           if (!on) return;
           if (then) then(); else listen();
         });
@@ -3227,19 +3272,8 @@
       /* H1: голос включали раньше → тихо поднимаем из кеша; индикаторы */
       if (window.NV) NV.maybeAuto();
       syncModes();
-      /* H2: 3D-аватар — только там, где потянет */
-      var fBtn = $('aiFace'), fHint = $('aiFaceHint');
-      /* Старое 3D-лицо временно отключено — заменяется на выбор аватаров
-         (реалистичный / мультяшный) в следующей волне. Кнопку не показываем. */
-      var FACE_DISABLED = true;
-      if (!FACE_DISABLED && faceCapable()) {
-        if (fBtn) fBtn.hidden = false;
-        if (fHint && !face) { fHint.hidden = false; }
-        if (faceFlag()) faceOn();
-      } else {
-        if (fBtn) fBtn.hidden = true;
-        if (fHint) fHint.hidden = true;
-      }
+      /* ЛОТ L: живой 2D-аватар выбранного сотрудника (вместо старого 3D) */
+      mountAvatar();
       var box = $('aiSubs'); if (box) box.innerHTML = '';
       try {
         actx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3266,7 +3300,7 @@
       try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
       try { if (window.NeuralVoice) window.NeuralVoice.stop(); } catch (e) {}
       speakingNow = false; // VITS-путь не дозовёт finish после stop()
-      faceOff(true); // выключаем рендер, но помним выбор на следующий звонок
+      unmountAvatar(); // выключаем рендер аватара; выбор сотрудника — в localStorage
       if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } // ОСВОБОЖДАЕМ микрофон
       if (actx) { try { actx.close(); } catch (e) {} actx = null; analyser = null; }
       if (tInt) { clearInterval(tInt); tInt = 0; }
@@ -3298,9 +3332,8 @@
       });
       var back = $('aiFbBack'); if (back) back.addEventListener('click', function () { fb.hidden = true; home.hidden = false; });
       var fbChat = $('aiFbChat'); if (fbChat) fbChat.addEventListener('click', function () { fb.hidden = true; home.hidden = false; });
-      /* H2 — тумблер 3D-аватара */
-      var ftBtn = $('aiFace');
-      if (ftBtn) ftBtn.addEventListener('click', function () { if (face) faceOff(); else faceOn(); });
+      /* ЛОТ L — галерея выбора сотрудника и стиля лица */
+      initPicker();
       /* H3 — честный попап про слух */
       var hearBtn = $('aiHearMode'), hearPop = $('aiHearPop');
       if (hearBtn && hearPop) hearBtn.addEventListener('click', function () {
@@ -3334,9 +3367,8 @@
     return {
       end: end,
       /* хуки для приёмочных тестов (безвредны в проде) */
-      faceStats: function () { return face ? face.stats() : null; },
       faceLevel: faceLevel,
-      faceCapable: faceCapable
+      avatarCtl: function () { return avaCtl; }
     };
   })();
   window.VoiceCall = VoiceCall;
