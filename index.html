@@ -253,6 +253,7 @@
       <div class="mb-menu__d" role="menu" hidden>
         <button class="mb-menu__i" role="menuitem" data-win="win-assistant" data-i18n="menu.assistant">Ассистент</button>
         <button class="mb-menu__i" role="menuitem" data-win="win-staff" data-i18n="mb.staff">Сотрудники</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-pulse" data-i18n="sb.pulse">Дашборд</button>
         <button class="mb-menu__i" role="menuitem" data-win="win-agents" data-i18n="agents.short">ИИ-агенты</button>
         <button class="mb-menu__i" role="menuitem" data-win="win-how" data-i18n="menu.how">Как работает</button>
         <button class="mb-menu__i" role="menuitem" data-win="win-who" data-i18n="menu.who">Кому</button>
@@ -278,6 +279,7 @@
     <div class="mb-menu">
       <button class="mb-menu__t" type="button" aria-haspopup="true" aria-expanded="false" data-i18n="mb.help">Помощь</button>
       <div class="mb-menu__d" role="menu" hidden>
+        <button class="mb-menu__i" role="menuitem" data-act="tour" data-i18n="tour.menu">Экскурсия по системе</button>
         <button class="mb-menu__i" role="menuitem" data-win="win-faq" data-i18n="menu.faq">Вопросы</button>
         <button class="mb-menu__i" role="menuitem" data-win="win-terminal" data-i18n="sb.terminal">Терминал</button>
         <button class="mb-menu__i" role="menuitem" data-win="win-game" data-i18n="mb.game">Игра</button>
@@ -306,6 +308,9 @@
         <line x1="1.5" y1="1.5" x2="15.5" y2="12.5" stroke="#F3350C" stroke-width="1.6" stroke-linecap="round"/>
       </svg>
     </span>
+    <button class="menubar__toggle menubar__prvc" id="prvcBtn" aria-haspopup="true" aria-expanded="false" aria-label="Счётчик внешних запросов" data-tip="внешних запросов" data-tip-i18n="prvc.count">
+      <span class="menubar__prvc-a" aria-hidden="true">⇡</span><span class="menubar__prvc-n" id="prvcNum">0</span>
+    </button>
     <button class="menubar__toggle menubar__spot" id="spotBtn" aria-label="Поиск" title="Поиск (⌘K)">
       <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="6.8" cy="6.8" r="4.6"/><line x1="10.4" y1="10.4" x2="14" y2="14"/></svg>
     </button>
@@ -374,6 +379,8 @@
         </div>
         <p class="hero-proof" data-i18n="readme.badge">Каждый ответ — со ссылкой на пункт документа. Можно проверить.</p>
         <button class="readme-touch" type="button" data-win="win-appstore"><span aria-hidden="true">▶</span> <span data-i18n="readme.try">Всё на этом сайте можно потрогать: чат, проверка договора, голос, генератор →</span></button>
+        <button class="readme-touch" type="button" data-win="win-pulse"><span aria-hidden="true">▶</span> <span data-i18n="readme.pulse">Посмотреть дашборд «Пульс компании» →</span></button>
+        <button class="readme-touch readme-touch--tour" type="button" data-act="tour"><span aria-hidden="true">▶</span> <span data-i18n="tour.readme">Пройти экскурсию по системе</span></button>
       </div>
     </article>
 
@@ -518,6 +525,34 @@
             </div>
           </article>
         </div>
+
+        <!-- ЛОТ J: слайдер «Человек vs ИИ-сотрудник» -->
+        <section class="hvai" id="hvai" aria-label="Человек или ИИ-сотрудник">
+          <h3 class="hvai__h" data-i18n="hv.title">Человек или ИИ-сотрудник?</h3>
+          <p class="hvai__lead" data-i18n="hv.lead">Подвигайте ползунок — посчитаем экономию.</p>
+          <div class="hvai__slider">
+            <label class="hvai__lbl" for="hvaiRange"><span data-i18n="hv.salary">Зарплата специалиста</span>: <b id="hvaiSalary">150 000 ₽/мес</b></label>
+            <input type="range" id="hvaiRange" min="60000" max="300000" step="5000" value="150000" aria-label="Зарплата специалиста, рублей в месяц">
+          </div>
+          <div class="hvai__cols">
+            <div class="hvai__col hvai__col--human">
+              <span class="hvai__col-t" data-i18n="hv.human">Человек — год</span>
+              <b class="hvai__col-v" id="hvaiHuman">0</b>
+              <span class="hvai__col-n" data-i18n="hv.humanNote">ЗП × 12 × 1,302</span>
+            </div>
+            <div class="hvai__col hvai__col--ai">
+              <span class="hvai__col-t" data-i18n="hv.ai">ИИ-сотрудник — год</span>
+              <b class="hvai__col-v" id="hvaiAi">0</b>
+              <span class="hvai__col-n" data-i18n="hv.aiNote">внедрение + 12 × поддержка</span>
+            </div>
+          </div>
+          <div class="hvai__out" aria-live="polite">
+            <div class="hvai__save"><span class="hvai__save-t" data-i18n="hv.save">Экономия</span> <b class="hvai__save-v" id="hvaiSave">0</b></div>
+            <div class="hvai__pay"><span data-i18n="hv.payback">окупаемость</span> <b id="hvaiPay">0</b> <span data-i18n="hv.months">мес</span></div>
+          </div>
+          <button class="wbtn hvai__cta" type="button" data-win="win-calc" data-i18n="hv.cta">Посчитать под мою задачу →</button>
+        </section>
+
         <button class="wbtn wbtn--primary staff-cta" data-win="win-call" data-i18n="staff.cta">Собрать штат — на демо →</button>
       </div>
     </article>
@@ -927,6 +962,7 @@
           <article class="svc-card"><h4 data-i18n="svc.s6.h">AI-интеграции</h4><p data-i18n="svc.s6.p">LLM в ваши продукты, fine-tuning</p><span class="svc-card__price" data-i18n="svc.s6.price">от 150 000 ₽</span></article>
           <article class="svc-card"><h4 data-i18n="svc.s7.h">AI-видео</h4><p data-i18n="svc.s7.p">Реклама, аватары</p><span class="svc-card__price" data-i18n="svc.s7.price">от 20 000 ₽/ролик</span></article>
           <article class="svc-card"><h4 data-i18n="svc.s8.h">Контент-фабрика</h4><p data-i18n="svc.s8.p">Статьи, SEO, соцсети</p><span class="svc-card__price" data-i18n="svc.s8.price">от 50 000 ₽/мес</span></article>
+          <article class="svc-card"><h4 data-i18n="svc.s9.h">ИИ-аналитика и дашборды</h4><p data-i18n="svc.s9.p">Панель руководителя: 1С, CRM, телефония</p><span class="svc-card__price" data-i18n="svc.s9.price">от 120 000 ₽</span></article>
         </div>
 
         <h3 class="svc-h3" data-i18n="svc.formats.eb">Форматы сотрудничества</h3>
@@ -1150,6 +1186,7 @@
 
         <div class="win-actions">
           <a class="wbtn wbtn--primary" id="calcCta" href="https://t.me/Shahen_kazaryan" target="_blank" rel="noopener" data-i18n="calc.cta">Получить точную смету</a>
+          <button class="wbtn" id="calcPdf" type="button" data-i18n="calc.pdf">Скачать смету (PDF)</button>
           <button class="wbtn" data-win="win-call" data-i18n="calc.voice">Обсудить голосом</button>
         </div>
         <p class="note" data-i18n="calc.disclaimer">Предварительная оценка. Финальная — после 30-минутного брифа.</p>
@@ -1367,6 +1404,79 @@
       </div>
     </article>
 
+    <!-- ЛОТ I: Дашборд «Пульс компании» (ECharts грузится лениво при первом открытии) -->
+    <article class="win win--wide win--pulse" id="win-pulse" role="dialog" aria-label="Пульс компании">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="pulse.title">Пульс компании</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body">
+        <h2 data-i18n="pulse.h1">Пульс компании — панель руководителя</h2>
+        <p class="lead" data-i18n="pulse.lead">ООО «Вектор» — вымышленная компания, где ИИ-сотрудники работают уже месяц. Все цифры — живые: фильтруйте, приближайте, кликайте по ролям.</p>
+
+        <!-- фильтры: отдел + период -->
+        <div class="pulse-bar">
+          <div class="pulse-chips" id="pulseDept" role="radiogroup" aria-label="Отдел">
+            <button type="button" class="pchip is-sel" role="radio" aria-checked="true" data-dept="all" data-i18n="pulse.d.all">Все отделы</button>
+            <button type="button" class="pchip" role="radio" aria-checked="false" data-dept="sales" data-i18n="pulse.d.sales">Продажи</button>
+            <button type="button" class="pchip" role="radio" aria-checked="false" data-dept="legal" data-i18n="pulse.d.legal">Юротдел</button>
+            <button type="button" class="pchip" role="radio" aria-checked="false" data-dept="support" data-i18n="pulse.d.sup">Поддержка</button>
+          </div>
+          <div class="pulse-chips pulse-chips--range" id="pulseRange" role="radiogroup" aria-label="Период">
+            <button type="button" class="pchip" role="radio" aria-checked="false" data-range="7" data-i18n="pulse.r7">7 дней</button>
+            <button type="button" class="pchip is-sel" role="radio" aria-checked="true" data-range="30" data-i18n="pulse.r30">30 дней</button>
+            <button type="button" class="pchip" role="radio" aria-checked="false" data-range="90" data-i18n="pulse.r90">90 дней</button>
+          </div>
+        </div>
+
+        <!-- блок 1: KPI-строка -->
+        <div class="pulse-kpis" id="pulseKpis">
+          <div class="pkpi"><span class="pkpi__l" data-i18n="pulse.k.rev">Выручка</span><b class="pkpi__v" id="pkV-rev">—</b><span class="pkpi__d" id="pkD-rev"></span></div>
+          <div class="pkpi"><span class="pkpi__l" data-i18n="pulse.k.leads">Заявки</span><b class="pkpi__v" id="pkV-leads">—</b><span class="pkpi__d" id="pkD-leads"></span></div>
+          <div class="pkpi"><span class="pkpi__l" data-i18n="pulse.k.ans">Ответов ИИ</span><b class="pkpi__v" id="pkV-ans">—</b><span class="pkpi__d" id="pkD-ans"></span><span class="pkpi__hl" id="pkH-ans" hidden></span></div>
+          <div class="pkpi"><span class="pkpi__l" data-i18n="pulse.k.hrs">Сэкономлено часов</span><b class="pkpi__v" id="pkV-hrs">—</b><span class="pkpi__d" id="pkD-hrs"></span><span class="pkpi__hl" id="pkH-hrs" hidden></span></div>
+        </div>
+        <p class="pulse-sub" data-i18n="pulse.k.mo">за 30 дней · ▲▼ — к прошлому месяцу · клик по роли в графике покажет её вклад</p>
+
+        <!-- заставка ленивой загрузки ECharts -->
+        <div class="pulse-loading" id="pulseLoading" role="status">
+          <span class="pulse-spin" aria-hidden="true"></span>
+          <span data-i18n="pulse.loading">Собираю графики… (~1,1 МБ, локально, без интернета)</span>
+        </div>
+
+        <!-- блоки 2–6 -->
+        <div class="pulse-grid" id="pulseGrid" hidden>
+          <section class="pulse-card pulse-card--wide">
+            <h3 class="pulse-card__t" data-i18n="pulse.b2.t">Заявки и конверсия</h3>
+            <div class="pulse-chart pulse-chart--tall" id="pChLeads"></div>
+          </section>
+          <section class="pulse-card">
+            <h3 class="pulse-card__t" data-i18n="pulse.b3.t">Работа ИИ-сотрудников</h3>
+            <div class="pulse-chart" id="pChRoles"></div>
+          </section>
+          <section class="pulse-card">
+            <h3 class="pulse-card__t" data-i18n="pulse.b4.t">Экономия за месяц</h3>
+            <div class="pulse-chart" id="pChEcon"></div>
+          </section>
+          <section class="pulse-card pulse-card--wide">
+            <h3 class="pulse-card__t" data-i18n="pulse.b5.t">Нагрузка по часам · 24×7</h3>
+            <div class="pulse-chart pulse-chart--heat" id="pChHeat"></div>
+          </section>
+          <section class="pulse-card pulse-card--wide">
+            <h3 class="pulse-card__t" data-i18n="pulse.b6.t">ИИ-инсайты</h3>
+            <ul class="pulse-feed" id="pFeed" aria-live="polite"></ul>
+          </section>
+        </div>
+
+        <!-- продающая плашка -->
+        <div class="pulse-sell">
+          <p><b data-i18n="pulse.sellH">Такую панель собираем под ваш бизнес</b><br><span data-i18n="pulse.sell">Ваши источники — 1С, CRM, телефония, сайт; ваши метрики и ИИ-инсайты. Работает в вашем контуре — от 120 000 ₽.</span></p>
+          <div class="win-actions">
+            <button class="wbtn wbtn--primary" data-win="win-calendar" data-i18n="pulse.chip.demo">Записаться</button>
+            <button class="wbtn" data-win="win-calc" data-i18n="pulse.chip.calc">Калькулятор</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
   </main>
 
   <!-- ============ МОБИЛЬНЫЙ ПЕЙДЖЕР ============ -->
@@ -1381,6 +1491,7 @@
     <button class="sb-icon" data-win="win-staff"><picture><source srcset="icons/staff.webp" type="image/webp"><img src="icons/staff.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="staff.title">Сотрудники</span></button>
     <button class="sb-icon" data-win="win-services"><picture><source srcset="icons/services.webp" type="image/webp"><img src="icons/services.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="menu.services">Услуги</span></button>
     <button class="sb-icon" data-win="win-devices"><picture><source srcset="icons/devices.webp" type="image/webp"><img src="icons/devices.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="dev.title">Устройства</span></button>
+    <button class="sb-icon" data-win="win-pulse"><picture><source srcset="icons/pulse.webp" type="image/webp"><img src="icons/pulse.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.pulse">Дашборд</span></button>
     <button class="sb-icon" data-win="win-portfolio"><picture><source srcset="icons/portfolio.webp" type="image/webp"><img src="icons/portfolio.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="port.title">Портфолио</span></button>
     <button class="sb-icon" data-win="win-pricing"><picture><source srcset="icons/pricing.webp" type="image/webp"><img src="icons/pricing.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="menu.pricing">Тарифы</span></button>
     <button class="sb-icon" data-win="win-calc"><picture><source srcset="icons/calc.webp" type="image/webp"><img src="icons/calc.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.calc">Калькулятор</span></button>
@@ -1590,6 +1701,7 @@
   <button class="dock__app" data-win="win-services" data-name="Услуги" data-name-i18n="menu.services" aria-label="Услуги"><picture><source srcset="icons/services.webp" type="image/webp"><img src="icons/services.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-devices" data-name="Устройства" data-name-i18n="dev.title" aria-label="Устройства"><picture><source srcset="icons/devices.webp" type="image/webp"><img src="icons/devices.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-calc" data-name="Калькулятор" data-name-i18n="sb.calc" aria-label="Калькулятор проекта"><picture><source srcset="icons/calc.webp" type="image/webp"><img src="icons/calc.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-pulse" data-name="Пульс компании" data-name-i18n="pulse.title" aria-label="Пульс компании — дашборд"><picture><source srcset="icons/pulse.webp" type="image/webp"><img src="icons/pulse.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-appstore" data-name="App Store" data-name-i18n="as.short" aria-label="App Store — витрина продуктов"><picture><source srcset="icons/appstore.webp" type="image/webp"><img src="icons/appstore.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-calendar" data-name="Календарь" data-name-i18n="cal.title" aria-label="Календарь — запись на демо"><picture><source srcset="icons/calendar.webp" type="image/webp"><img src="icons/calendar.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-faq" data-name="Вопросы" data-name-i18n="menu.faq" aria-label="Вопросы"><picture><source srcset="icons/faq.webp" type="image/webp"><img src="icons/faq.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
@@ -1626,7 +1738,8 @@
 </button>
 
 <script src="js/i18n.js" defer></script>
-<script src="js/localai.js" defer></script>
+<!-- js/localai.js (41 КБ) грузится лениво из os.js при первом открытии окна с агентом (Сообщения / Звонок / Фабрика) -->
 <script src="js/os.js" defer></script>
+<script src="js/lotj.js" defer></script>
 </body>
 </html>

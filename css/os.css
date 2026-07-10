@@ -1796,3 +1796,158 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
   .fx-pulse{animation:none;left:35%}
 }
 .aicall-card__btn.is-wait{opacity:.6;cursor:progress}
+
+/* ============================================================
+   ЛОТ I — Дашборд «Пульс компании»
+   ============================================================ */
+.win--pulse{max-width:1020px}
+.pulse-bar{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:space-between;align-items:center;margin:14px 0 12px}
+.pulse-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{border:0;border-radius:999px;cursor:pointer;font:inherit;font-size:11.5px;font-weight:600;
+  padding:5px 11px;color:var(--text-mid);background:var(--surface-btn);box-shadow:inset 0 0 0 1px var(--ring)}
+.pchip:hover{background:var(--surface-btn-hover)}
+.pchip.is-sel{color:#fff;background:#0A84FF;box-shadow:none}
+:root.theme-light .pchip.is-sel{background:#0A6DDB}
+
+/* KPI-строка */
+.pulse-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pkpi{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:var(--r-8);
+  background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring);transition:box-shadow .2s var(--ease)}
+.pkpi.is-hl{box-shadow:inset 0 0 0 1.5px rgba(10,132,255,.55)}
+.pkpi__l{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-dim)}
+.pkpi__v{font-size:clamp(16px,1.6vw,21px);font-weight:800;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.pkpi__d{font-size:10.5px;font-weight:700}
+.pkpi__d.is-up{color:var(--green)}
+.pkpi__d.is-down{color:var(--red)}
+:root.theme-light .pkpi__d.is-up{color:#177036}
+.pkpi__hl{font-size:10.5px;font-weight:700;margin-top:2px}
+.pulse-sub{margin:8px 0 4px;font-size:11px;color:var(--text-dim)}
+
+/* сетка карточек: десктоп 2 колонки, широкие блоки на всю ширину */
+.pulse-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.pulse-card{padding:12px 14px 10px;border-radius:var(--r-widget);background:var(--surface-soft);
+  box-shadow:inset 0 0 0 1px var(--ring);min-width:0}
+.pulse-card--wide{grid-column:1/-1}
+.pulse-card__t{margin:0 0 6px;font-size:12.5px;font-weight:700}
+.pulse-chart{width:100%;height:230px}
+.pulse-chart--tall{height:260px}
+.pulse-chart--heat{height:250px}
+
+/* лента ИИ-инсайтов */
+.pulse-feed{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.pulse-feed li{position:relative;padding:8px 12px 8px 30px;border-radius:var(--r-8);background:var(--surface);
+  font-size:12.5px;line-height:1.45;box-shadow:inset 0 0 0 1px var(--ring)}
+.pulse-feed li::before{content:'✦';position:absolute;left:11px;top:8px;color:#0A84FF;font-size:12px}
+.pulse-feed li.is-typing::after{content:'';display:inline-block;width:7px;height:13px;margin-left:2px;
+  vertical-align:-2px;background:var(--text-dim);animation:pulse-caret 1s steps(2) infinite}
+@keyframes pulse-caret{50%{opacity:0}}
+
+/* заставка ленивой загрузки */
+.pulse-loading{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+  margin-top:14px;padding:38px 16px;border-radius:var(--r-widget);background:var(--surface-soft);
+  box-shadow:inset 0 0 0 1px var(--ring);font-size:12.5px;color:var(--text-dim)}
+.pulse-spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--ring-strong);
+  border-top-color:#0A84FF;animation:pulse-spin .8s linear infinite}
+@keyframes pulse-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){
+  .pulse-spin{animation:none}
+  .pulse-feed li.is-typing::after{animation:none}
+}
+
+/* продающая плашка */
+.pulse-sell{margin-top:14px;padding:14px 16px;border-radius:var(--r-widget);display:flex;gap:12px;align-items:center;
+  flex-wrap:wrap;justify-content:space-between;background:linear-gradient(135deg,rgba(10,132,255,.12),rgba(50,215,75,.10));
+  box-shadow:inset 0 0 0 1px var(--ring)}
+.pulse-sell p{margin:0;font-size:12.5px;line-height:1.5;flex:1 1 260px}
+.pulse-sell .win-actions{margin:0}
+
+/* мобайл: столбец */
+@media (max-width:740px){
+  .pulse-grid{grid-template-columns:1fr}
+  .pulse-kpis{grid-template-columns:1fr 1fr}
+  .pkpi__v{font-size:17px}
+  .pulse-bar{flex-direction:column;align-items:flex-start}
+  .pulse-chart{height:210px}
+  .pulse-chart--tall{height:230px}
+  .pulse-chart--heat{height:220px}
+}
+
+/* ============================================================
+   ЛОТ J — счётчик приватности, слайдер «человек vs ИИ», экскурсия
+   ============================================================ */
+
+/* --- счётчик приватности в меню-баре --- */
+.menubar__prvc{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);
+  font-size:12px;font-weight:600;line-height:1;padding:0 7px;min-width:34px}
+.menubar__prvc-a{font-size:13px;opacity:.85}
+.menubar__prvc-n{font-variant-numeric:tabular-nums}
+.menubar__prvc.is-hot{color:var(--yellow)}
+.menubar__prvc.is-hot .menubar__prvc-a{color:var(--yellow);opacity:1}
+
+/* попап приватности */
+.prvc-pop{position:fixed;top:38px;right:12px;z-index:4000;width:min(340px,calc(100vw - 24px));
+  background:var(--glass-window);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid var(--ring-strong);border-radius:var(--r-widget);box-shadow:var(--sh-deep);
+  padding:16px 16px 14px;color:var(--text);transform-origin:top right;
+  animation:prvcIn .18s var(--ease)}
+@keyframes prvcIn{from{opacity:0;transform:scale(.94) translateY(-6px)}to{opacity:1;transform:none}}
+.prvc-pop__h{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin:0 0 8px}
+.prvc-pop__dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex:none;
+  box-shadow:0 0 0 4px rgba(50,215,75,.18)}
+.prvc-pop.is-hot .prvc-pop__dot{background:var(--yellow);box-shadow:0 0 0 4px rgba(255,214,10,.18)}
+.prvc-pop__big{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1;margin:2px 0 8px}
+.prvc-pop__big small{font-size:12px;font-weight:600;color:var(--text-dim);margin-left:6px;font-family:var(--font)}
+.prvc-pop__txt{font-size:12.5px;line-height:1.5;color:var(--text-dim);margin:0 0 12px}
+.prvc-pop__close{width:100%;padding:9px;border-radius:var(--r-8);border:1px solid var(--ring);
+  background:var(--surface-btn);color:var(--text);font-size:13px;font-weight:600;cursor:pointer}
+.prvc-pop__close:hover{background:var(--surface-btn-hover)}
+
+/* --- слайдер «человек vs ИИ-сотрудник» --- */
+.hvai{margin:22px 0 6px;padding:18px;border-radius:var(--r-widget);
+  border:1px solid var(--ring);background:var(--surface-soft)}
+.hvai__h{margin:0 0 4px;font-size:17px}
+.hvai__lead{margin:0 0 14px;font-size:13px;color:var(--text-dim);line-height:1.5}
+.hvai__lbl{display:block;font-size:13px;color:var(--text-dim);margin-bottom:8px}
+.hvai__lbl b{color:var(--text);font-family:var(--mono);font-weight:700}
+.hvai__slider input[type=range]{width:100%;accent-color:var(--red);height:26px;cursor:pointer}
+.hvai__cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.hvai__col{padding:14px;border-radius:var(--r-8);border:1px solid var(--ring);
+  background:var(--surface);display:flex;flex-direction:column;gap:4px}
+.hvai__col--human{border-color:rgba(243,53,12,.35)}
+.hvai__col--ai{border-color:rgba(50,215,75,.35)}
+.hvai__col-t{font-size:12px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--text-dim)}
+.hvai__col-v{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1.1}
+.hvai__col--human .hvai__col-v{color:var(--red)}
+.hvai__col--ai .hvai__col-v{color:var(--green)}
+:root.theme-light .hvai__col--ai .hvai__col-v{color:#177036}
+.hvai__col-n{font-size:11px;color:var(--text-dim);line-height:1.4}
+.hvai__out{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;
+  padding:12px 14px;border-radius:var(--r-8);background:rgba(50,215,75,.10);
+  border:1px solid rgba(50,215,75,.3)}
+:root.theme-light .hvai__out{background:rgba(23,112,54,.08);border-color:rgba(23,112,54,.28)}
+.hvai__save-t{font-size:13px;font-weight:600;color:var(--text-dim)}
+.hvai__save-v{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--green)}
+:root.theme-light .hvai__save-v{color:#177036}
+.hvai__pay{font-size:13px;color:var(--text-dim)}
+.hvai__pay b{font-family:var(--mono);font-size:16px;color:var(--text);font-weight:700}
+.hvai__cta{margin-top:14px}
+@media (max-width:560px){.hvai__cols{grid-template-columns:1fr}.hvai__col-v{font-size:20px}}
+
+/* README — кнопка экскурсии наследует .readme-touch */
+.readme-touch--tour{opacity:.95}
+
+/* --- driver.js: подгонка попапа под тёмную/светлую тему --- */
+.driver-popover{background:var(--glass-window)!important;color:var(--text)!important;
+  border:1px solid var(--ring-strong);border-radius:var(--r-widget)!important;
+  box-shadow:var(--sh-deep)!important;backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);font-family:var(--font)!important;max-width:340px!important}
+.driver-popover-title{font-size:15px!important;font-weight:700!important;color:var(--text)!important}
+.driver-popover-description{font-size:13px!important;line-height:1.5!important;color:var(--text-dim)!important}
+.driver-popover-progress-text{color:var(--text-dim)!important;font-size:11px!important}
+.driver-popover-navigation-btns button.driver-popover-next-btn,
+.driver-popover-navigation-btns button.driver-popover-prev-btn{
+  background:var(--surface-btn)!important;color:var(--text)!important;border:1px solid var(--ring)!important;
+  text-shadow:none!important;border-radius:var(--r-6)!important;font-weight:600!important;font-size:12.5px!important}
+.driver-popover-navigation-btns button.driver-popover-next-btn{background:var(--red-btn)!important;color:#fff!important;border-color:transparent!important}
+.driver-popover-close-btn{color:var(--text-dim)!important}
+.driver-popover-arrow{border-color:var(--glass-window)!important}

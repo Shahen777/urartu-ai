@@ -11,6 +11,28 @@
   function lang() { return (window.__lang === 'en') ? 'en' : 'ru'; }
   function tr(key) { return (window.I18N && window.I18N.t) ? window.I18N.t(key, lang()) : key; }
 
+  /* ---------- БРОНЯ (ЛОТ J): санитайзер любого HTML перед innerHTML ----------
+     DOMPurify грузится локально (vendor/purify.min.js), эагерно.
+     Разрешаем разметку наших ответов (mark из BM25, blockquote, списки, таблицы),
+     режем onerror/onclick/script и прочую инъекцию. Ссылки — только http(s). */
+  function sanitizeHTML(html) {
+    if (html == null) return '';
+    if (window.DOMPurify && window.DOMPurify.sanitize) {
+      return window.DOMPurify.sanitize(String(html), {
+        ALLOWED_TAGS: ['a', 'b', 'strong', 'i', 'em', 'u', 's', 'mark', 'small', 'sup', 'sub',
+          'br', 'p', 'span', 'div', 'blockquote', 'code', 'pre', 'kbd',
+          'ul', 'ol', 'li', 'dl', 'dt', 'dd',
+          'table', 'thead', 'tbody', 'tr', 'th', 'td',
+          'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr'],
+        ALLOWED_ATTR: ['href', 'title', 'class', 'lang', 'dir', 'colspan', 'rowspan'],
+        ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:|#)/i,
+        ADD_ATTR: ['target', 'rel']
+      });
+    }
+    return String(html); // страховка: наши строки уже безопасны (esc в localai.js)
+  }
+  window.OSSanitize = sanitizeHTML;
+
   /* ---------- Z-INDEX МЕНЕДЖЕР ----------
      Потолок 7900: док (8500) и меню-бар (9000) всегда остаются сверху.
      При достижении потолка слои пересчитываются с нуля. */
@@ -215,6 +237,52 @@
     frame.setAttribute('allow', 'fullscreen');
     stage.appendChild(frame);
   }
+  /* ---------- ЛОТ I: ДАШБОРД «ПУЛЬС КОМПАНИИ» ----------
+     js/pulse.js (а из него — vendor/echarts.min.js, ~1,1 МБ локально)
+     грузится ЛЕНИВО при первом открытии окна. При старте страницы —
+     ноль лишних байтов, как game/delegation. */
+  var pulseLoading = false;
+  function ensurePulse() {
+    if (window.Pulse) { window.Pulse.open(); return; }
+    if (pulseLoading) return;
+    pulseLoading = true;
+    var s = document.createElement('script');
+    s.src = 'js/pulse.js';
+    s.onload = function () { if (window.Pulse) window.Pulse.open(); };
+    s.onerror = function () {
+      pulseLoading = false;
+      var l = document.getElementById('pulseLoading');
+      if (l) l.textContent = tr('pulse.err');
+    };
+    document.head.appendChild(s);
+  }
+
+  /* Приёмка V7.1: localai.js (движок ответов агентов, ~41 КБ) — лениво,
+     при первом открытии окна с агентом (Сообщения / Звонок / Фабрика).
+     При старте страницы — ноль лишних байтов (вес первой загрузки ≤ 650 КБ).
+     Внешние вызовы LocalAI и так за guard'ами window.LocalAI; колбэки
+     выполняются и при onerror, чтобы окно открылось в любом случае. */
+  var localaiQ = [], localaiState = 0; /* 0 — нет, 1 — грузится, 2 — готов */
+  function ensureLocalAI(cb) {
+    if (window.LocalAI) { if (cb) { try { cb(); } catch (e) {} } return; }
+    if (cb) localaiQ.push(cb);
+    if (localaiState === 1) return;
+    localaiState = 1;
+    var s = document.createElement('script');
+    s.src = 'js/localai.js';
+    s.onload = function () {
+      localaiState = 2;
+      var q = localaiQ; localaiQ = [];
+      q.forEach(function (f) { try { f(); } catch (e) {} });
+    };
+    s.onerror = function () {
+      localaiState = 0;
+      var q = localaiQ; localaiQ = [];
+      q.forEach(function (f) { try { f(); } catch (e) {} });
+    };
+    document.head.appendChild(s);
+  }
+
   function gameFsActive() {
     var fe = document.fullscreenElement || document.webkitFullscreenElement;
     var win = document.getElementById('win-game');
@@ -347,7 +415,9 @@
     hydrateImages(win);
     if (id === 'win-agents') ensureAgentsFrame();
     if (id === 'win-game') ensureGameFrame();
-    if (id === 'win-assistant' && window.Messenger) window.Messenger.onOpen();
+    if (id === 'win-pulse') ensurePulse();
+    if (id === 'win-assistant') ensureLocalAI(function () { if (window.Messenger) window.Messenger.onOpen(); });
+    if (id === 'win-call' || id === 'win-factory') ensureLocalAI();
     place(win);
     win.style.transform = '';
     win.classList.remove('is-closing');
@@ -1720,6 +1790,31 @@
     /* смена языка: перерисовать суммы и ссылку без анимации */
     document.addEventListener('i18n:change', function () { render(false); });
 
+    /* ЛОТ J: снимок сметы для PDF-экспорта (js/lotj.js) */
+    window.OSCalc = {
+      estimate: function () {
+        var t = total();
+        var opts = [];
+        if (state.hw) opts.push({ key: 'pdf.hw', rub: RATES.hw });
+        var o = [];
+        if (state.hw) o.push(tr('pdf.hw'));
+        return {
+          svcKey: SVC_KEY[state.svc],
+          volKey: 'calc.vol' + state.volIdx,
+          mult: state.mult,
+          rush: state.rush,
+          hw: state.hw,
+          sup: state.sup,
+          supportMo: RATES.supportMo,
+          optsText: o,
+          totalRub: t,
+          totalUsd: toUsd(t),
+          fmtRub: fmtRub,
+          fmtUsd: fmtUsd
+        };
+      }
+    };
+
     render(false);
   })();
 
@@ -2138,7 +2233,7 @@
       row.className = 'msg__row msg__row--' + (m.who === 'me' ? 'me' : 'them');
       var b = document.createElement('div');
       b.className = 'msg__bubble';
-      if (m.html) { b.classList.add('msg__bubble--rich'); b.innerHTML = m.html; } // html строится только нашим кодом (G1), пользовательский текст экранируется
+      if (m.html) { b.classList.add('msg__bubble--rich'); b.innerHTML = sanitizeHTML(m.html); } // ЛОТ J: любой html проходит через DOMPurify (mark из BM25 выживает)
       else b.textContent = textOf(m);
       row.appendChild(b);
       if (m.chips && m.chips.length) {
@@ -2218,6 +2313,16 @@
       setTimeout(function () {
         var fin = function (res) {
           clearTyping();
+          // ЛОТ J: ответ живой модели (WebLLM) приходит markdown-ом — рендерим
+          // markdown-it → DOMPurify → DOM. Готовые html-ответы (BM25/юрист) не трогаем.
+          if (res && res.source === 'webllm' && res.text && !res.html && window.LotJ && window.LotJ.md) {
+            window.LotJ.md(res.text).then(function (html) {
+              push({ who: 'them', html: html, text: res.text, chips: res.chips || [] });
+            }, function () {
+              push({ who: 'them', text: res.text, chips: res.chips || [] });
+            });
+            return;
+          }
           push({ who: 'them', text: res.text, html: res.html, chips: res.chips || [] });
         };
         if (window.LocalAI && window.LocalAI.askAsync) {
@@ -2383,6 +2488,8 @@
 
     function onOpen() {
       init();
+      /* ЛОТ J: заранее подгружаем DOMPurify — до первого ответа модели (броня) */
+      if (window.LotJ && window.LotJ.ensureArmor) window.LotJ.ensureArmor();
       try { sessionStorage.setItem('msgOpened', '1'); } catch (e) {}
       if (window.Push) window.Push.suppress();
       if (!cur || (isMobile())) { /* мобайл — стартуем со списка */ }
@@ -2398,6 +2505,8 @@
     return { init: init, onOpen: onOpen, openConversation: openConversation };
   })();
   window.Messenger = Messenger;
+  /* стабильный публичный API для ЛОТ J (экскурсия открывает окна) */
+  window.OS = { open: openWindow, close: closeWindow };
   Messenger.init();
 
   /* G6 — делегированный обработчик [data-chat]: открыть диалог агента */
@@ -2668,8 +2777,17 @@
       });
     }
 
-    /* пользователь уже включал голос → тихо поднимаем из кеша (офлайн) */
-    function maybeAuto() { if (supported && st === 'off' && flag()) enable(); }
+    /* пользователь уже включал голос → тихо поднимаем ИЗ КЕША (офлайн).
+       Если кеш вычищен браузером — молча не качаем 60 МБ заново:
+       тяжёлое только по явной кнопке. */
+    function maybeAuto() {
+      if (!supported || st !== 'off' || !flag()) return;
+      loadScript().then(function () {
+        return window.NeuralVoice.cached();
+      }).then(function (c) {
+        if (c && st === 'off') enable();
+      }, function () {});
+    }
 
     function ready() { return st === 'ready' && !!window.NeuralVoice && window.NeuralVoice.state() === 'ready'; }
 
@@ -3002,9 +3120,21 @@
     }
 
     /* Переключатель голоса: показываем, только если системе есть из чего
-       выбирать. Подсказку — когда играет роботизированная Milena. */
+       выбирать. Подсказку — когда играет роботизированная Milena.
+       V7.2: при активном нейроголосе ходим по дикторам VITS
+       (Ирина → Дмитрий → Руслан), а не по системным голосам. */
+    function neuralActive() {
+      return window.NV && NV.ready() && lang() === 'ru' && window.NeuralVoice && window.NeuralVoice.setVoice;
+    }
+
     function refreshVoiceUI() {
       var btn = $('aiVoice'), nameEl = $('aiVoiceName'), hint = $('aiVoiceHint');
+      if (neuralActive()) {
+        if (btn) btn.hidden = false;
+        if (nameEl) nameEl.textContent = tr(window.NeuralVoice.voice().key);
+        if (hint) hint.hidden = true;
+        return;
+      }
       var list = ruVoices();
       var cur = pickVoice();
       if (btn) btn.hidden = list.length < 2;
@@ -3013,7 +3143,40 @@
       if (hint) hint.hidden = !(robo && lang() === 'ru');
     }
 
+    var nvSwitching = false;
+    function cycleNeuralVoice() {
+      if (nvSwitching) return;
+      var voices = window.NeuralVoice.voices();
+      var curId = window.NeuralVoice.voice().id;
+      var i = 0;
+      for (var k = 0; k < voices.length; k++) if (voices[k].id === curId) i = k;
+      var next = voices[(i + 1) % voices.length];
+      var nameEl = $('aiVoiceName'), hint = $('aiVoiceHint');
+      nvSwitching = true;
+      /* честность про вес: модели этого диктора нет в кеше → предупреждаем */
+      window.NeuralVoice.voiceCached(next.id).then(function (inCache) {
+        if (hint && !inCache) {
+          hint.setAttribute('data-i18n', 'nv.sw.dl');
+          hint.textContent = tr('nv.sw.dl');
+          hint.hidden = false;
+        }
+        if (nameEl) nameEl.textContent = tr('nv.sw.loading');
+        return window.NeuralVoice.setVoice(next.id, function (p) {
+          if (nameEl && p && p.total) nameEl.textContent = Math.min(100, Math.round(p.loaded / p.total * 100)) + '%';
+        });
+      }).then(function () {
+        nvSwitching = false;
+        refreshVoiceUI();
+        if (on) window.NeuralVoice.speak(tr('ai.voicetest'));
+      }, function (err) {
+        nvSwitching = false;
+        refreshVoiceUI();
+        try { console.warn('[NV] voice switch failed:', err); } catch (e) {}
+      });
+    }
+
     function cycleVoice() {
+      if (neuralActive()) { cycleNeuralVoice(); return; }
       var list = ruVoices().slice().sort(function (a, b) { return voiceRank(a) - voiceRank(b); });
       if (list.length < 2) return;
       var cur = pickVoice();
@@ -3066,7 +3229,10 @@
       syncModes();
       /* H2: 3D-аватар — только там, где потянет */
       var fBtn = $('aiFace'), fHint = $('aiFaceHint');
-      if (faceCapable()) {
+      /* Старое 3D-лицо временно отключено — заменяется на выбор аватаров
+         (реалистичный / мультяшный) в следующей волне. Кнопку не показываем. */
+      var FACE_DISABLED = true;
+      if (!FACE_DISABLED && faceCapable()) {
         if (fBtn) fBtn.hidden = false;
         if (fHint && !face) { fHint.hidden = false; }
         if (faceFlag()) faceOn();
@@ -3099,6 +3265,7 @@
       stopRec();
       try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
       try { if (window.NeuralVoice) window.NeuralVoice.stop(); } catch (e) {}
+      speakingNow = false; // VITS-путь не дозовёт finish после stop()
       faceOff(true); // выключаем рендер, но помним выбор на следующий звонок
       if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } // ОСВОБОЖДАЕМ микрофон
       if (actx) { try { actx.close(); } catch (e) {} actx = null; analyser = null; }
@@ -3140,8 +3307,9 @@
         hearPop.hidden = !hearPop.hidden;
         hearBtn.setAttribute('aria-expanded', hearPop.hidden ? 'false' : 'true');
       });
-      /* индикатор голоса обновляется, когда нейроголос догрузился */
-      document.addEventListener('nv:ready', syncModes);
+      /* индикатор голоса обновляется, когда нейроголос догрузился;
+         переключатель дикторов тоже (V7.2) */
+      document.addEventListener('nv:ready', function () { syncModes(); refreshVoiceUI(); });
       document.addEventListener('i18n:change', syncModes);
       /* закрытие окна «Звонок» завершает разговор и освобождает микрофон */
       var win = document.getElementById('win-call');
@@ -3224,11 +3392,15 @@
         if (!topic) { txt.textContent = tr('fab.needTopic'); if (src) src.textContent = ''; if (ta) ta.focus(); return; }
         txt.textContent = '…';
         go.disabled = true;
-        window.LocalAI.generate({ format: fmt, tone: tone, topic: topic, lang: lang() }).then(function (r) {
-          go.disabled = false;
-          if (src) src.textContent = (r.source === 'webllm') ? tr('ai.src.webllm') : tr('ai.src.intent');
-          typeOut(txt, r.text);
-        }, function () { go.disabled = false; });
+        /* localai.js теперь ленивый — на случай клика раньше его загрузки */
+        ensureLocalAI(function () {
+          if (!window.LocalAI || !window.LocalAI.generate) { go.disabled = false; return; }
+          window.LocalAI.generate({ format: fmt, tone: tone, topic: topic, lang: lang() }).then(function (r) {
+            go.disabled = false;
+            if (src) src.textContent = (r.source === 'webllm') ? tr('ai.src.webllm') : tr('ai.src.intent');
+            typeOut(txt, r.text);
+          }, function () { go.disabled = false; });
+        });
       });
       var cp = $('fxCopy');
       if (cp) cp.addEventListener('click', function () {
