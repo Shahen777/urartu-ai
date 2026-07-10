@@ -918,7 +918,19 @@
       'agents.custom': 'ваш агент',
       'agents.office.hint': 'Так многоагентная система выглядит «изнутри»: агенты передают задачи друг другу.',
       'agents.office.open': 'Показать 3D-офис',
-      'agents.empty.tasks': 'Пока тихо — агенты ждут задач.'
+      'agents.empty.tasks': 'Пока тихо — агенты ждут задач.',
+      'boot.welcome': 'Urartu AI',
+      'boot.enter': 'Нажмите, чтобы войти',
+      'boot.user.dir': 'Директор',
+      'boot.user.dir.role': 'Владелец бизнеса',
+      'boot.user.guest': 'Демо-гость',
+      'boot.user.guest.role': 'Посмотреть, как всё устроено',
+      'lock.w.title': 'ИИ-сотрудники · онлайн',
+      'lock.w.sub': '5 агентов на связи 24/7',
+      'lock.n.app': 'Urartu AI · Секретарь',
+      'lock.n.body': 'Записал 3 демо на завтра и ответил на 12 обращений.',
+      'lock.n.when': 'сейчас',
+      'lock.swipe': 'Смахните вверх, чтобы открыть'
     },
 
     en: {
@@ -1833,7 +1845,19 @@
       'agents.custom': 'your agent',
       'agents.office.hint': 'This is the multi-agent system from the inside: agents hand tasks to each other.',
       'agents.office.open': 'Show 3D office',
-      'agents.empty.tasks': 'Quiet for now — agents are waiting for tasks.'
+      'agents.empty.tasks': 'Quiet for now — agents are waiting for tasks.',
+      'boot.welcome': 'Urartu AI',
+      'boot.enter': 'Click to log in',
+      'boot.user.dir': 'Director',
+      'boot.user.dir.role': 'Business owner',
+      'boot.user.guest': 'Demo guest',
+      'boot.user.guest.role': 'See how it all works',
+      'lock.w.title': 'AI employees · online',
+      'lock.w.sub': '5 agents on call 24/7',
+      'lock.n.app': 'Urartu AI · Secretary',
+      'lock.n.body': 'Booked 3 demos for tomorrow and answered 12 tickets.',
+      'lock.n.when': 'now',
+      'lock.swipe': 'Swipe up to open'
     }
   };
 

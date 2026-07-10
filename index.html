@@ -176,6 +176,60 @@
 </head>
 <body>
 
+<!-- ================= ЗАГРУЗКА / ВХОД / ЭКРАН БЛОКИРОВКИ =================
+     Десктоп: загрузка (лого + прогресс) → выбор пользователя → рабочий стол.
+     Мобильный: экран блокировки (часы, дата, уведомление) → свайп вверх → главный экран.
+     Разметка в HTML, чтобы не мигал рабочий стол до готовности JS. -->
+<div id="boot" class="boot" role="presentation">
+  <!-- ЛОГО-ЗАГРУЗКА (macOS) -->
+  <div class="boot__stage boot__mac" data-boot="logo">
+    <span class="boot__logo" aria-hidden="true">
+      <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+        <path d="M8 52 L26 22 L36 38 L44 26 L64 52 Z" fill="currentColor"/>
+        <path d="M22 52 L36 30 L50 52 Z" fill="rgba(255,255,255,.32)"/>
+      </svg>
+    </span>
+    <span class="boot__bar"><i></i></span>
+  </div>
+  <!-- ВЫБОР ПОЛЬЗОВАТЕЛЯ (macOS) -->
+  <div class="boot__stage boot__login" data-boot="login" hidden>
+    <p class="boot__welcome" data-i18n="boot.welcome">Urartu AI</p>
+    <div class="boot__users" id="bootUsers"></div>
+  </div>
+  <!-- ЭКРАН БЛОКИРОВКИ (iPhone) -->
+  <div class="boot__stage boot__lock" data-boot="lock" hidden>
+    <div class="lock__top">
+      <span class="lock__op">Urartu</span>
+    </div>
+    <div class="lock__clockwrap">
+      <p class="lock__date" id="lockDate">—</p>
+      <p class="lock__time" id="lockTime">--:--</p>
+    </div>
+    <div class="lock__widgets">
+      <div class="lock__widget">
+        <span class="lock__wico" aria-hidden="true">🟢</span>
+        <div><b data-i18n="lock.w.title">ИИ-сотрудники · онлайн</b><span data-i18n="lock.w.sub">5 агентов на связи 24/7</span></div>
+      </div>
+    </div>
+    <div class="lock__notif" id="lockNotif">
+      <span class="lock__nico" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 72 72" fill="none"><rect width="72" height="72" rx="16" fill="#D42E00"/><path d="M18 50 L34 24 L43 40 L49 30 L57 50 Z" fill="#fff"/></svg>
+      </span>
+      <div class="lock__ntext">
+        <b class="lock__ntitle" data-i18n="lock.n.app">Urartu AI · Секретарь</b>
+        <span class="lock__nbody" data-i18n="lock.n.body">Записал 3 демо на завтра и ответил на 12 обращений.</span>
+      </div>
+      <span class="lock__nwhen" data-i18n="lock.n.when">сейчас</span>
+    </div>
+    <button class="lock__unlock" id="lockUnlock" type="button">
+      <span class="lock__arrow" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+      </span>
+      <span data-i18n="lock.swipe">Смахните вверх, чтобы открыть</span>
+    </button>
+  </div>
+</div>
+
 <div class="desktop" aria-hidden="true"></div>
 
 <!-- ================= iOS СТАТУС-БАР (мобильный) ================= -->
@@ -2155,6 +2209,7 @@
 </div>
 
 <script src="js/i18n.js" defer></script>
+<script src="js/boot.js" defer></script>
 <!-- js/localai.js (41 КБ) грузится лениво из os.js при первом открытии окна с агентом (Сообщения / Звонок / Фабрика) -->
 <script src="js/os.js" defer></script>
 <script src="js/avatars.js" defer></script>
