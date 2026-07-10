@@ -2373,15 +2373,39 @@
           }
           push({ who: 'them', text: res.text, html: res.html, chips: res.chips || [] });
         };
-        if (window.LocalAI && window.LocalAI.askAsync) {
-          // G1: асинхронный уровень (WebLLM, если пользователь её включил)
-          window.LocalAI.askAsync(agent, text, lang()).then(fin, function () {
-            fin(window.LocalAI.ask(agent, text, lang()));
+        function localChat() {
+          if (window.LocalAI && window.LocalAI.askAsync) {
+            // G1: асинхронный уровень (WebLLM, если пользователь её включил)
+            window.LocalAI.askAsync(agent, text, lang()).then(fin, function () {
+              fin(window.LocalAI.ask(agent, text, lang()));
+            });
+          } else {
+            fin(window.LocalAI ? window.LocalAI.ask(agent, text, lang()) : { text: text, chips: [] });
+          }
+        }
+        /* умный агент (kie.ai LLM), если бэкенд доступен — иначе локально */
+        if (window.AgentAPI) {
+          var hist = (threads[agent] || []).slice(-8).map(function (m) { return { role: m.who === 'me' ? 'user' : 'assistant', content: m.text || '' }; }).filter(function (m) { return m.content; });
+          window.AgentAPI.available().then(function (ok) {
+            if (!ok) { localChat(); return; }
+            window.AgentAPI.reply(agent, text, hist, false).then(function (r) {
+              fin({ text: r.text, chips: [] });
+            }, function () { localChat(); });
           });
         } else {
-          fin(window.LocalAI ? window.LocalAI.ask(agent, text, lang()) : { text: text, chips: [] });
+          localChat();
         }
       }, delay);
+    }
+
+    /* если подключён умный агент — честно меняем плашку «демо» на «настоящая модель» */
+    function updateDemoBanner() {
+      var t = el('msgDemoText'); if (!t) return;
+      if (window.AgentAPI) window.AgentAPI.available().then(function (ok) {
+        var el2 = el('msgDemoText'); if (!el2) return;
+        var k = ok ? 'msg.demo.live' : 'msg.demo';
+        el2.setAttribute('data-i18n', k); el2.textContent = tr(k);
+      });
     }
 
     function init() {
@@ -2389,6 +2413,7 @@
       threads = {};
       CONVS.forEach(function (c) { threads[c.id] = c.seed.slice(); });
       buildList();
+      updateDemoBanner();
       var form = el('msgForm'), field = el('msgText'), back = el('msgBack');
       if (form) form.addEventListener('submit', function (e) {
         e.preventDefault(); if (!field) return; var v = field.value; field.value = ''; send(v);
@@ -2398,7 +2423,7 @@
       });
       document.addEventListener('i18n:change', function () {
         if (!inited) return;
-        buildListPreservePrev(); setHead(); renderThread();
+        buildListPreservePrev(); setHead(); renderThread(); updateDemoBanner();
       });
       /* ЛОТ L: смена сотрудника/стиля в звонке обновляет лица в чате */
       document.addEventListener('ava:change', function () {
@@ -2882,6 +2907,7 @@
   var VoiceCall = (function () {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     var home, live, fb, on = false, muted = false, speakingNow = false;
+    var callHist = [], curAudio = null;   // история диалога + текущий аудио-ответ (умный агент)
     var stream = null, actx = null, analyser = null, raf = 0;
     var rec = null, recWanted = false;
     var t0 = 0, tInt = 0, silT = 0, iosT = 0;
@@ -3121,20 +3147,55 @@
       if (silT) { clearTimeout(silT); silT = 0; }
       setStatus('ai.st.think');
       var low = txt.toLowerCase();
-      if (/до свидан|пока\b|прощай|goodbye|bye\b/.test(low)) { speak(tr('ai.bye'), function () { end(); }); return; }
-      if (/запиш|демо|встреч|назнач|календар|book|demo|schedule|meeting/.test(low)) {
-        speak(tr('ai.openCal'));
-        openWindow('win-calendar', $('aiCallBtn'));
+      var goodbye = /до свидан|пока\b|прощай|goodbye|bye\b/.test(low);
+      var sched = /запиш|демо|встреч|назнач|календар|book|demo|schedule|meeting/.test(low);
+      var human = /человек|шаген|живо[йм]|менеджер|оператор|human|shagen|real person/.test(low);
+
+      /* локальный путь (заготовки + локальная модель) — если умного агента нет */
+      function localReply() {
+        if (goodbye) { speak(tr('ai.bye'), function () { end(); }); return; }
+        if (sched) { speak(tr('ai.openCal')); openWindow('win-calendar', $('aiCallBtn')); return; }
+        if (human) { speak(tr('ai.human')); try { window.open('https://t.me/Shahen_kazaryan', '_blank', 'noopener'); } catch (e) {} return; }
+        var fin = function (res) { if (on) speak(res.text); };
+        if (window.LocalAI && window.LocalAI.askAsync) window.LocalAI.askAsync('secretary', txt, lang()).then(fin, function () { fin(window.LocalAI.ask('secretary', txt, lang())); });
+        else fin(window.LocalAI ? window.LocalAI.ask('secretary', txt, lang()) : { text: txt });
+      }
+
+      /* умный голосовой агент (kie.ai LLM + живой голос) — если сервис доступен */
+      if (window.AgentAPI) {
+        callHist.push({ role: 'user', content: txt });
+        window.AgentAPI.available().then(function (ok) {
+          if (!ok || !on) { return localReply(); }
+          window.AgentAPI.reply('secretary', txt, callHist, true).then(function (r) {
+            if (!on) return;
+            callHist.push({ role: 'assistant', content: r.text });
+            if (sched) openWindow('win-calendar', $('aiCallBtn'));
+            if (human) { try { window.open('https://t.me/Shahen_kazaryan', '_blank', 'noopener'); } catch (e) {} }
+            speakAgent(r.text, r.audio, function () { if (goodbye) end(); });
+          }, function () { localReply(); });
+        });
         return;
       }
-      if (/человек|шаген|живо[йм]|менеджер|оператор|human|shagen|real person/.test(low)) {
-        speak(tr('ai.human'));
-        try { window.open('https://t.me/Shahen_kazaryan', '_blank', 'noopener'); } catch (e) {}
-        return;
-      }
-      var fin = function (res) { if (on) speak(res.text); };
-      if (window.LocalAI && window.LocalAI.askAsync) window.LocalAI.askAsync('secretary', txt, lang()).then(fin, function () { fin(window.LocalAI.ask('secretary', txt, lang())); });
-      else fin(window.LocalAI ? window.LocalAI.ask('secretary', txt, lang()) : { text: txt });
+      localReply();
+    }
+
+    /* проговорить ответ умного агента: живой mp3 (edge-tts) с липсинком, иначе синтез */
+    function speakAgent(text, audioUrl, then) {
+      stopRec();
+      if (!audioUrl) { speak(text, then); return; }
+      var w = $('aiAvaWrap');
+      var a = new Audio(); curAudio = a;
+      var subbed = false, doneCalled = false;
+      var done = function () {
+        if (doneCalled) return; doneCalled = true;
+        speakingNow = false; if (w) w.classList.remove('is-talk'); curAudio = null;
+        if (!on) return; if (then) then(); else listen();
+      };
+      a.onplay = function () { if (!subbed) { subbed = true; sub('ai', text); speakingNow = true; setStatus('ai.st.speak'); if (w) w.classList.add('is-talk'); } };
+      a.onended = done;
+      a.onerror = function () { curAudio = null; if (!subbed) speak(text, then); else done(); };
+      a.src = audioUrl;
+      var p = a.play(); if (p && p.catch) p.catch(function () { curAudio = null; if (!subbed) speak(text, then); });
     }
 
     /* гудок 0.6с — тихий синусоидальный тон 425 Гц (как в телефонной сети) */
@@ -3281,7 +3342,7 @@
     }
 
     function begin() {
-      on = true; muted = false;
+      on = true; muted = false; callHist = [];
       home.hidden = true; fb.hidden = true; live.hidden = false;
       var mb = $('aiMute'); if (mb) { mb.classList.remove('is-off'); mb.setAttribute('aria-pressed', 'false'); }
       refreshVoiceUI();
@@ -3313,6 +3374,7 @@
       if (!on && live.hidden) return;
       on = false;
       stopRec();
+      if (curAudio) { try { curAudio.pause(); } catch (e) {} curAudio = null; }
       try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
       try { if (window.NeuralVoice) window.NeuralVoice.stop(); } catch (e) {}
       speakingNow = false; // VITS-путь не дозовёт finish после stop()

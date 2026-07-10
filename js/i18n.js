@@ -56,6 +56,7 @@
       /* Сообщения (мессенджер, F1) */
       'msg.title': 'Сообщения',
       'msg.demo': 'Демо-режим: отвечает локальный сценарий. Настоящий ИИ-сотрудник работает у вас в контуре — покажем на демо.',
+      'msg.demo.live': '🟢 Отвечает настоящая ИИ-модель. Это живой ассистент — как ваш будущий сотрудник в контуре.',
       'msg.ph': 'Сообщение…',
       'msg.live': 'Шаген (живой)', 'msg.liveSub': 'Написать в Telegram →',
       'msg.n.documoved': 'Документовед', 'msg.n.lawyer': 'Юрист-проверяющий',
@@ -986,6 +987,7 @@
       /* Messages (messenger, F1) */
       'msg.title': 'Messages',
       'msg.demo': 'Demo mode: a local scenario is answering. A real AI employee runs inside your own perimeter — we will show it on the demo.',
+      'msg.demo.live': '🟢 Answered by a real AI model. This is a live assistant — like your future in-house employee.',
       'msg.ph': 'Message…',
       'msg.live': 'Shagen (live)', 'msg.liveSub': 'Message on Telegram →',
       'msg.n.documoved': 'Document Clerk', 'msg.n.lawyer': 'Legal Reviewer',
