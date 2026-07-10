@@ -8,6 +8,9 @@
 |---|---|---|---|---|
 | `echarts.min.js` | Apache ECharts — графики дашборда «Пульс компании» (~1,1 МБ, лениво при первом открытии окна) | 6.0.0 | Apache-2.0 | npm echarts |
 | `countup.umd.js` | CountUp.js — анимация KPI-цифр дашборда (~6 КБ, грузится вместе с ним) | 2.9.0 | MIT | npm countup.js |
+| `gridstack/gridstack-all.js` + `gridstack.min.css` | GridStack — перетаскиваемые виджеты «Обзора» CRM (~88 КБ, лениво с окном CRM) | 12.6.0 | MIT | npm pack gridstack |
+| `fullcalendar/index.global.min.js` + `ru.global.min.js` | FullCalendar (core+daygrid+interaction, глобальный бандл) — календарь задач CRM (~284 КБ, лениво с окном CRM) | 6.1.21 | MIT | npm pack fullcalendar / @fullcalendar/core |
+| `tabler/tabler-crm.css` | сабсет Tabler + стили CRM (канбан, P&L, активы, FullCalendar-темы) — лениво с окном CRM | по мотивам 1.4.0 | MIT | своё по мотивам @tabler/core |
 | `vits/vits-engine.mjs` | адаптация @diffusionstudio/vits-web (локальные пути, CacheStorage, кеш сессии) | из v1.0.3 | MIT | npm @diffusionstudio/vits-web |
 | `vits/vits-worker.mjs` | наш module-worker для синтеза | — | MIT | своё |
 | `vits/piper_phonemize.{mjs,wasm,data}` | фонемизатор espeak-ng (wasm 0.6 МБ + данные 18 МБ) | 1.0.0 | MIT | npm @diffusionstudio/piper-wasm (+ESM-глю из vits-web) |

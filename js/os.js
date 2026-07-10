@@ -274,6 +274,18 @@
     document.head.appendChild(s);
   }
 
+  /* devices.js — интерактив окна «Устройства» (LOT T2), лениво при первом открытии. */
+  var devicesLoading = false;
+  function ensureDevices() {
+    if (window.Devices) { window.Devices.refresh(); return; }
+    if (devicesLoading) return;
+    devicesLoading = true;
+    var s = document.createElement('script');
+    s.src = 'js/devices.js';
+    s.onerror = function () { devicesLoading = false; };
+    document.head.appendChild(s);
+  }
+
   /* Приёмка V7.1: localai.js (движок ответов агентов, ~41 КБ) — лениво,
      при первом открытии окна с агентом (Сообщения / Звонок / Фабрика).
      При старте страницы — ноль лишних байтов (вес первой загрузки ≤ 650 КБ).
@@ -433,6 +445,7 @@
     if (id === 'win-agents') ensureAgentsFrame();
     if (id === 'win-game') ensureGameFrame();
     if (id === 'win-pulse') ensurePulse();
+    if (id === 'win-devices') ensureDevices();
     if (id === 'win-assistant') ensureLocalAI(function () { if (window.Messenger) window.Messenger.onOpen(); });
     if (id === 'win-call' || id === 'win-factory') ensureLocalAI();
     place(win);
@@ -2578,7 +2591,7 @@
         idx.push({ label: h.textContent.trim(), win: 'win-services', kind: 'svc' });
       });
       // устройства
-      Array.prototype.forEach.call(document.querySelectorAll('#win-devices h3, #win-devices .dev-card h4'), function (h) {
+      Array.prototype.forEach.call(document.querySelectorAll('#win-devices .dev-card__name'), function (h) {
         var t = h.textContent.trim(); if (t) idx.push({ label: t, win: 'win-devices', kind: 'dev' });
       });
       // сотрудники

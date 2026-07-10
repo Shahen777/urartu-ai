@@ -128,3 +128,172 @@
 @media (prefers-reduced-motion:reduce){
   .crm-tab,.crm-table tbody tr{transition:none}
 }
+
+/* ============================================================
+   ЛОТ U — полноценная CRM: Обзор-виджеты (gridstack), Задачи
+   (канбан + FullCalendar), Финансы, Активы.
+   ============================================================ */
+.win--pulse{max-width:1240px}
+.crm-kpis--5{grid-template-columns:repeat(5,1fr)}
+.wbtn--sm{font-size:11.5px;padding:5px 12px}
+.crm-dim{color:var(--text-dim)}
+.crm-aitag{font-style:normal;font-size:11px}
+.crm-kv{font-variant-numeric:tabular-nums}
+.crm-kv.is-top{color:#2fb344}
+
+/* ---------- Обзор: панель управления раскладкой ---------- */
+.crm-gridbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.crm-note--drag{opacity:.8}
+
+/* ---------- gridstack: виджеты ---------- */
+#crmGrid{margin:0 -6px}
+#crmGrid .grid-stack-item-content{inset:6px}
+.crm-card--w{display:flex;flex-direction:column;overflow:hidden}
+.crm-card--w .crm-card__h{flex:none;cursor:grab}
+.crm-card--w .crm-card__h:active{cursor:grabbing}
+.grid-stack-item.ui-draggable-dragging .crm-card,
+.grid-stack-item.ui-resizable-resizing .crm-card{box-shadow:inset 0 0 0 1px #0A84FF,0 12px 32px rgba(0,0,0,.25)}
+.grid-stack-placeholder>.placeholder-content{border:1.5px dashed rgba(10,132,255,.55);border-radius:12px;background:rgba(10,132,255,.06)}
+.crm-chart--fill{flex:1 1 auto;height:auto;min-height:120px}
+.crm-chart--gauge{height:210px}
+
+/* ближайшие задачи (виджет) */
+.crm-next{list-style:none;margin:4px 0 0;padding:0;overflow:auto;flex:1;min-height:0}
+.crm-next__i{display:flex;align-items:center;gap:10px;padding:6.5px 2px;border-bottom:1px solid var(--ring);font-size:12px}
+.crm-next__i:last-child{border-bottom:0}
+.crm-next__d{flex:none;min-width:52px;text-align:center;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;
+  background:var(--surface);color:var(--text-dim);font-variant-numeric:tabular-nums}
+.crm-next__d.is-soon{color:#f59f00;background:rgba(245,159,0,.13)}
+.crm-next__t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crm-next__w{flex:none;display:inline-flex;align-items:center;gap:4px}
+
+/* лента ИИ-активности (виджет) */
+.crm-feed{list-style:none;margin:4px 0 0;padding:0;overflow:auto;flex:1;min-height:0}
+.crm-feed__i{display:flex;gap:10px;padding:7px 2px;border-bottom:1px solid var(--ring)}
+.crm-feed__i:last-child{border-bottom:0}
+.crm-feed__i .crm-ava{margin-top:2px}
+.crm-feed__t{display:block;font-size:10.5px;font-weight:700;color:var(--text-dim)}
+.crm-feed__i p{margin:1px 0 0;font-size:12px;line-height:1.4}
+.crm-ava--xs{width:20px;height:20px;font-size:8.5px}
+
+/* ---------- Задачи: канбан ---------- */
+.crm-kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+.kb-col{border-radius:12px;background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);padding:8px;min-height:120px;
+  transition:box-shadow .15s,background .15s}
+.kb-col.is-over{box-shadow:inset 0 0 0 1.5px #0A84FF;background:rgba(10,132,255,.05)}
+.kb-col__h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 4px 8px;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim)}
+.kb-col__h b{font-size:10.5px;min-width:20px;text-align:center;padding:1px 6px;border-radius:999px;background:var(--surface);color:var(--text-dim)}
+.kb-col--new .kb-col__h span{color:#0A84FF}
+.kb-col--work .kb-col__h span{color:#f59f00}
+.kb-col--review .kb-col__h span{color:#5E5CE6}
+.kb-col--done .kb-col__h span{color:#2fb344}
+.kb-col__list{display:flex;flex-direction:column;gap:8px;min-height:40px}
+.kb-card{border-radius:10px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring);padding:9px 10px;cursor:grab}
+.kb-card:active{cursor:grabbing}
+.kb-card.is-drag{opacity:.45}
+.kb-card h4{margin:6px 0 7px;font-size:12px;font-weight:600;line-height:1.35}
+.kb-card__top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kb-card__who{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim)}
+.kb-card__ai{margin-top:6px;font-size:10.5px;font-weight:700;color:#2fb344}
+.kb-col--done .kb-card h4{text-decoration:line-through;text-decoration-color:var(--ring-strong);opacity:.75}
+.kb-pr{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:1.5px 7px;border-radius:999px}
+.kb-pr--hi{color:#d63939;background:rgba(214,57,57,.12)}
+.kb-pr--mid{color:#0A84FF;background:rgba(10,132,255,.10)}
+.kb-pr--lo{color:var(--text-dim);background:var(--surface-btn)}
+.kb-due{font-size:10px;font-weight:600;color:var(--text-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.kb-due.is-soon{color:#f59f00}
+
+/* ---------- Задачи: FullCalendar под темы сайта ---------- */
+.crm-calwrap{border-radius:12px;background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);padding:12px 14px}
+.crm-calwrap[hidden]{display:none}
+#crmCal{--fc-border-color:var(--ring);--fc-page-bg-color:transparent;--fc-neutral-bg-color:var(--surface);
+  --fc-today-bg-color:rgba(10,132,255,.08);--fc-event-text-color:#fff;
+  --fc-button-bg-color:var(--surface-btn);--fc-button-border-color:transparent;--fc-button-text-color:var(--text);
+  --fc-button-hover-bg-color:var(--surface-btn-hover);--fc-button-hover-border-color:transparent;
+  --fc-button-active-bg-color:#0A84FF;--fc-button-active-border-color:transparent;
+  font-size:12px}
+#crmCal .fc-toolbar-title{font-size:14.5px;font-weight:700;text-transform:capitalize}
+#crmCal .fc-button{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:8px;box-shadow:none}
+#crmCal .fc-button:focus{box-shadow:0 0 0 2px var(--ring-strong)}
+#crmCal .fc-daygrid-day-number,#crmCal .fc-col-header-cell-cushion{color:var(--text);text-decoration:none;font-size:11px}
+#crmCal .fc-col-header-cell-cushion{font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:9.5px;color:var(--text-dim)}
+#crmCal .fc-event{border:0;border-radius:6px;font-size:10.5px;padding:1px 4px;cursor:default}
+#crmCal .fc-event.fc-event-draggable{cursor:grab}
+#crmCal .fc-daygrid-more-link{color:#0A84FF;font-size:10.5px}
+#crmCal .fc-popover{background:var(--surface-soft);border:0;box-shadow:0 12px 32px rgba(0,0,0,.3),inset 0 0 0 1px var(--ring);border-radius:10px}
+#crmCal .fc-popover-header{background:var(--surface);color:var(--text)}
+
+/* ---------- Финансы ---------- */
+.crm-pl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:2px}
+.crm-pl td{padding:7px 6px;border-bottom:1px solid var(--ring)}
+.crm-pl td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.crm-pl td.is-in{color:#2fb344;font-weight:650}
+.crm-pl tr.is-b td{font-weight:700}
+.crm-pl tr.is-total td{font-weight:800;border-bottom:0;border-top:2px solid var(--ring-strong);font-size:13px}
+.crm-pl__m{font-size:10.5px;font-weight:700;color:#2fb344;background:rgba(47,179,68,.12);padding:1.5px 7px;border-radius:999px;margin-left:6px}
+.crm-in{color:#2fb344}
+.crm-out{color:#d63939}
+.crm-table--pays td{white-space:normal}
+
+/* ---------- Активы ---------- */
+.crm-roigrid--assets{grid-template-columns:minmax(240px,1fr) 1.6fr}
+.crm-gstats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:2px}
+.crm-gstat{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:82px;padding:7px 10px;border-radius:10px;
+  background:var(--surface);font-size:10px;color:var(--text-dim)}
+.crm-gstat b{font-size:15px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.crm-table--assets tr.is-ai-asset td:first-child b{color:#0A84FF}
+:root.theme-light .crm-table--assets tr.is-ai-asset td:first-child b{color:#0A6DDB}
+.crm-ava--big{width:52px;height:52px;border-radius:12px;font-size:17px}
+.crm-dcard__m{display:inline-block;font-size:11.5px;color:var(--text-dim);margin-right:10px}
+
+/* ---------- сводка «что ИИ сделал за неделю» ---------- */
+.crm-week{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;
+  background:linear-gradient(120deg,rgba(10,132,255,.12),rgba(94,92,230,.10));box-shadow:inset 0 0 0 1px var(--ring)}
+.crm-week__ic{flex:none;font-size:22px;line-height:1.1}
+.crm-week__b{min-width:0}
+.crm-week__t{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.crm-week__t b{font-size:13px;font-weight:800}
+.crm-week__pill{font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  padding:2px 8px;border-radius:999px;color:#0A84FF;background:rgba(10,132,255,.14)}
+:root.theme-light .crm-week__pill{color:#0A6DDB}
+.crm-week__p{margin:3px 0 0;font-size:12px;line-height:1.5;color:var(--text-dim)}
+.crm-week__p b{color:var(--text);font-variant-numeric:tabular-nums;font-weight:800}
+
+/* ---------- фильтр по сотруднику ---------- */
+.crm-filter{display:inline-flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0}
+.crm-filter__lbl{font-size:11px;color:var(--text-dim);white-space:nowrap}
+.crm-filter__sel{font:inherit;font-size:12px;color:var(--text);background:var(--surface);border:0;
+  box-shadow:inset 0 0 0 1px var(--ring);border-radius:8px;padding:5px 10px;max-width:220px;cursor:pointer}
+.crm-filter__sel:focus-visible{outline:2px solid #0A84FF;outline-offset:2px}
+.crm-empty{color:var(--text-dim);font-size:11.5px;font-style:italic}
+
+/* ---------- лента задач в профиле сотрудника ---------- */
+.crm-dcard__feed{margin-top:8px;padding-top:8px;border-top:1px solid var(--ring)}
+.crm-dcard__feedh{display:block;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px}
+.crm-dtasks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+.crm-dtask{display:flex;align-items:baseline;gap:8px;font-size:11.5px;line-height:1.4}
+.crm-dtask__st{flex:none;width:14px;text-align:center;color:var(--text-dim)}
+.crm-dtask--done .crm-dtask__st{color:#2fb344}
+.crm-dtask__t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crm-dtask--done .crm-dtask__t{color:var(--text-dim)}
+.crm-dtask__d{flex:none;font-size:10.5px;color:var(--text-dim);font-variant-numeric:tabular-nums}
+
+/* ---------- мобильный ---------- */
+@media (max-width:900px){
+  .crm-kpis--5{grid-template-columns:repeat(3,1fr)}
+  .crm-roigrid--assets{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .crm-kpis--5{grid-template-columns:1fr 1fr}
+  /* канбан: колонки горизонтальным свайпом */
+  .crm-kanban{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:10px;padding-bottom:6px;
+    scroll-snap-type:x proximity}
+  .crm-kanban .kb-col{flex:0 0 78%;max-width:290px;scroll-snap-align:start}
+  #crmCal .fc-toolbar{flex-wrap:wrap;gap:6px}
+  #crmCal .fc-toolbar-title{font-size:13px}
+  .crm-table--pays td[data-l],.crm-table--assets td[data-l]{white-space:normal}
+}
+@media (prefers-reduced-motion:reduce){
+  .kb-col,.kb-card{transition:none}
+}
