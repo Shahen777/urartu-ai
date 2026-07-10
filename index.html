@@ -404,7 +404,7 @@
 
           <div class="msg__thread" id="msgThread" role="log" aria-live="polite" aria-relevant="additions"></div>
           <form class="msg__input" id="msgForm" autocomplete="off">
-            <input class="msg__field" id="msgText" type="text" data-i18n-ph="msg.ph" placeholder="Сообщение…" aria-label="Сообщение" enterkeyhint="send">
+            <input class="msg__field" id="msgText" type="text" maxlength="2000" data-i18n-ph="msg.ph" placeholder="Сообщение…" aria-label="Сообщение" enterkeyhint="send">
             <button class="msg__send" type="submit" aria-label="Отправить">
               <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/></svg>
             </button>
@@ -633,8 +633,8 @@
           </div>
 
           <div class="call__card">
-            <div class="call__avatar" aria-hidden="true">ШК</div>
-            <h2 class="call__name">Шаген Казарян</h2>
+            <div class="call__avatar" aria-hidden="true" data-i18n="call.av">ШК</div>
+            <h2 class="call__name" data-i18n="call.name">Шаген Казарян</h2>
             <p class="call__role" data-i18n="call.role">Urartu AI · внедрение локального ИИ</p>
 
             <div class="call__actions">
@@ -801,10 +801,10 @@
         <div class="finder">
           <div class="finder__bar"><span data-i18n="finder.name">Имя</span><span data-i18n="finder.meta">Размер · Дата</span></div>
           <div class="finder__list">
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f1">Регламент договорной работы.pdf</span><span class="finder__meta">240&nbsp;КБ</span><span class="finder__date">12.05.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f2">Положение о персональных данных.pdf</span><span class="finder__meta">180&nbsp;КБ</span><span class="finder__date">03.04.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f3">Регламент согласования закупок.pdf</span><span class="finder__meta">96&nbsp;КБ</span><span class="finder__date">28.03.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f4">Инструкция по документообороту.pdf</span><span class="finder__meta">312&nbsp;КБ</span><span class="finder__date">19.02.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f1">Регламент договорной работы.pdf</span><span class="finder__meta" data-i18n="reg.s1">240&nbsp;КБ</span><span class="finder__date">12.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f2">Положение о персональных данных.pdf</span><span class="finder__meta" data-i18n="reg.s2">180&nbsp;КБ</span><span class="finder__date">03.04.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f3">Регламент согласования закупок.pdf</span><span class="finder__meta" data-i18n="reg.s3">96&nbsp;КБ</span><span class="finder__date">28.03.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f4">Инструкция по документообороту.pdf</span><span class="finder__meta" data-i18n="reg.s4">312&nbsp;КБ</span><span class="finder__date">19.02.2026</span></div>
           </div>
         </div>
         <p class="note" data-i18n="reg.note">На пилоте здесь будут ваши документы — ассистент отвечает только по ним.</p>
@@ -820,10 +820,10 @@
         <div class="finder">
           <div class="finder__bar"><span data-i18n="finder.name">Имя</span><span data-i18n="finder.meta">Размер · Дата</span></div>
           <div class="finder__list">
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f1">Типовые договоры.pdf</span><span class="finder__meta">1.2&nbsp;МБ</span><span class="finder__date">07.06.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f2">Чек-листы проверки.pdf</span><span class="finder__meta">88&nbsp;КБ</span><span class="finder__date">21.05.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f3">Шаблоны писем и претензий.pdf</span><span class="finder__meta">54&nbsp;КБ</span><span class="finder__date">14.05.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f4">Внутренние стандарты.pdf</span><span class="finder__meta">420&nbsp;КБ</span><span class="finder__date">30.04.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f1">Типовые договоры.pdf</span><span class="finder__meta" data-i18n="kb.s1">1.2&nbsp;МБ</span><span class="finder__date">07.06.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f2">Чек-листы проверки.pdf</span><span class="finder__meta" data-i18n="kb.s2">88&nbsp;КБ</span><span class="finder__date">21.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f3">Шаблоны писем и претензий.pdf</span><span class="finder__meta" data-i18n="kb.s3">54&nbsp;КБ</span><span class="finder__date">14.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f4">Внутренние стандарты.pdf</span><span class="finder__meta" data-i18n="kb.s4">420&nbsp;КБ</span><span class="finder__date">30.04.2026</span></div>
           </div>
         </div>
         <p class="note" data-i18n="kb.note">На пилоте здесь будут ваши документы — векторный индекс строится локально.</p>

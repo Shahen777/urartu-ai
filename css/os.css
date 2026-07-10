@@ -1183,6 +1183,9 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
      (15 штук друг на друге) просвечивали тёмной полосой у нижней кромки;
      visibility:hidden убирает и тени, и лишнюю отрисовку */
   .win:not(.is-open):not(.is-closing){box-shadow:none}
+  /* iOS-клавиатура: JS пишет её высоту в --kbh (visualViewport),
+     лист поджимается снизу — композер чата остаётся над клавиатурой */
+  .win.is-open{bottom:var(--kbh,0px)}
 
   /* iOS app-переход: фон (пейджер) слегка отъезжает и темнеет */
   .pager{transition:transform .45s var(--ios-ease)}
@@ -1356,8 +1359,12 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
     padding-right:calc(24px + env(safe-area-inset-right));
     padding-bottom:calc(108px + env(safe-area-inset-bottom));
   }
-  /* 7 колонок → 2 ряда из 13 иконок, третий ряд не подлезает под док */
-  .springboard{grid-template-columns:repeat(7,60px);row-gap:18px}
+  /* 12 колонок × 56px → все 23 иконки в 2 ряда: третьего ряда нет,
+     под фиксированный док ничего не подлезает и тапы не перехватываются */
+  .springboard{grid-template-columns:repeat(12,56px);row-gap:14px}
+  .sb-icon{width:56px}
+  .sb-icon img{width:56px;height:56px}
+  .sb-icon span{width:56px;font-size:10px}
 }
 
 /* зона перехвата свайпа: правый верхний угол, как на iPhone */
@@ -1380,6 +1387,15 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
   /* кружок трафиклайта остаётся 12px, но прозрачный ::after расширяет
      область нажатия до ~24px (2.5.5) */
   .tl button::after{content:"";position:absolute;inset:-6px}
+  /* мелкие контролы: прозрачный ::after добивает hit-зону до ≥44×44,
+     не меняя визуальный размер (iOS HIG) */
+  .msg__send,.win-back,.cc-fab,.ios-search,.pager-dots button{position:relative}
+  .msg__send::after,.win-back::after,.cc-fab::after,.ios-search::after{
+    content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:max(100%,44px);height:max(100%,44px)}
+  /* точки пейджера стоят с шагом 16px — расширяем насколько можно без
+     наложения соседних hit-зон */
+  .pager-dots button::after{content:"";position:absolute;inset:-4px}
 }
 
 /* ================= REDUCED MOTION ================= */

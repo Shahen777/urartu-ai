@@ -368,13 +368,29 @@
     { id: 'r15', re: /инн|огрн|кпп|р\/с|расч[её]тн\w+\s+сч[её]т|реквизит|bank\s+details/i, miss: 'warn' }
   ];
   var PENALTY_RE = /неустойк|пен[яию]\b|штраф|penalt/i;
-  /* симметрия неустойки: в предложениях с санкциями должны упоминаться ОБЕ стороны */
+  /* симметрия неустойки: санкции должны быть у ОБЕИХ сторон.
+     Сначала ищем, КТО именно платит («Исполнитель уплачивает неустойку…»):
+     если плательщик назван явно — «ok» только когда платят обе стороны.
+     Если конструкция «X уплачивает» не найдена — прежняя эвристика
+     (обе стороны упомянуты в предложениях про санкции). */
+  var CUST_RE = /заказчик|покупател|клиент|customer|client|buyer/i;
+  var EXEC_RE = /исполнител|подрядчик|поставщик|contractor|supplier|seller/i;
+  var PAYER_RE = /(заказчик\w*|покупател\w*|клиент\w*|исполнител\w*|подрядчик\w*|поставщик\w*|customer|client|buyer|contractor|supplier|seller)[^.\n]{0,50}?(уплачива|выплачива|возмеща|обязан\w*\s+(?:у|вы)плат|(?:shall|must|will)\s+pay)/ig;
   function penaltySym(text) {
     if (!PENALTY_RE.test(text)) return 'miss';
-    var seg = text.split(/\n|\./).filter(function (x) { return PENALTY_RE.test(x); }).join('. ');
-    var cust = /заказчик|покупател|клиент|customer|client|buyer/i.test(seg);
-    var exec = /исполнител|подрядчик|поставщик|contractor|supplier|seller/i.test(seg);
-    return (cust && exec) ? 'ok' : 'warn';
+    var segs = text.split(/\n|\./).filter(function (x) { return PENALTY_RE.test(x); });
+    var payCust = false, payExec = false, anyPayer = false, m;
+    segs.forEach(function (s) {
+      PAYER_RE.lastIndex = 0;
+      while ((m = PAYER_RE.exec(s))) {
+        anyPayer = true;
+        if (CUST_RE.test(m[1])) payCust = true;
+        if (EXEC_RE.test(m[1])) payExec = true;
+      }
+    });
+    if (anyPayer) return (payCust && payExec) ? 'ok' : 'warn';
+    var seg = segs.join('. ');
+    return (CUST_RE.test(seg) && EXEC_RE.test(seg)) ? 'ok' : 'warn';
   }
   /* checkContract(text) -> { items: [{id, status: ok|warn|miss}], counts, words } */
   AI.checkContract = function (text) {

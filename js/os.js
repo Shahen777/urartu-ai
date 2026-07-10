@@ -2151,7 +2151,9 @@
     }
 
     function send(text) {
-      text = (text || '').trim(); if (!text || !cur) return;
+      // Страховка от гигантской вставки (LocalAI.ask ~O(n²) + layout пузыря):
+      // поле и так имеет maxlength=2000, но режем и программные вызовы.
+      text = String(text || '').slice(0, 2000).trim(); if (!text || !cur) return;
       push({ who: 'me', text: text });
       showTyping();
       var delay = reduceMotion ? 0 : (800 + Math.random() * 700); // 0.8–1.5с
@@ -2821,6 +2823,31 @@
       });
     }
     init();
+  })();
+
+  /* ============================================================
+     Экранная клавиатура (iOS/Android): фиксированные листы не сжимаются
+     сами, поэтому пишем высоту клавиатуры в --kbh (visualViewport) —
+     CSS поджимает открытый лист снизу, композер чата остаётся видимым.
+     ============================================================ */
+  (function keyboardInset() {
+    var vv = window.visualViewport;
+    if (!vv) return;
+    var root = document.documentElement;
+    function apply() {
+      var kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      root.style.setProperty('--kbh', kb > 40 ? kb + 'px' : '0px');
+      if (kb > 40) {
+        var ae = document.activeElement;
+        if (ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName) && ae.closest('.win')) {
+          ae.scrollIntoView({ block: 'nearest' });
+          var th = document.getElementById('msgThread');
+          if (th) th.scrollTop = th.scrollHeight;
+        }
+      }
+    }
+    vv.addEventListener('resize', apply);
+    vv.addEventListener('scroll', apply);
   })();
 
   /* ============================================================

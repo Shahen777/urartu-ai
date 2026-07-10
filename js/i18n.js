@@ -296,6 +296,7 @@
 
       /* Звонок */
       'call.title': 'Звонок', 'call.short': 'Позвонить',
+      'call.av': 'ШК', 'call.name': 'Шаген Казарян',
       'call.role': 'Urartu AI · внедрение локального ИИ',
       'call.audio': 'Аудиозвонок', 'call.video': 'Видеозвонок',
       'call.audioAria': 'Позвонить голосом', 'call.videoAria': 'Позвонить с видео',
@@ -345,10 +346,12 @@
       'reg.title': 'Регламенты',
       'reg.f1': 'Регламент договорной работы.pdf', 'reg.f2': 'Положение о персональных данных.pdf',
       'reg.f3': 'Регламент согласования закупок.pdf', 'reg.f4': 'Инструкция по документообороту.pdf',
+      'reg.s1': '240&nbsp;КБ', 'reg.s2': '180&nbsp;КБ', 'reg.s3': '96&nbsp;КБ', 'reg.s4': '312&nbsp;КБ',
       'reg.note': 'На пилоте здесь будут ваши документы — ассистент отвечает только по ним.',
       'kb.title': 'База знаний',
       'kb.f1': 'Типовые договоры.pdf', 'kb.f2': 'Чек-листы проверки.pdf',
       'kb.f3': 'Шаблоны писем и претензий.pdf', 'kb.f4': 'Внутренние стандарты.pdf',
+      'kb.s1': '1.2&nbsp;МБ', 'kb.s2': '88&nbsp;КБ', 'kb.s3': '54&nbsp;КБ', 'kb.s4': '420&nbsp;КБ',
       'kb.note': 'На пилоте здесь будут ваши документы — векторный индекс строится локально.',
       'finder.name': 'Имя', 'finder.meta': 'Размер · Дата',
 
@@ -377,7 +380,7 @@
 
       /* G1 — WebLLM (настоящая локальная модель) */
       'ai.llm.btn': 'Запустить настоящий локальный ИИ',
-      'ai.llm.hint': 'Модель скачается один раз ({size}) и работает офлайн в браузере — как у вас на сервере.',
+      'ai.llm.hint': 'Модель скачается один раз ({size}, с внешнего CDN jsDelivr/HuggingFace) и дальше работает офлайн в браузере — как у вас на сервере.',
       'ai.llm.loading': 'Устанавливаю модель…',
       'ai.llm.ready': 'Настоящая локальная модель работает в вашем браузере. Откройте вкладку Network — данные никуда не уходят.',
       'ai.llm.err': 'Не удалось загрузить модель (нужен интернет для первого скачивания). Работаю на локальном поиске и сценариях.',
@@ -739,7 +742,7 @@
       'as.feat.eb': 'FEATURED · APP OF THE WEEK',
       'as.feat.h': 'AI employee 24/7',
       'as.feat.p': 'A digital employee on your own server: answers by your policies, checks contracts, runs support. Never sleeps, never leaks your data.',
-      'as.feat.meta': 'From 150,000 ₽ to deploy',
+      'as.feat.meta': 'From $1,500 to deploy',
       'as.sec.live': 'Our live products',
       'as.p.game.name': 'Game “Assemble 70B”',
       'as.p.game.sub': 'Merge models up to 70B — playable',
@@ -806,6 +809,7 @@
 
       /* Call */
       'call.title': 'Call', 'call.short': 'Call',
+      'call.av': 'SK', 'call.name': 'Shahen Kazaryan',
       'call.role': 'Urartu AI · on-premise AI deployment',
       'call.audio': 'Audio call', 'call.video': 'Video call',
       'call.audioAria': 'Start an audio call', 'call.videoAria': 'Start a video call',
@@ -855,10 +859,12 @@
       'reg.title': 'Policies',
       'reg.f1': 'Contract workflow policy.pdf', 'reg.f2': 'Personal data regulation.pdf',
       'reg.f3': 'Procurement approval policy.pdf', 'reg.f4': 'Document management guide.pdf',
+      'reg.s1': '240&nbsp;KB', 'reg.s2': '180&nbsp;KB', 'reg.s3': '96&nbsp;KB', 'reg.s4': '312&nbsp;KB',
       'reg.note': 'During the pilot your own documents live here — the assistant answers only from them.',
       'kb.title': 'Knowledge base',
       'kb.f1': 'Standard contracts.pdf', 'kb.f2': 'Review checklists.pdf',
       'kb.f3': 'Letter & claim templates.pdf', 'kb.f4': 'Internal standards.pdf',
+      'kb.s1': '1.2&nbsp;MB', 'kb.s2': '88&nbsp;KB', 'kb.s3': '54&nbsp;KB', 'kb.s4': '420&nbsp;KB',
       'kb.note': 'During the pilot your own documents live here — the vector index is built locally.',
       'finder.name': 'Name', 'finder.meta': 'Size · Date',
 
@@ -887,7 +893,7 @@
 
       /* G1 — WebLLM (real local model) */
       'ai.llm.btn': 'Run a real local AI',
-      'ai.llm.hint': 'The model downloads once ({size}) and then runs offline in your browser — same as on your server.',
+      'ai.llm.hint': 'The model downloads once ({size}, from the external jsDelivr/HuggingFace CDN) and then runs offline in your browser — same as on your server.',
       'ai.llm.loading': 'Installing the model…',
       'ai.llm.ready': 'A real local model is running in your browser. Open the Network tab — no data leaves the page.',
       'ai.llm.err': 'Could not load the model (internet is needed for the first download). Falling back to local search and scenarios.',
@@ -982,7 +988,7 @@
       'fab.copy': 'Copy', 'fab.copied': 'Copied ✓',
       'fab.needTopic': 'Enter a topic — and the pipeline starts.',
       'fab.sellH': 'The Factory — inside your perimeter',
-      'fab.sell': 'A publishing calendar, your tone, your products, one-click approval. Articles, posts, newsletters — every day, no burnout. From 50,000 ₽/mo.',
+      'fab.sell': 'A publishing calendar, your tone, your products, one-click approval. Articles, posts, newsletters — every day, no burnout. From $500/mo.',
       'fab.cta': 'Book a demo',
       'as.p.fab.name': 'Content Factory', 'as.p.fab.sub': 'Posts, product cards and review replies',
 
@@ -1006,7 +1012,7 @@
       'ai.p': 'Free test: a voice conversation from your browser — like a phone call.',
       'ai.badge': 'AI · 24/7',
       'ai.call': 'Call the AI',
-      'ai.note': 'This is a demo in your browser. The real Secretary runs on the company server, makes phone calls and knows your knowledge base — from 200,000 ₽.',
+      'ai.note': 'This is a demo in your browser. The real Secretary runs on the company server, makes phone calls and knows your knowledge base — from $2,000.',
       'ai.name': 'Urartu AI Secretary',
       'ai.mute': 'Mic',
       'ai.end': 'End',
