@@ -30,14 +30,33 @@
 
   var healthy = null;         // null=неизвестно, true, false
   var checkedAt = 0;
+  var sameOriginTried = false;
+
+  function probe(b) {
+    return fetch(b + '/api/health', { method: 'GET' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { return !!(j && j.ok && j.has_key); })
+      .catch(function () { return false; });
+  }
 
   function available() {
-    if (!base) return Promise.resolve(false);
     if (healthy !== null && (Date.now() - checkedAt) < 60000) return Promise.resolve(healthy);
-    return fetch(base + '/api/health', { method: 'GET' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { healthy = !!(j && j.ok && j.has_key); checkedAt = Date.now(); return healthy; })
-      .catch(function () { healthy = false; checkedAt = Date.now(); return false; });
+    if (base) {
+      return probe(base).then(function (ok) { healthy = ok; checkedAt = Date.now(); return ok; });
+    }
+    /* без явного адреса: если сайт и агент опубликованы на одном хосте
+       (напр. сайт-ОС и агент развёрнуты вместе на VPS), находим агента
+       рядом — на том же домене, без ручной настройки. */
+    if (!sameOriginTried) {
+      sameOriginTried = true;
+      return probe('').then(function (ok) {
+        healthy = ok; checkedAt = Date.now();
+        if (ok) base = '';
+        return ok;
+      });
+    }
+    healthy = false; checkedAt = Date.now();
+    return Promise.resolve(false);
   }
 
   function reply(agent, message, history, voice) {
