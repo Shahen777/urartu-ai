@@ -11,6 +11,12 @@
       'meta.title': 'Локальные ИИ-сотрудники 24/7 для бизнеса — свой ИИ на вашем сервере | 152-ФЗ | Urartu AI',
       'meta.desc': 'Внедряем локальных ИИ-сотрудников 24/7: цифровые агенты на сервере компании — отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Данные не уходят в облако. Локальный ИИ, 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.',
 
+      /* меню-бар: сгруппированные меню */
+      'mb.product': 'Продукт', 'mb.company': 'Компания', 'mb.help': 'Помощь', 'mb.contact': 'Связаться',
+      'mb.staff': 'Сотрудники', 'mb.allservices': 'Все услуги', 'mb.devices': 'Устройства',
+      'mb.calc': 'Калькулятор', 'mb.appstore': 'App Store', 'mb.calendar': 'Записаться на демо',
+      'mb.game': 'Игра',
+
       /* меню / статус */
       'menu.assistant': 'Сообщения', 'menu.how': 'Как работает', 'menu.who': 'Кому',
       'menu.pricing': 'Тарифы', 'menu.faq': 'Вопросы', 'menu.about': 'О нас', 'menu.mail': 'Контакты',
@@ -456,7 +462,7 @@
       'voice.aria': 'Голосовой ввод — поговорить с Секретарём',
       'voice.listen': 'Говорите — я слушаю…',
       'ai.voice': 'Голос', 'ai.voicetest': 'Так звучит мой голос. Слушаю вас.',
-      'ai.voicehint': 'Голос звучит роботом? macOS: Системные настройки → Универсальный доступ → Устная речь → загрузите улучшенный голос «Милена». В Chrome живой голос подтягивается сам.',
+      'ai.voicehint': 'Голос звучит роботом? Нажмите «Живой голос» на экране вызова — нейросетевой голос считается прямо на вашем устройстве. Или в macOS загрузите «Милена (улучшенный)».',
       'voice.nosr.say': 'Здравствуйте! Говорить я умею, но этот браузер не умеет меня слушать. Откройте сайт в Chrome или Safari — и поговорим.',
       'voice.nosr': 'Голосовой ввод работает в Chrome и Safari — в этом браузере нет API распознавания речи. Напишите текстом: отвечу так же.',
       'voice.denied': 'Микрофон не разрешён. Разрешите доступ в настройках браузера и нажмите микрофон снова.',
@@ -518,6 +524,32 @@
       'ai.fb.chat': 'Текстовый чат с Секретарём',
       'ai.fb.back': 'Назад',
 
+      /* H1 — нейросетевой голос (VITS, локально) */
+      'nv.btn': 'Живой голос (60 МБ, один раз)',
+      'nv.btn.loading': 'Загружаю нейросетевой голос…',
+      'nv.btn.on': 'Нейросетевой голос включён',
+      'nv.err': 'Не получилось — попробовать ещё раз',
+      'nv.done': 'Загружено — теперь работает офлайн',
+      'nv.mb': 'МБ',
+      'nv.note': 'Голос синтезируется на вашем устройстве — ни звука наружу. У клиентов этот же движок стоит на их сервере — от 200 000 ₽.',
+      'nv.cc': 'Живой голос',
+      'nv.cc.off': '60 МБ один раз — дальше офлайн',
+      'nv.cc.load': 'загрузка…',
+      'nv.cc.on': 'нейросетевой · локально',
+      'ai.mode.sys': 'Голос: системный',
+      'ai.mode.neural': 'Голос: нейросетевой, локально',
+
+      /* H2 — 3D-аватар */
+      'ai.face': 'Аватар',
+      'ai.face.hint': 'Видео-аватар: ~0,75 МБ, 3D-рендер на вашем устройстве — наружу ничего не уходит.',
+      'ai.face.weak': 'Видео-аватар отключён: устройству не хватает мощности (меньше 30 кадров/с). Пульсирующий аватар остаётся.',
+
+      /* H3 — честный индикатор слуха */
+      'ai.hear.browser': 'Слух: браузерный — звук уходит в Google',
+      'ai.hear.local': 'Слух: локальный — ничего не уходит',
+      'ai.hear.pop': 'Распознавание речи в этом демо делает браузер: Chrome отправляет звук в Google. Наши боевые внедрения слушают локально — звук не покидает сервер компании. Полностью локальный слух прямо в браузере (модель ~45 МБ) появится здесь в следующем обновлении.',
+      'ai.hear.soon': 'Локальный слух (~45 МБ) — скоро',
+
       /* G6 — кнопка на карточке Секретаря */
       'try.voice': 'Позвонить сейчас'
     },
@@ -526,6 +558,12 @@
       /* meta */
       'meta.title': 'Local AI Employees, working 24/7 — On-Premise AI for Business | 152-FZ | Urartu AI',
       'meta.desc': 'We deploy local AI employees that work 24/7 — digital agents on your own server: answer from your policies, review contracts and run customer support. On-premise AI, never sends data to the cloud. 152-FZ compliant. Pilot in 2 weeks. Moscow and all of Russia.',
+
+      /* menu bar: grouped menus */
+      'mb.product': 'Product', 'mb.company': 'Company', 'mb.help': 'Help', 'mb.contact': 'Contact',
+      'mb.staff': 'Employees', 'mb.allservices': 'All services', 'mb.devices': 'Devices',
+      'mb.calc': 'Calculator', 'mb.appstore': 'App Store', 'mb.calendar': 'Book a demo',
+      'mb.game': 'Game',
 
       /* menu / status */
       'menu.assistant': 'Messages', 'menu.how': 'How it works', 'menu.who': "Who it's for",
@@ -972,7 +1010,7 @@
       'voice.aria': 'Voice input — talk to the Secretary',
       'voice.listen': 'Speak — I am listening…',
       'ai.voice': 'Voice', 'ai.voicetest': 'This is how my voice sounds. I am listening.',
-      'ai.voicehint': 'Voice sounds robotic? On macOS: System Settings → Accessibility → Spoken Content → download an enhanced voice. Chrome loads a natural voice on its own.',
+      'ai.voicehint': 'Voice sounds robotic? Tap “Neural voice” on the call screen — a neural voice (Russian) runs right on your device. Or download an enhanced system voice on macOS.',
       'voice.nosr.say': 'Hello! I can speak, but this browser cannot hear me. Open the site in Chrome or Safari and we will talk.',
       'voice.nosr': 'Voice input works in Chrome and Safari — this browser has no speech-recognition API. Type your message instead: I answer the same way.',
       'voice.denied': 'Microphone is not allowed. Grant access in the browser settings and press the mic again.',
@@ -1033,6 +1071,32 @@
       'ai.human': 'Connecting you with Shagen in Telegram — continue there.',
       'ai.fb.chat': 'Text chat with the Secretary',
       'ai.fb.back': 'Back',
+
+      /* H1 — neural voice (VITS, on-device) */
+      'nv.btn': 'Neural voice (60 MB, one time)',
+      'nv.btn.loading': 'Loading the neural voice…',
+      'nv.btn.on': 'Neural voice is on',
+      'nv.err': 'Failed — try again',
+      'nv.done': 'Downloaded — now works offline',
+      'nv.mb': 'MB',
+      'nv.note': 'The voice is synthesized on your device — not a sound leaves it. Our clients run this same engine on their own servers — from $2,000.',
+      'nv.cc': 'Neural voice',
+      'nv.cc.off': '60 MB once — offline afterwards',
+      'nv.cc.load': 'loading…',
+      'nv.cc.on': 'neural · on-device',
+      'ai.mode.sys': 'Voice: system',
+      'ai.mode.neural': 'Voice: neural, on-device',
+
+      /* H2 — 3D avatar */
+      'ai.face': 'Avatar',
+      'ai.face.hint': 'Video avatar: ~0.75 MB, 3D rendered on your device — nothing leaves it.',
+      'ai.face.weak': 'Video avatar turned off: the device can’t keep 30 fps. The pulsing avatar stays on.',
+
+      /* H3 — honest hearing indicator */
+      'ai.hear.browser': 'Hearing: browser — audio goes to Google',
+      'ai.hear.local': 'Hearing: local — nothing leaves',
+      'ai.hear.pop': 'Speech recognition in this demo is done by the browser: Chrome sends the audio to Google. Our production deployments listen locally — audio never leaves the company server. Fully local in-browser hearing (a ~45 MB model) is coming in the next update.',
+      'ai.hear.soon': 'Local hearing (~45 MB) — coming soon',
 
       /* G6 — Secretary card button */
       'try.voice': 'Call now'

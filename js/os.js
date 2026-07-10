@@ -630,12 +630,69 @@
   initAgentsFs();
   initGameFs();
 
+  /* ---------- МЕНЮ-БАР: выпадающие списки (как в macOS) ----------
+     Двенадцать плоских пунктов не помещались в строку и переносились.
+     Сгруппированы в пять меню. Клик открывает; пока одно открыто,
+     наведение на соседнее переключает — как в настоящей строке меню. */
+  var menus = Array.prototype.slice.call(document.querySelectorAll('.mb-menu'));
+
+  function closeMenus() {
+    menus.forEach(function (m) {
+      m.classList.remove('is-open');
+      var d = m.querySelector('.mb-menu__d'); if (d) d.hidden = true;
+      var t = m.querySelector('.mb-menu__t'); if (t) t.setAttribute('aria-expanded', 'false');
+    });
+  }
+  function openMenu(m) {
+    closeMenus();
+    m.classList.add('is-open');
+    var d = m.querySelector('.mb-menu__d'); if (d) d.hidden = false;
+    var t = m.querySelector('.mb-menu__t'); if (t) t.setAttribute('aria-expanded', 'true');
+  }
+  function anyMenuOpen() { return menus.some(function (m) { return m.classList.contains('is-open'); }); }
+
+  menus.forEach(function (m) {
+    var t = m.querySelector('.mb-menu__t');
+    if (!t) return;
+    t.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (m.classList.contains('is-open')) closeMenus(); else openMenu(m);
+    });
+    m.addEventListener('mouseenter', function () { if (anyMenuOpen()) openMenu(m); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); openMenu(m);
+        var first = m.querySelector('.mb-menu__i'); if (first) first.focus();
+      }
+    });
+    m.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      var items = Array.prototype.slice.call(m.querySelectorAll('.mb-menu__i'));
+      var i = items.indexOf(document.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
+    });
+  });
+
+  if (menus.length) {
+    document.addEventListener('click', function (e) { if (!e.target.closest('.mb-menu')) closeMenus(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && anyMenuOpen()) {
+        var open = menus.filter(function (m) { return m.classList.contains('is-open'); })[0];
+        closeMenus();
+        var t = open && open.querySelector('.mb-menu__t'); if (t) t.focus();
+      }
+    });
+  }
+
   /* ---------- ТРИГГЕРЫ ОТКРЫТИЯ ---------- */
   document.addEventListener('click', function (e) {
     var t = e.target.closest('[data-win]');
     if (!t) return;
     e.preventDefault();
     closeCC();
+    closeMenus();
     openWindow(t.dataset.win, t);
   });
 
@@ -2529,11 +2586,121 @@
   window.Push = Push;
 
   /* ============================================================
+     H1 — «ЖИВОЙ ГОЛОС»: нейросетевой русский TTS (Piper/VITS) на
+     устройстве посетителя. Модель 60 МБ грузится ТОЛЬКО по явной
+     кнопке (экран звонка или Пункт управления) с прогрессом и
+     кешируется в CacheStorage — со второго раза офлайн и мгновенно.
+     Тяжёлый код (js/voice.js + vendor/vits + vendor/ort) подключается
+     лениво: на старте страницы — ноль лишних байтов и запросов.
+     ============================================================ */
+  var NV = (function () {
+    var st = 'off'; // off | loading | ready | error
+    var supported = !!(window.WebAssembly && window.caches && ('noModule' in HTMLScriptElement.prototype));
+    var scriptP = null;
+    var pct = 0, mbL = 0, mbT = 60.3;
+
+    function $(id) { return document.getElementById(id); }
+    function flag() { try { return localStorage.getItem('nvOn') === '1'; } catch (e) { return false; } }
+    function setFlag(v) { try { localStorage.setItem('nvOn', v ? '1' : '0'); } catch (e) {} }
+
+    function loadScript() {
+      if (window.NeuralVoice) return Promise.resolve();
+      if (scriptP) return scriptP;
+      scriptP = new Promise(function (res, rej) {
+        var s = document.createElement('script');
+        s.src = 'js/voice.js';
+        s.onload = function () { if (window.NeuralVoice) res(); else rej(new Error('voice.js: no NeuralVoice')); };
+        s.onerror = function () { scriptP = null; rej(new Error('voice.js load failed')); };
+        document.head.appendChild(s);
+      });
+      return scriptP;
+    }
+
+    function setKey(el, key) { if (el) { el.setAttribute('data-i18n', key); el.textContent = tr(key); } }
+
+    function render() {
+      var btn = $('nvBtn'), lbl = $('nvBtnLabel'), prog = $('nvProg'), fill = $('nvFill'), pctEl = $('nvPct'), sub = $('ccxVoiceSub');
+      if (st === 'loading') {
+        if (btn) btn.disabled = true;
+        setKey(lbl, 'nv.btn.loading');
+        if (prog) prog.hidden = false;
+        if (fill) fill.style.width = pct + '%';
+        if (pctEl) { pctEl.removeAttribute('data-i18n'); pctEl.textContent = pct + '% · ' + mbL.toFixed(1) + ' / ' + mbT.toFixed(1) + ' ' + tr('nv.mb'); }
+        if (sub) { sub.removeAttribute('data-i18n'); sub.textContent = tr('nv.cc.load') + ' ' + pct + '%'; }
+      } else if (st === 'ready') {
+        if (btn) { btn.disabled = true; btn.classList.add('is-on'); }
+        setKey(lbl, 'nv.btn.on');
+        if (prog) prog.hidden = false;
+        if (fill) fill.style.width = '100%';
+        setKey(pctEl, 'nv.done');
+        setKey(sub, 'nv.cc.on');
+      } else if (st === 'error') {
+        if (btn) btn.disabled = false;
+        setKey(lbl, 'nv.err');
+        if (prog) prog.hidden = true;
+        setKey(sub, 'nv.cc.off');
+      } else {
+        if (btn) btn.disabled = false;
+        setKey(lbl, 'nv.btn');
+        if (prog) prog.hidden = true;
+        setKey(sub, 'nv.cc.off');
+      }
+    }
+
+    function enable() {
+      if (!supported || st === 'loading' || st === 'ready') return;
+      st = 'loading'; pct = 0; mbL = 0; render();
+      loadScript().then(function () {
+        return window.NeuralVoice.enable(function (p) {
+          if (p && p.total) {
+            mbT = p.total / 1048576; mbL = p.loaded / 1048576;
+            pct = Math.min(100, Math.round(p.loaded / p.total * 100));
+          }
+          if (p && p.phase === 'warm') { pct = 100; mbL = mbT; }
+          render();
+        });
+      }).then(function () {
+        st = 'ready'; setFlag(true); render();
+        try { document.dispatchEvent(new Event('nv:ready')); } catch (e) {}
+      }, function (err) {
+        st = 'error'; render();
+        try { console.warn('[NV] enable failed:', err); } catch (e) {}
+      });
+    }
+
+    /* пользователь уже включал голос → тихо поднимаем из кеша (офлайн) */
+    function maybeAuto() { if (supported && st === 'off' && flag()) enable(); }
+
+    function ready() { return st === 'ready' && !!window.NeuralVoice && window.NeuralVoice.state() === 'ready'; }
+
+    function init() {
+      var btn = $('nvBtn'), block = $('nvBlock'), ccx = $('ccxVoice');
+      if (supported) {
+        if (block) block.hidden = false;
+        if (ccx) ccx.hidden = false;
+      }
+      if (btn) btn.addEventListener('click', enable);
+      if (ccx) ccx.addEventListener('click', function () {
+        if (st === 'off' || st === 'error') enable();
+        else openWindow('win-call', ccx);
+      });
+      document.addEventListener('i18n:change', render);
+      render();
+    }
+    init();
+    return { enable: enable, maybeAuto: maybeAuto, ready: ready, state: function () { return st; }, supported: supported };
+  })();
+  window.NV = NV;
+
+  /* ============================================================
      G4 — «ПОЗВОНИТЬ ИИ-СЕКРЕТАРЮ»: живой голосовой звонок в браузере
      getUserMedia → гудок → TTS-приветствие → SpeechRecognition →
      LocalAI.ask('secretary') → ответ голосом. Всё локально, кроме
      системных голосов ОС. Честные фолбэки: нет распознавания (Firefox),
      нет микрофона, нет русского голоса (тогда субтитры).
+
+     H1/H2/H3: приоритет речи VITS → системный; 3D-лицо с липсинком
+     (лениво, three.js); честные индикаторы «Голос» и «Слух».
      ============================================================ */
   var VoiceCall = (function () {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2541,9 +2708,93 @@
     var stream = null, actx = null, analyser = null, raf = 0;
     var rec = null, recWanted = false;
     var t0 = 0, tInt = 0, silT = 0, iosT = 0;
+    var face = null, faceLoading = false, sysPulse = 0;
 
     function $(id) { return document.getElementById(id); }
-    function setStatus(key) { var s = $('aiStatus'); if (s) s.textContent = tr(key); }
+    function setStatus(key) {
+      var s = $('aiStatus'); if (s) s.textContent = tr(key);
+      if (face) {
+        var m = { 'ai.st.listen': 'listen', 'ai.st.think': 'think', 'ai.st.speak': 'speak' };
+        try { face.setState(m[key] || 'idle'); } catch (e) {}
+      }
+    }
+
+    /* H1/H3 — честные индикаторы: чем говорит и чем слушает демо */
+    function syncModes() {
+      var vt = $('aiVoiceModeTxt'), vd = $('aiVoiceDot');
+      var neural = window.NV && NV.ready() && lang() === 'ru';
+      var key = neural ? 'ai.mode.neural' : 'ai.mode.sys';
+      if (vt) { vt.setAttribute('data-i18n', key); vt.textContent = tr(key); }
+      if (vd) vd.classList.toggle('aicall__dot--ok', !!neural);
+    }
+
+    /* H2 — уровень речи 0..1 для липсинка: RMS от VITS,
+       сглаженная синусоида + boundary-пульс для системного голоса */
+    function faceLevel() {
+      if (window.NeuralVoice && window.NeuralVoice.speaking()) return window.NeuralVoice.rms();
+      if (speakingNow) {
+        sysPulse *= 0.94;
+        return Math.max(0, Math.min(1, 0.22 + 0.18 * Math.sin(Date.now() / 90) + sysPulse * 0.5));
+      }
+      return 0;
+    }
+
+    function faceFlag() { try { return localStorage.getItem('faceOn') === '1'; } catch (e) { return false; } }
+    function setFaceFlag(v) { try { localStorage.setItem('faceOn', v ? '1' : '0'); } catch (e) {} }
+
+    /* бюджет: на слабом мобильном 3D-лицо не предлагаем вовсе */
+    function faceCapable() {
+      try {
+        if (!('noModule' in HTMLScriptElement.prototype)) return false;
+        var coarse = window.matchMedia('(pointer: coarse)').matches;
+        if (coarse && (navigator.deviceMemory || 8) < 4) return false;
+        var c = document.createElement('canvas');
+        var gl = c.getContext('webgl2');
+        if (!gl) return false;
+        var lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext();
+        return true;
+      } catch (e) { return false; }
+    }
+
+    function faceOn() {
+      if (face || faceLoading) return;
+      faceLoading = true;
+      var box = $('aiFaceBox'), ava = $('aiAvaWrap'), btn = $('aiFace'), hint = $('aiFaceHint');
+      var url = new URL('js/face3d.mjs', location.href).href;
+      (new Function('u', 'return import(u)'))(url).then(function (mod) {
+        return mod.init({
+          container: box,
+          getLevel: faceLevel,
+          onWeak: function () {
+            faceOff();
+            var h = $('aiFaceHint'), b = $('aiFace');
+            if (h) { h.setAttribute('data-i18n', 'ai.face.weak'); h.textContent = tr('ai.face.weak'); h.hidden = false; }
+            if (b) b.hidden = true;
+          }
+        }).then(function () { return mod; });
+      }).then(function (mod) {
+        faceLoading = false;
+        face = mod;
+        if (box) box.hidden = false;
+        if (ava) ava.hidden = true;
+        if (btn) { btn.classList.add('is-on'); btn.setAttribute('aria-pressed', 'true'); }
+        if (hint) hint.hidden = true;
+        setFaceFlag(true);
+        try { face.setState(speakingNow ? 'speak' : 'idle'); } catch (e) {}
+      }, function (err) {
+        faceLoading = false;
+        try { console.warn('[Face3D] load failed:', err); } catch (e) {}
+      });
+    }
+
+    function faceOff(keepPref) {
+      var box = $('aiFaceBox'), ava = $('aiAvaWrap'), btn = $('aiFace');
+      if (face) { try { face.dispose(); } catch (e) {} face = null; }
+      if (box) { box.hidden = true; box.innerHTML = ''; }
+      if (ava) ava.hidden = false;
+      if (btn) { btn.classList.remove('is-on'); btn.setAttribute('aria-pressed', 'false'); }
+      if (!keepPref) setFaceFlag(false);
+    }
     function fmt(sec) { var m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
 
     /* субтитры: держим последние 2 реплики */
@@ -2589,6 +2840,22 @@
     function speak(text, then) {
       sub('ai', text);
       stopRec();
+
+      /* H1 — приоритет речи: нейросетевой VITS (если загружен) → системный */
+      if (window.NV && NV.ready() && lang() === 'ru' && window.NeuralVoice) {
+        speakingNow = true;
+        setStatus('ai.st.speak');
+        var wn = $('aiAvaWrap'); if (wn) wn.classList.add('is-talk');
+        window.NeuralVoice.speak(text, function () {
+          speakingNow = false;
+          if (wn) wn.classList.remove('is-talk');
+          if (face) { try { face.setState('idle'); } catch (e) {} }
+          if (!on) return;
+          if (then) then(); else listen();
+        });
+        return;
+      }
+
       if (!window.speechSynthesis) { setTimeout(function () { if (then) then(); else listen(); }, 900); return; }
       speakingNow = true;
       setStatus('ai.st.speak');
@@ -2617,6 +2884,8 @@
         u.rate = robotic ? 0.92 : 1.0;
         u.pitch = robotic ? 0.95 : 1.0;
         u.onend = u.onerror = finish;
+        /* H2 — событие границы слова → пульс рта у 3D-лица */
+        u.onboundary = function () { sysPulse = 1; };
 
         var started = false;
         u.onstart = function () { started = true; };
@@ -2792,6 +3061,19 @@
       home.hidden = true; fb.hidden = true; live.hidden = false;
       var mb = $('aiMute'); if (mb) { mb.classList.remove('is-off'); mb.setAttribute('aria-pressed', 'false'); }
       refreshVoiceUI();
+      /* H1: голос включали раньше → тихо поднимаем из кеша; индикаторы */
+      if (window.NV) NV.maybeAuto();
+      syncModes();
+      /* H2: 3D-аватар — только там, где потянет */
+      var fBtn = $('aiFace'), fHint = $('aiFaceHint');
+      if (faceCapable()) {
+        if (fBtn) fBtn.hidden = false;
+        if (fHint && !face) { fHint.hidden = false; }
+        if (faceFlag()) faceOn();
+      } else {
+        if (fBtn) fBtn.hidden = true;
+        if (fHint) fHint.hidden = true;
+      }
       var box = $('aiSubs'); if (box) box.innerHTML = '';
       try {
         actx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2816,6 +3098,8 @@
       on = false;
       stopRec();
       try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      try { if (window.NeuralVoice) window.NeuralVoice.stop(); } catch (e) {}
+      faceOff(true); // выключаем рендер, но помним выбор на следующий звонок
       if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } // ОСВОБОЖДАЕМ микрофон
       if (actx) { try { actx.close(); } catch (e) {} actx = null; analyser = null; }
       if (tInt) { clearInterval(tInt); tInt = 0; }
@@ -2847,6 +3131,18 @@
       });
       var back = $('aiFbBack'); if (back) back.addEventListener('click', function () { fb.hidden = true; home.hidden = false; });
       var fbChat = $('aiFbChat'); if (fbChat) fbChat.addEventListener('click', function () { fb.hidden = true; home.hidden = false; });
+      /* H2 — тумблер 3D-аватара */
+      var ftBtn = $('aiFace');
+      if (ftBtn) ftBtn.addEventListener('click', function () { if (face) faceOff(); else faceOn(); });
+      /* H3 — честный попап про слух */
+      var hearBtn = $('aiHearMode'), hearPop = $('aiHearPop');
+      if (hearBtn && hearPop) hearBtn.addEventListener('click', function () {
+        hearPop.hidden = !hearPop.hidden;
+        hearBtn.setAttribute('aria-expanded', hearPop.hidden ? 'false' : 'true');
+      });
+      /* индикатор голоса обновляется, когда нейроголос догрузился */
+      document.addEventListener('nv:ready', syncModes);
+      document.addEventListener('i18n:change', syncModes);
       /* закрытие окна «Звонок» завершает разговор и освобождает микрофон */
       var win = document.getElementById('win-call');
       if (win) win.addEventListener('click', function (e) {
@@ -2867,7 +3163,13 @@
       }
     }
     init();
-    return { end: end };
+    return {
+      end: end,
+      /* хуки для приёмочных тестов (безвредны в проде) */
+      faceStats: function () { return face ? face.stats() : null; },
+      faceLevel: faceLevel,
+      faceCapable: faceCapable
+    };
   })();
   window.VoiceCall = VoiceCall;
 

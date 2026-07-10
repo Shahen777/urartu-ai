@@ -244,18 +244,54 @@
     </svg>
     Urartu&nbsp;AI
   </span>
-  <button class="menu-item" data-win="win-assistant" data-i18n="menu.assistant">Ассистент</button>
-  <button class="menu-item" data-win="win-staff" data-i18n="menu.staff">Сотрудники</button>
-  <button class="menu-item" data-win="win-how" data-i18n="menu.how">Как работает</button>
-  <button class="menu-item" data-win="win-who" data-i18n="menu.who">Кому</button>
-  <button class="menu-item" data-win="win-pricing" data-i18n="menu.pricing">Тарифы</button>
-  <button class="menu-item" data-win="win-services" data-i18n="menu.services">Услуги</button>
-  <button class="menu-item" data-win="win-faq" data-i18n="menu.faq">Вопросы</button>
-  <button class="menu-item" data-win="win-portfolio" data-i18n="menu.portfolio">Портфолио</button>
-  <button class="menu-item" data-win="win-appstore" data-i18n="as.short">App Store</button>
-  <button class="menu-item" data-win="win-calendar" data-i18n="cal.title">Календарь</button>
-  <button class="menu-item" data-win="win-about" data-i18n="menu.about">О нас</button>
-  <button class="menu-item" data-win="win-mail" data-i18n="menu.mail">Контакты</button>
+
+  
+  <!-- Меню сгруппированы, как в macOS: 5 пунктов с выпадающими списками -->
+  <nav class="menubar__menus" id="menubarMenus" role="menubar" aria-label="Меню">
+    <div class="mb-menu">
+      <button class="mb-menu__t" type="button" aria-haspopup="true" aria-expanded="false" data-i18n="mb.product">Продукт</button>
+      <div class="mb-menu__d" role="menu" hidden>
+        <button class="mb-menu__i" role="menuitem" data-win="win-assistant" data-i18n="menu.assistant">Ассистент</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-staff" data-i18n="mb.staff">Сотрудники</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-agents" data-i18n="agents.short">ИИ-агенты</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-how" data-i18n="menu.how">Как работает</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-who" data-i18n="menu.who">Кому</button>
+      </div>
+    </div>
+    <div class="mb-menu">
+      <button class="mb-menu__t" type="button" aria-haspopup="true" aria-expanded="false" data-i18n="menu.services">Услуги</button>
+      <div class="mb-menu__d" role="menu" hidden>
+        <button class="mb-menu__i" role="menuitem" data-win="win-services" data-i18n="mb.allservices">Все услуги</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-pricing" data-i18n="menu.pricing">Тарифы</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-devices" data-i18n="mb.devices">Устройства</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-calc" data-i18n="mb.calc">Калькулятор</button>
+      </div>
+    </div>
+    <div class="mb-menu">
+      <button class="mb-menu__t" type="button" aria-haspopup="true" aria-expanded="false" data-i18n="mb.company">Компания</button>
+      <div class="mb-menu__d" role="menu" hidden>
+        <button class="mb-menu__i" role="menuitem" data-win="win-portfolio" data-i18n="menu.portfolio">Портфолио</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-about" data-i18n="menu.about">О нас</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-appstore" data-i18n="mb.appstore">App Store</button>
+      </div>
+    </div>
+    <div class="mb-menu">
+      <button class="mb-menu__t" type="button" aria-haspopup="true" aria-expanded="false" data-i18n="mb.help">Помощь</button>
+      <div class="mb-menu__d" role="menu" hidden>
+        <button class="mb-menu__i" role="menuitem" data-win="win-faq" data-i18n="menu.faq">Вопросы</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-terminal" data-i18n="sb.terminal">Терминал</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-game" data-i18n="mb.game">Игра</button>
+      </div>
+    </div>
+    <div class="mb-menu">
+      <button class="mb-menu__t" type="button" aria-haspopup="true" aria-expanded="false" data-i18n="mb.contact">Связаться</button>
+      <div class="mb-menu__d" role="menu" hidden>
+        <button class="mb-menu__i" role="menuitem" data-win="win-calendar" data-i18n="mb.calendar">Записаться на демо</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-call" data-i18n="call.short">Позвонить</button>
+        <button class="mb-menu__i" role="menuitem" data-win="win-mail" data-i18n="menu.mail">Контакты</button>
+      </div>
+    </div>
+  </nav>
 
   <div class="menubar__right">
     <span class="menubar__status"><span class="status-dot"></span><span data-i18n="status.local">ЛОКАЛЬНО · 152-ФЗ</span></span>
@@ -630,6 +666,19 @@
               <span data-i18n="ai.call">Позвонить ИИ</span>
             </button>
             <p class="aicall-card__note" data-i18n="ai.note">Это демо в вашем браузере. Настоящий Секретарь работает на сервере компании, звонит по телефону и знает вашу базу — от 200 000 ₽.</p>
+
+            <!-- H1: нейросетевой голос (VITS, локально) — грузится только по этой кнопке -->
+            <div class="nv" id="nvBlock" hidden>
+              <button class="nv__btn" id="nvBtn" type="button">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 12h2l2-5 3 10 3-14 3 12 2-6 1 3h2"/></svg>
+                <span id="nvBtnLabel" data-i18n="nv.btn">Живой голос (60 МБ, один раз)</span>
+              </button>
+              <div class="nv__prog" id="nvProg" hidden>
+                <div class="nv__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><i id="nvFill"></i></div>
+                <span class="nv__pct mono" id="nvPct">0%</span>
+              </div>
+              <p class="nv__note" id="nvNote" data-i18n="nv.note">Голос синтезируется на вашем устройстве — ни звука наружу. У клиентов этот же движок стоит на их сервере — от 200 000 ₽.</p>
+            </div>
           </div>
 
           <div class="call__card">
@@ -680,9 +729,20 @@
               <span class="aicall__wave aicall__wave--2" aria-hidden="true"></span>
               <span class="aicall__ava" aria-hidden="true"><svg viewBox="0 0 32 32" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="16" height="13" rx="4"/><circle cx="13" cy="16" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="16" r="1.6" fill="currentColor" stroke="none"/><path d="M13 20h6"/><line x1="16" y1="10" x2="16" y2="6"/><circle cx="16" cy="5" r="1.4"/><path d="M8 15H5.5M24 15h2.5"/></svg></span>
             </div>
+            <!-- H2: контейнер 3D-аватара (three.js, лениво) -->
+            <div class="aicall__face" id="aiFaceBox" hidden aria-hidden="true"></div>
             <h3 class="aicall__name" data-i18n="ai.name">ИИ-секретарь Урарту</h3>
             <div class="aicall__timer" id="aiTimer" aria-hidden="true">00:00</div>
             <div class="aicall__status" id="aiStatus">…</div>
+            <!-- H1/H3: честные индикаторы голоса и слуха -->
+            <div class="aicall__modes">
+              <span class="aicall__mode" id="aiVoiceMode"><i class="aicall__dot" id="aiVoiceDot" aria-hidden="true"></i><span id="aiVoiceModeTxt" data-i18n="ai.mode.sys">Голос: системный</span></span>
+              <button class="aicall__mode aicall__mode--btn" id="aiHearMode" type="button" aria-expanded="false"><i class="aicall__dot aicall__dot--warn" id="aiHearDot" aria-hidden="true"></i><span id="aiHearModeTxt" data-i18n="ai.hear.browser">Слух: браузерный — звук уходит в Google</span></button>
+            </div>
+            <div class="aicall__hearpop" id="aiHearPop" hidden>
+              <p data-i18n="ai.hear.pop">Распознавание речи в этом демо делает браузер: Chrome отправляет звук в Google. Наши боевые внедрения слушают локально — звук не покидает сервер компании. Полностью локальный слух прямо в браузере (модель ~45 МБ) появится здесь в следующем обновлении.</p>
+              <button class="aicall__hearsoon" id="aiHearSoon" type="button" disabled data-i18n="ai.hear.soon">Локальный слух (~45 МБ) — скоро</button>
+            </div>
             <div class="aicall__mic" aria-hidden="true"><i id="aiMicLevel"></i></div>
             <div class="aicall__subs" id="aiSubs" aria-live="polite"></div>
           </div>
@@ -695,12 +755,17 @@
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
               <span id="aiVoiceName" data-i18n="ai.voice">Голос</span>
             </button>
+            <button class="aicall__ctl" id="aiFace" type="button" hidden aria-pressed="false">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="15" cy="10.5" r="0.6" fill="currentColor" stroke="none"/><path d="M9 15q3 2.2 6 0"/></svg>
+              <span data-i18n="ai.face">Аватар</span>
+            </button>
             <button class="aicall__end" id="aiEnd" type="button">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 9c-2.6 0-5 .5-7.1 1.5-.6.3-1 .9-.9 1.6l.3 2.2c.1.6.6 1 1.2.9l3-.4c.5-.1.9-.5 1-1l.3-1.6c.7-.2 1.4-.2 2.2-.2s1.5.1 2.2.2l.3 1.6c.1.5.5.9 1 1l3 .4c.6.1 1.1-.3 1.2-.9l.3-2.2c.1-.7-.3-1.3-.9-1.6C17 9.5 14.6 9 12 9z"/></svg>
               <span data-i18n="ai.end">Завершить</span>
             </button>
           </div>
-          <p class="aicall__hint" id="aiVoiceHint" hidden data-i18n="ai.voicehint">Голос звучит роботом? В macOS: Системные настройки → Универсальный доступ → Устная речь → Системный голос → загрузите «Милена (улучшенный)». В Chrome живой голос подтягивается сам.</p>
+          <p class="aicall__hint" id="aiFaceHint" hidden data-i18n="ai.face.hint">Видео-аватар: ~0,75 МБ, 3D-рендер на вашем устройстве — наружу ничего не уходит.</p>
+          <p class="aicall__hint" id="aiVoiceHint" hidden data-i18n="ai.voicehint">Голос звучит роботом? Нажмите «Живой голос» на экране вызова — нейросетевой голос считается прямо на вашем устройстве. Или в macOS загрузите «Милена (улучшенный)».</p>
           <p class="aicall__honest" data-i18n="ai.note">Это демо в вашем браузере. Настоящий Секретарь работает на сервере компании, звонит по телефону и знает вашу базу — от 200 000 ₽.</p>
         </div>
 
@@ -1497,6 +1562,17 @@
         <span class="ccx__tile-txt">
           <span class="ccx__tile-t" data-i18n="call.short">Позвонить</span>
           <span class="ccx__tile-v" data-i18n="ccx.callHint">Аудио или видео из браузера</span>
+        </span>
+      </button>
+
+      <!-- H1: живой голос из Пункта управления -->
+      <button class="ccx__tile" id="ccxVoice" type="button" hidden>
+        <span class="ccx__tile-ic" aria-hidden="true" style="background:#BF5AF2">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M3 12h2l2-5 3 10 3-14 3 12 2-6 1 3h2"/></svg>
+        </span>
+        <span class="ccx__tile-txt">
+          <span class="ccx__tile-t" data-i18n="nv.cc">Живой голос</span>
+          <span class="ccx__tile-v" id="ccxVoiceSub" data-i18n="nv.cc.off">60 МБ один раз — дальше офлайн</span>
         </span>
       </button>
 

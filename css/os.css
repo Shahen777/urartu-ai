@@ -155,6 +155,39 @@ html.js .reveal.in{opacity:1;transition:opacity .25s var(--ease)}
   transition:background .15s var(--ease);
 }
 .menu-item:hover,.menu-item:focus-visible{background:var(--menu-hover);outline:none}
+
+/* ---------- Меню-бар: 5 пунктов с выпадающими списками (как в macOS) ---------- */
+.menubar__menus{display:flex;align-items:center;gap:1px}
+.mb-menu{position:relative}
+.mb-menu__t{
+  padding:3px 10px;border-radius:var(--r-6);font-size:13px;color:var(--text);
+  white-space:nowrap;transition:background .12s var(--ease);
+}
+.mb-menu__t:hover,.mb-menu__t:focus-visible{background:var(--menu-hover);outline:none}
+.mb-menu.is-open .mb-menu__t{background:var(--menu-hover)}
+
+.mb-menu__d{
+  position:absolute;top:calc(100% + 5px);left:0;z-index:9100;
+  min-width:206px;padding:5px;border-radius:10px;
+  background:var(--glass-window);
+  -webkit-backdrop-filter:blur(26px) saturate(1.5);backdrop-filter:blur(26px) saturate(1.5);
+  box-shadow:var(--sh-deep);
+  display:flex;flex-direction:column;
+  transform-origin:top left;
+  animation:mbDrop .14s var(--ease);
+}
+@keyframes mbDrop{from{opacity:0;transform:scale(.97) translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.mb-menu__d{animation:none}}
+
+.mb-menu__i{
+  display:block;width:100%;text-align:left;white-space:nowrap;
+  padding:6px 10px;border-radius:6px;font-size:13px;color:var(--text);
+  transition:background .1s linear,color .1s linear;
+}
+.mb-menu__i:hover,.mb-menu__i:focus-visible{background:#0A84FF;color:#fff;outline:none}
+
+@media (max-width:1200px){ .mb-menu__t{padding:3px 7px;font-size:12.5px} }
+@media (max-width:1023px){ .menubar__menus{display:none} }
 .menubar__right{margin-left:auto;display:flex;align-items:center;gap:12px;color:var(--text-mid)}
 .menubar__status{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(50,215,75,.7)}
@@ -1663,6 +1696,44 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
 #aiVoiceName{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .aicall-fb{max-width:430px;margin:0 auto;text-align:center;padding:22px 6px}
 .aicall-fb__t{font-size:13.5px;line-height:1.5;color:var(--text-mid)}
+
+/* ============================================================
+   H1 — «Живой голос» (нейросетевой TTS локально)
+   ============================================================ */
+.nv{margin-top:10px;padding-top:10px;border-top:1px solid var(--line, rgba(128,128,128,.18))}
+.nv__btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:9px 12px;border-radius:11px;border:1px solid rgba(191,90,242,.45);
+  background:rgba(191,90,242,.12);color:inherit;font:inherit;font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:background .15s ease,transform .15s ease}
+.nv__btn:hover:not(:disabled){background:rgba(191,90,242,.22);transform:translateY(-1px)}
+.nv__btn:disabled{cursor:default;opacity:.85}
+.nv__btn.is-on{border-color:rgba(50,215,75,.5);background:rgba(50,215,75,.12)}
+.nv__prog{display:flex;align-items:center;gap:10px;margin-top:8px}
+.nv__bar{flex:1 1 auto;height:6px;border-radius:3px;background:rgba(128,128,128,.22);overflow:hidden}
+.nv__bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,#BF5AF2,#32D74B);transition:width .25s ease}
+.nv__pct{flex:0 0 auto;font-size:10.5px;color:var(--text-dim);white-space:nowrap}
+.nv__note{margin:8px 0 0;font-size:10.5px;line-height:1.45;color:var(--text-dim)}
+
+/* H1/H3 — честные индикаторы «Голос» и «Слух» в экране разговора */
+.aicall__modes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:9px}
+.aicall__mode{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);
+  font-size:10.5px;color:rgba(255,255,255,.82)}
+.aicall__mode--btn{cursor:pointer;font:inherit;font-size:10.5px}
+.aicall__mode--btn:hover{background:rgba(255,255,255,.18)}
+.aicall__dot{width:7px;height:7px;border-radius:50%;background:#8E8E93;flex:0 0 auto}
+.aicall__dot--ok{background:#32D74B;box-shadow:0 0 6px rgba(50,215,75,.7)}
+.aicall__dot--warn{background:#FF9F0A;box-shadow:0 0 6px rgba(255,159,10,.6)}
+.aicall__hearpop{margin:8px auto 0;max-width:400px;padding:10px 12px;border-radius:12px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);text-align:left}
+.aicall__hearpop p{margin:0;font-size:11px;line-height:1.5;color:rgba(255,255,255,.85)}
+.aicall__hearsoon{display:block;margin-top:8px;padding:6px 10px;border-radius:9px;border:1px dashed rgba(255,255,255,.3);
+  background:none;color:rgba(255,255,255,.6);font:inherit;font-size:10.5px;cursor:default}
+
+/* H2 — 3D-аватар */
+.aicall__face{display:grid;place-items:center;margin-bottom:6px;min-height:200px}
+.aicall__face canvas{display:block;border-radius:18px}
+.aicall__ctl.is-on svg{background:#32D74B;color:#08300f}
 
 /* ============================================================
    G5 — фабрика контента
