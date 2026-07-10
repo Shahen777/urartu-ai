@@ -207,7 +207,7 @@
     </div>
     <div class="lock__widgets">
       <div class="lock__widget">
-        <span class="lock__wico" aria-hidden="true">🟢</span>
+        <span class="lock__wico" aria-hidden="true"><i class="lock__dot"></i></span>
         <div><b data-i18n="lock.w.title">ИИ-сотрудники · онлайн</b><span data-i18n="lock.w.sub">5 агентов на связи 24/7</span></div>
       </div>
     </div>
@@ -941,12 +941,15 @@
             <button class="agp__tab" role="tab" data-agp-tab="office" data-i18n="agents.tab.office">3D-офис</button>
           </div>
           <div class="agp__panes">
-            <section class="agp__pane is-on" data-agp-pane="team" id="agpTeam"></section>
-            <section class="agp__pane" data-agp-pane="tasks" id="agpTasks"></section>
-            <section class="agp__pane" data-agp-pane="office" id="agpOffice">
-              <p class="agp__officehint" data-i18n="agents.office.hint">Так многоагентная система выглядит «изнутри»: агенты передают задачи друг другу.</p>
-              <div class="agents" id="agentsStage"></div>
-              <p class="note mono agents__credit"><span data-i18n="agents.credit">Симуляция: открытый проект The Delegation, лицензия MIT</span> · <a href="https://github.com/arturitu/the-delegation" target="_blank" rel="noopener">github.com/arturitu/the-delegation</a></p>
+            <section class="agp__pane is-on" data-agp-pane="team" id="agpTeam" role="tabpanel" aria-labelledby="agpTab-team"></section>
+            <section class="agp__pane" data-agp-pane="tasks" id="agpTasks" role="tabpanel" aria-labelledby="agpTab-tasks"></section>
+            <section class="agp__pane" data-agp-pane="office" id="agpOffice" role="tabpanel" aria-labelledby="agpTab-office">
+              <div id="agpOfficeScene"></div>
+              <!-- Тяжёлая 3D-визуализация (The Delegation) — по кнопке -->
+              <div class="agp3d" id="agp3d" hidden>
+                <div class="agents" id="agentsStage"></div>
+                <p class="note mono agents__credit"><span data-i18n="agents.credit">Симуляция: открытый проект The Delegation, лицензия MIT</span> · <a href="https://github.com/arturitu/the-delegation" target="_blank" rel="noopener">github.com/arturitu/the-delegation</a></p>
+              </div>
             </section>
           </div>
         </div>

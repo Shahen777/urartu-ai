@@ -85,14 +85,23 @@
     }
   ];
 
+  /* SVG-глифы ролей (единый штрих, как у карточек сотрудников) */
+  var GLYPH = {
+    documoved: '<svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h9l5 5v19H9z"/><path d="M18 4v5h5"/><line x1="12.5" y1="15" x2="19.5" y2="15"/><line x1="12.5" y1="19" x2="19.5" y2="19"/><line x1="12.5" y1="23" x2="17" y2="23"/></svg>',
+    lawyer: '<svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l9 3v7c0 6-4 10-9 13-5-3-9-7-9-13V7z"/><path d="M12 15.5l3 3 5-6"/></svg>',
+    support: '<svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18v-2a9 9 0 0 1 18 0v2"/><path d="M7 18h2.5v6H8a3 3 0 0 1-3-3v0a3 3 0 0 1 2-2.8z"/><path d="M25 18h-2.5v6H24a3 3 0 0 0 3-3v0a3 3 0 0 0-2-2.8z"/><path d="M22.5 24v1a3 3 0 0 1-3 3H16"/></svg>',
+    secretary: '<svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="12.5" y="4" width="7" height="13" rx="3.5"/><path d="M9 14a7 7 0 0 0 14 0"/><line x1="16" y1="21" x2="16" y2="25"/><line x1="12" y1="25" x2="20" y2="25"/></svg>',
+    content: '<svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22l14-14 4 4-14 14-5 1z"/><path d="M17 11l4 4"/></svg>'
+  };
+
   /* Шаблоны ролей для «Создать агента» */
   function templates() {
     return [
-      { role: 'documoved', hue: 210, icon: '📄', title: L('Документовед', 'Document expert'), model: 'Qwen 14–32B', desc: L('отвечает по регламентам и базе', 'answers from your policies') },
-      { role: 'lawyer', hue: 16, icon: '⚖️', title: L('Юрист-проверяющий', 'Contract reviewer'), model: 'Qwen 32–70B', desc: L('проверяет договоры по чек-листу', 'reviews contracts by checklist') },
-      { role: 'support', hue: 150, icon: '💬', title: L('Оператор поддержки', 'Support operator'), model: 'Qwen 8–14B', desc: L('отвечает клиентам 24/7', 'answers customers 24/7') },
-      { role: 'secretary', hue: 262, icon: '📞', title: L('Секретарь-голос', 'Voice secretary'), model: L('малая + речь', 'small + speech'), desc: L('принимает звонки голосом', 'answers calls by voice') },
-      { role: 'content', hue: 330, icon: '✍️', title: L('Контент-менеджер', 'Content manager'), model: 'Qwen 32B', desc: L('пишет тексты в вашем стиле', 'writes copy in your voice') }
+      { role: 'documoved', hue: 210, icon: GLYPH.documoved, title: L('Документовед', 'Document expert'), model: 'Qwen 14–32B', desc: L('отвечает по регламентам и базе', 'answers from your policies') },
+      { role: 'lawyer', hue: 16, icon: GLYPH.lawyer, title: L('Юрист-проверяющий', 'Contract reviewer'), model: 'Qwen 32–70B', desc: L('проверяет договоры по чек-листу', 'reviews contracts by checklist') },
+      { role: 'support', hue: 150, icon: GLYPH.support, title: L('Оператор поддержки', 'Support operator'), model: 'Qwen 8–14B', desc: L('отвечает клиентам 24/7', 'answers customers 24/7') },
+      { role: 'secretary', hue: 262, icon: GLYPH.secretary, title: L('Секретарь-голос', 'Voice secretary'), model: L('малая + речь', 'small + speech'), desc: L('принимает звонки голосом', 'answers calls by voice') },
+      { role: 'content', hue: 330, icon: GLYPH.content, title: L('Контент-менеджер', 'Content manager'), model: 'Qwen 32B', desc: L('пишет тексты в вашем стиле', 'writes copy in your voice') }
     ];
   }
 
@@ -187,7 +196,8 @@
         '<span class="agcreate__ic">' + t.icon + '</span><b>' + esc(t.title) + '</b><span class="agcreate__rd">' + esc(t.desc) + '</span><span class="agcreate__rm">' + esc(t.model) + '</span></button>';
     }).join('');
     ov.innerHTML =
-      '<div class="agcreate__box" role="dialog" aria-label="' + esc(tr('agents.create.title')) + '">' +
+      '<div class="agcreate__box" role="dialog" aria-modal="true" aria-label="' + esc(tr('agents.create.title')) + '">' +
+        '<span class="agcreate__grab" aria-hidden="true"></span>' +
         '<h3 class="agcreate__h">' + esc(tr('agents.create.title')) + '</h3>' +
         '<p class="agcreate__sub">' + esc(tr('agents.create.sub')) + '</p>' +
         '<label class="agcreate__lbl">' + esc(tr('agents.create.role')) + '</label>' +
@@ -309,6 +319,93 @@
     pane.appendChild(list);
   }
 
+  /* ---------- вкладка «Офис»: наши сотрудники в перспективной сцене ---------- */
+  var officeBuilt = false, officeRO = null, officeTick = null;
+  var POS = ['tl', 'tr', 'ml', 'mr', 'bc']; // раскладка подов вокруг сервера (десктоп)
+  function renderOffice() {
+    var pane = document.getElementById('agpOfficeScene');
+    if (!pane) return;
+    if (officeBuilt) { drawWires(); return; }
+    officeBuilt = true;
+    pane.innerHTML = '';
+    var head = el('div', 'agp__head');
+    head.innerHTML = '<div><h2 class="agp__h2">' + esc(L('Офис в работе', 'The office at work')) + '</h2>' +
+      '<p class="agp__lead">' + esc(L('Те же сотрудники, что в команде. Все живут на вашем сервере и передают задачи друг другу — данные не уходят наружу.', 'The same team as above. They all run on your server and hand tasks to each other — data never leaves.')) + '</p></div>';
+    pane.appendChild(head);
+
+    var office = el('div', 'office');
+    office.innerHTML = '<div class="office__floor" aria-hidden="true"></div>' +
+      '<svg class="office__wires" aria-hidden="true"></svg>' +
+      '<div class="office__hub"><span class="office__hubglow"></span>' +
+        '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><line x1="7" y1="7" x2="7" y2="7"/><line x1="7" y1="17" x2="7" y2="17"/></svg>' +
+        '<b>' + esc(L('Ваш сервер', 'Your server')) + '</b><span>' + esc(L('локально · 152-ФЗ', 'on-prem · local')) + '</span></div>';
+    ROSTER.forEach(function (a, i) {
+      var nm = esc(tr(nameKeyOf(a.id)));
+      var pod = el('div', 'office__pod office__pod--' + POS[i]);
+      pod.style.setProperty('--hue', a.hue);
+      pod.setAttribute('data-pod', a.id);
+      pod.innerHTML =
+        '<div class="office__bubble"><span></span></div>' +
+        '<div class="office__seat">' +
+          '<span class="office__ava"><img src="' + avaSrc(a.id) + '" alt="" width="76" height="76" loading="lazy" decoding="async"><i class="office__live"></i></span>' +
+          '<b class="office__name">' + nm + '</b>' +
+          '<span class="office__role">' + esc(tr(roleKeyOf(a.id))) + '</span>' +
+        '</div>' +
+        '<span class="office__desk" aria-hidden="true"></span>';
+      office.appendChild(pod);
+      var sp = pod.querySelector('.office__bubble span');
+      var ix = 0; sp.textContent = a.tasks[0];
+      pod.__tick = function () { ix = (ix + 1) % a.tasks.length; sp.textContent = a.tasks[ix]; };
+    });
+    pane.appendChild(office);
+
+    /* кнопка «показать 3D» */
+    var btn = el('button', 'office__3dbtn');
+    btn.type = 'button';
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg><span>' + esc(tr('agents.office.open')) + '</span>';
+    btn.addEventListener('click', function () {
+      var box = document.getElementById('agp3d');
+      if (box) { box.hidden = false; box.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); }
+      if (window.__ensureAgentsFrame) window.__ensureAgentsFrame();
+      btn.disabled = true; btn.classList.add('is-loaded');
+    });
+    pane.appendChild(btn);
+
+    requestAnimationFrame(drawWires);
+    if (window.ResizeObserver && !officeRO) {
+      officeRO = new ResizeObserver(function () { drawWires(); });
+      officeRO.observe(office);
+    }
+    if (!officeTick) officeTick = setInterval(function () {
+      var win = document.getElementById('win-agents');
+      var op = document.getElementById('agpOffice');
+      if (!win || !win.classList.contains('is-open') || document.hidden || !op || !op.classList.contains('is-on')) return;
+      pane.querySelectorAll('.office__pod').forEach(function (p) { if (p.__tick) p.__tick(); });
+    }, 3400);
+  }
+  function reduceMotion() { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  function drawWires() {
+    var office = document.querySelector('#agpOfficeScene .office');
+    var svg = office && office.querySelector('.office__wires');
+    var hub = office && office.querySelector('.office__hub');
+    if (!svg || !hub) return;
+    var ob = office.getBoundingClientRect();
+    svg.setAttribute('viewBox', '0 0 ' + ob.width + ' ' + ob.height);
+    var hb = hub.getBoundingClientRect();
+    var hx = hb.left - ob.left + hb.width / 2, hy = hb.top - ob.top + hb.height / 2;
+    var paths = '';
+    office.querySelectorAll('.office__pod').forEach(function (p) {
+      var pb = p.getBoundingClientRect();
+      var px = pb.left - ob.left + pb.width / 2, py = pb.top - ob.top + pb.height / 2;
+      var hue = p.style.getPropertyValue('--hue') || '220';
+      var mx = (px + hx) / 2, my = (py + hy) / 2 - 14;
+      paths += '<path d="M' + px + ' ' + py + ' Q' + mx + ' ' + my + ' ' + hx + ' ' + hy + '" ' +
+        'fill="none" stroke="hsl(' + hue + ' 80% 60%)" stroke-width="1.6" stroke-linecap="round" ' +
+        'stroke-dasharray="4 8" opacity=".55" class="office__wire"/>';
+    });
+    svg.innerHTML = paths;
+  }
+
   /* ---------- лёгкий тост ---------- */
   function toast(msg) {
     var t = el('div', 'agtoast', esc(msg));
@@ -322,13 +419,32 @@
     var panel = document.getElementById('agentsPanel');
     if (!panel || panel.__tabs) return;
     panel.__tabs = true;
-    panel.querySelectorAll('.agp__tab').forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        var name = tab.dataset.agpTab;
-        panel.querySelectorAll('.agp__tab').forEach(function (t) { t.classList.toggle('is-on', t === tab); });
+    var tabs = Array.prototype.slice.call(panel.querySelectorAll('.agp__tab'));
+    tabs.forEach(function (tab, i) {
+      var name = tab.dataset.agpTab;
+      tab.id = 'agpTab-' + name;
+      tab.setAttribute('aria-controls', 'agp' + name.charAt(0).toUpperCase() + name.slice(1));
+      tab.setAttribute('aria-selected', tab.classList.contains('is-on') ? 'true' : 'false');
+      tab.tabIndex = tab.classList.contains('is-on') ? 0 : -1;
+      function activate() {
+        tabs.forEach(function (t) {
+          var on = t === tab;
+          t.classList.toggle('is-on', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+          t.tabIndex = on ? 0 : -1;
+        });
         panel.querySelectorAll('.agp__pane').forEach(function (p) { p.classList.toggle('is-on', p.dataset.agpPane === name); });
         if (name === 'tasks') renderTasks();
-        if (name === 'office' && window.__ensureAgentsFrame) window.__ensureAgentsFrame();
+        if (name === 'office') renderOffice();
+      }
+      tab.addEventListener('click', activate);
+      tab.addEventListener('keydown', function (e) {
+        var idx = tabs.indexOf(tab), n = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = tabs[(idx + 1) % tabs.length];
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = tabs[(idx - 1 + tabs.length) % tabs.length];
+        else if (e.key === 'Home') n = tabs[0];
+        else if (e.key === 'End') n = tabs[tabs.length - 1];
+        if (n) { e.preventDefault(); n.click(); n.focus(); }
       });
     });
   }
@@ -353,6 +469,8 @@
     renderTeam();
     var tasksPane = document.getElementById('agpTasks');
     if (tasksPane && tasksPane.classList.contains('is-on')) renderTasks();
+    var op = document.getElementById('agpOffice');
+    if (officeBuilt) { officeBuilt = false; if (op && op.classList.contains('is-on')) renderOffice(); }
   });
 
   window.AgentsPanel = { ensure: ensure };
