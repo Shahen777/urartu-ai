@@ -3366,7 +3366,18 @@
       iosT = setInterval(function () { try { if (window.speechSynthesis && speechSynthesis.speaking) speechSynthesis.resume(); } catch (e) {} }, 5000);
       meter();
       setStatus('ai.st.speak');
-      var greet = function () { speak(tr('ai.greet')); };
+      var greetLocal = function () { speak(tr('ai.greet')); };
+      var greet = function () {
+        if (!window.AgentAPI) { greetLocal(); return; }
+        window.AgentAPI.available().then(function (ok) {
+          if (!ok || !on) { greetLocal(); return; }
+          window.AgentAPI.reply('secretary', 'Клиент только что подключился к звонку. Поприветствуй его коротко и представься.', [], true).then(function (r) {
+            if (!on) return;
+            callHist.push({ role: 'assistant', content: r.text });
+            speakAgent(r.text, r.audio);
+          }, greetLocal);
+        });
+      };
       if (actx) dialTone(greet); else greet();
     }
 
