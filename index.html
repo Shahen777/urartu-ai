@@ -691,11 +691,16 @@
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="21"/></svg>
               <span data-i18n="ai.mute">Микрофон</span>
             </button>
+            <button class="aicall__ctl" id="aiVoice" type="button" hidden>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+              <span id="aiVoiceName" data-i18n="ai.voice">Голос</span>
+            </button>
             <button class="aicall__end" id="aiEnd" type="button">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 9c-2.6 0-5 .5-7.1 1.5-.6.3-1 .9-.9 1.6l.3 2.2c.1.6.6 1 1.2.9l3-.4c.5-.1.9-.5 1-1l.3-1.6c.7-.2 1.4-.2 2.2-.2s1.5.1 2.2.2l.3 1.6c.1.5.5.9 1 1l3 .4c.6.1 1.1-.3 1.2-.9l.3-2.2c.1-.7-.3-1.3-.9-1.6C17 9.5 14.6 9 12 9z"/></svg>
               <span data-i18n="ai.end">Завершить</span>
             </button>
           </div>
+          <p class="aicall__hint" id="aiVoiceHint" hidden data-i18n="ai.voicehint">Голос звучит роботом? В macOS: Системные настройки → Универсальный доступ → Устная речь → Системный голос → загрузите «Милена (улучшенный)». В Chrome живой голос подтягивается сам.</p>
           <p class="aicall__honest" data-i18n="ai.note">Это демо в вашем браузере. Настоящий Секретарь работает на сервере компании, звонит по телефону и знает вашу базу — от 200 000 ₽.</p>
         </div>
 

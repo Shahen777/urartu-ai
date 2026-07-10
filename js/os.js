@@ -2556,18 +2556,34 @@
       while (box.children.length > 2) box.removeChild(box.firstChild);
     }
 
-    /* русский голос: предпочитаем Milena / Google русский */
-    function pickVoice() {
+    /* Выбор голоса по «живости».
+       Milena — старый системный голос, звучит роботом; ставим его в конец.
+       Сетевые голоса Google и улучшенные (Enhanced/Premium/Siri) звучат
+       заметно человечнее. Выбор пользователя, если он был, важнее всего. */
+    function ruVoices() {
       var want = (lang() === 'en') ? /^en/i : /^ru/i;
       var vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
-      var best = null;
-      for (var i = 0; i < vs.length; i++) {
-        if (!want.test(vs[i].lang)) continue;
-        if (/milena/i.test(vs[i].name)) return vs[i];
-        if (/google/i.test(vs[i].name) && !best) best = vs[i];
-        if (!best) best = vs[i];
+      return vs.filter(function (v) { return want.test(v.lang); });
+    }
+
+    function voiceRank(v) {
+      var n = v.name || '';
+      if (/enhanced|premium|siri|neural/i.test(n)) return 0;   // улучшенные — лучшие
+      if (v.localService === false) return 1;                   // сетевые (Google) — живые
+      if (/google/i.test(n)) return 1;
+      if (/milena/i.test(n)) return 3;                          // робот — в конец
+      return 2;
+    }
+
+    function pickVoice() {
+      var list = ruVoices();
+      if (!list.length) return null;   // системный по умолчанию; субтитры всё равно есть
+      var saved = null;
+      try { saved = localStorage.getItem('aiVoice'); } catch (e) {}
+      if (saved) {
+        for (var i = 0; i < list.length; i++) if (list[i].name === saved) return list[i];
       }
-      return best; // null → системный по умолчанию, субтитры всё равно есть
+      return list.slice().sort(function (a, b) { return voiceRank(a) - voiceRank(b); })[0];
     }
 
     function speak(text, then) {
@@ -2590,9 +2606,16 @@
 
       var say = function () {
         var u = new SpeechSynthesisUtterance(text);
-        var v = pickVoice(); if (v) u.voice = v;
+        /* назначение голоса не должно ронять речь: при неудаче говорим
+           системным по умолчанию, но говорим */
+        var v = pickVoice();
+        try { if (v) u.voice = v; } catch (e) { v = null; }
         u.lang = (lang() === 'en') ? 'en-US' : 'ru-RU';
-        u.rate = 1.02; u.pitch = 1.0;
+        /* Milena на полной скорости «тарахтит»; чуть медленнее и ниже —
+           заметно человечнее. Живые голоса Google оставляем как есть. */
+        var robotic = v && /milena/i.test(v.name || '') && !/enhanced|premium|улучш/i.test(v.name || '');
+        u.rate = robotic ? 0.92 : 1.0;
+        u.pitch = robotic ? 0.95 : 1.0;
         u.onend = u.onerror = finish;
 
         var started = false;
@@ -2709,13 +2732,38 @@
       } catch (e) {}
     }
 
+    /* Переключатель голоса: показываем, только если системе есть из чего
+       выбирать. Подсказку — когда играет роботизированная Milena. */
+    function refreshVoiceUI() {
+      var btn = $('aiVoice'), nameEl = $('aiVoiceName'), hint = $('aiVoiceHint');
+      var list = ruVoices();
+      var cur = pickVoice();
+      if (btn) btn.hidden = list.length < 2;
+      if (nameEl && cur) nameEl.textContent = (cur.name || '').replace(/\s*\(.*\)$/, '').slice(0, 18);
+      var robo = cur && /milena/i.test(cur.name || '') && !/enhanced|premium|улучш/i.test(cur.name || '');
+      if (hint) hint.hidden = !(robo && lang() === 'ru');
+    }
+
+    function cycleVoice() {
+      var list = ruVoices().slice().sort(function (a, b) { return voiceRank(a) - voiceRank(b); });
+      if (list.length < 2) return;
+      var cur = pickVoice();
+      var i = 0;
+      for (var k = 0; k < list.length; k++) if (list[k].name === (cur && cur.name)) i = k;
+      var next = list[(i + 1) % list.length];
+      try { localStorage.setItem('aiVoice', next.name); } catch (e) {}
+      refreshVoiceUI();
+      sayOnce(tr('ai.voicetest'));   // сразу слышно, как звучит выбранный
+    }
+
     /* Короткая фраза без разговора: используется в фолбэках, чтобы посетитель
        услышал живой голос, даже если распознавание речи в браузере недоступно. */
     function sayOnce(text) {
       if (!window.speechSynthesis) return;
       try {
         var u = new SpeechSynthesisUtterance(text);
-        var v = pickVoice(); if (v) u.voice = v;
+        var v = pickVoice();
+        try { if (v) u.voice = v; } catch (e) {}
         u.lang = (lang() === 'en') ? 'en-US' : 'ru-RU';
         speechSynthesis.resume();
         speechSynthesis.speak(u);
@@ -2743,6 +2791,7 @@
       on = true; muted = false;
       home.hidden = true; fb.hidden = true; live.hidden = false;
       var mb = $('aiMute'); if (mb) { mb.classList.remove('is-off'); mb.setAttribute('aria-pressed', 'false'); }
+      refreshVoiceUI();
       var box = $('aiSubs'); if (box) box.innerHTML = '';
       try {
         actx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2787,6 +2836,7 @@
       if (!home || !live || !btn) return;
       btn.addEventListener('click', start); // строго по жесту (iOS-автоплей)
       var e1 = $('aiEnd'); if (e1) e1.addEventListener('click', end);
+      var vb = $('aiVoice'); if (vb) vb.addEventListener('click', cycleVoice);
       var mb = $('aiMute');
       if (mb) mb.addEventListener('click', function () {
         muted = !muted;

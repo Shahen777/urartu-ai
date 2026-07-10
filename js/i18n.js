@@ -455,6 +455,8 @@
       /* G4 — голос Секретаря */
       'voice.aria': 'Голосовой ввод — поговорить с Секретарём',
       'voice.listen': 'Говорите — я слушаю…',
+      'ai.voice': 'Голос', 'ai.voicetest': 'Так звучит мой голос. Слушаю вас.',
+      'ai.voicehint': 'Голос звучит роботом? macOS: Системные настройки → Универсальный доступ → Устная речь → загрузите улучшенный голос «Милена». В Chrome живой голос подтягивается сам.',
       'voice.nosr.say': 'Здравствуйте! Говорить я умею, но этот браузер не умеет меня слушать. Откройте сайт в Chrome или Safari — и поговорим.',
       'voice.nosr': 'Голосовой ввод работает в Chrome и Safari — в этом браузере нет API распознавания речи. Напишите текстом: отвечу так же.',
       'voice.denied': 'Микрофон не разрешён. Разрешите доступ в настройках браузера и нажмите микрофон снова.',
@@ -969,6 +971,8 @@
       /* G4 — Secretary voice */
       'voice.aria': 'Voice input — talk to the Secretary',
       'voice.listen': 'Speak — I am listening…',
+      'ai.voice': 'Voice', 'ai.voicetest': 'This is how my voice sounds. I am listening.',
+      'ai.voicehint': 'Voice sounds robotic? On macOS: System Settings → Accessibility → Spoken Content → download an enhanced voice. Chrome loads a natural voice on its own.',
       'voice.nosr.say': 'Hello! I can speak, but this browser cannot hear me. Open the site in Chrome or Safari and we will talk.',
       'voice.nosr': 'Voice input works in Chrome and Safari — this browser has no speech-recognition API. Type your message instead: I answer the same way.',
       'voice.denied': 'Microphone is not allowed. Grant access in the browser settings and press the mic again.',
