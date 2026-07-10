@@ -2639,3 +2639,95 @@ html.is-locked, html.is-locked body{overflow:hidden}
 .o3d__loading{position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.7);font-size:14px}
 .o3d.is-failed::after{content:attr(data-fail);position:absolute;inset:0;display:grid;place-items:center;
   color:rgba(255,255,255,.7);font-size:14px;padding:20px;text-align:center}
+
+/* ============================================================
+   Сканер документов (js/scan.js) — мобильное демо камеры
+   ============================================================ */
+/* иконка на домашнем экране */
+.sb-icon--scan .sb-tile{width:60px;height:60px;border-radius:15px;display:grid;place-items:center;
+  background:linear-gradient(160deg,#3a4658,#1b2230);box-shadow:0 6px 16px rgba(0,0,0,.3),inset 0 0 0 .5px rgba(255,255,255,.14)}
+@media(min-width:1024px){.sb-icon--scan{display:none}} /* только мобильная версия */
+
+#win-scan .win__body{padding:0;overflow:hidden}
+.scan{height:100%;min-height:420px;display:flex;flex-direction:column;background:#0b0d14;color:#fff}
+
+/* --- интро / отказ --- */
+.scan__intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:28px 24px calc(28px + env(safe-area-inset-bottom));gap:6px}
+.scan__ill{margin-bottom:8px}
+.scan__h{font-size:22px;font-weight:650;letter-spacing:-.02em;margin:0}
+.scan__p{font-size:14px;color:rgba(255,255,255,.72);line-height:1.5;margin:6px 0 4px;max-width:34ch}
+.scan__badge{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.82);
+  padding:9px 14px;border-radius:999px;background:rgba(48,209,88,.14);box-shadow:inset 0 0 0 .5px rgba(48,209,88,.4);margin:12px 0 18px}
+.scan__go{display:inline-flex;align-items:center;gap:9px;appearance:none;border:0;cursor:pointer;font:inherit;
+  font-size:16px;font-weight:600;color:#fff;padding:15px 26px;border-radius:15px;background:#0a84ff;
+  box-shadow:0 10px 26px rgba(10,132,255,.4);transition:transform .14s ease-out,filter .16s}
+.scan__go:active{transform:scale(.97)}.scan__go:hover{filter:brightness(1.06)}
+
+/* --- камера --- */
+.scan__cam{position:relative;flex:1;display:flex;flex-direction:column;background:#000;overflow:hidden}
+.scan__video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.scan__frame{position:absolute;left:8%;right:8%;top:12%;bottom:24%;pointer-events:none}
+.scan__c{position:absolute;width:30px;height:30px;border:3px solid rgba(255,255,255,.92);border-radius:3px}
+.scan__c--tl{left:0;top:0;border-right:0;border-bottom:0}
+.scan__c--tr{right:0;top:0;border-left:0;border-bottom:0}
+.scan__c--bl{left:0;bottom:0;border-right:0;border-top:0}
+.scan__c--br{right:0;bottom:0;border-left:0;border-top:0}
+.scan__scan{position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#0a84ff,transparent);
+  box-shadow:0 0 12px #0a84ff;animation:scanMove 2.4s ease-in-out infinite}
+@keyframes scanMove{0%,100%{top:0;opacity:.3}50%{top:100%;opacity:1}}
+.scan__hint{position:absolute;left:0;right:0;top:calc(12% - 34px);text-align:center;font-size:13px;
+  color:rgba(255,255,255,.9);text-shadow:0 1px 6px rgba(0,0,0,.7);margin:0}
+.scan__bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px calc(22px + env(safe-area-inset-bottom));padding-top:16px;
+  background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.scan__x{width:44px;height:44px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.16);color:#fff;font-size:18px}
+.scan__sp{width:44px}
+.scan__shoot{width:72px;height:72px;border-radius:50%;border:0;cursor:pointer;background:transparent;
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.95);display:grid;place-items:center;transition:transform .12s ease-out}
+.scan__shoot span{width:56px;height:56px;border-radius:50%;background:#fff;display:block}
+.scan__shoot:active{transform:scale(.92)}
+
+/* --- обработка --- */
+.scan__proc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
+.scan__shot{position:relative;width:min(72%,240px);aspect-ratio:3/4;border-radius:14px;overflow:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,.5),inset 0 0 0 .5px rgba(255,255,255,.15)}
+.scan__shot img{width:100%;height:100%;object-fit:cover;display:block;filter:contrast(1.05)}
+.scan__laser{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#0a84ff,transparent);
+  box-shadow:0 0 16px #0a84ff;animation:scanMove 1.4s ease-in-out infinite}
+.scan__procmsg{display:inline-flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:rgba(255,255,255,.9)}
+.scan__dot{width:9px;height:9px;border-radius:50%;background:#0a84ff;animation:agcWork 1.3s ease-out infinite}
+
+/* --- результат --- */
+.scan__res{flex:1;overflow-y:auto;padding:20px 18px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.scan__reshead{display:flex;gap:14px;align-items:center}
+.scan__resthumb{width:56px;height:74px;object-fit:cover;border-radius:9px;box-shadow:0 6px 18px rgba(0,0,0,.5),inset 0 0 0 .5px rgba(255,255,255,.15)}
+.scan__h2{font-size:19px;font-weight:650;letter-spacing:-.02em;margin:0}
+.scan__ressub{font-size:12.5px;color:rgba(255,255,255,.62);margin:2px 0 0}
+.scan__card{border-radius:16px;padding:14px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12)}
+.scan__cardh{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.scan__cardh img{width:40px;height:40px;border-radius:50%;object-fit:cover;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.25)}
+.scan__cardh b{display:block;font-size:14.5px;font-weight:650}
+.scan__cardh span{font-size:12px;color:rgba(255,255,255,.6)}
+.scan__ex{display:flex;flex-direction:column;gap:1px}
+.scan__row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13.5px}
+.scan__row:last-child{border-bottom:0}
+.scan__row span{color:rgba(255,255,255,.62)}.scan__row b{font-weight:600;text-align:right}
+.scan__risks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.scan__risk{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.88)}
+.scan__warn,.scan__ok{flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:1px}
+.scan__warn{background:rgba(255,159,10,.2);color:#ff9f0a}
+.scan__ok{background:rgba(48,209,88,.18);color:#30d158}
+.scan__badge--res{align-self:stretch;justify-content:center;margin:2px 0}
+.scan__acts{display:flex;gap:10px;margin-top:4px}
+.scan__again,.scan__cta{flex:1;appearance:none;border:0;cursor:pointer;font:inherit;font-size:14.5px;font-weight:600;
+  padding:14px;border-radius:13px;transition:transform .14s ease-out}
+.scan__again{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.18)}
+.scan__cta{background:#0a84ff;color:#fff}
+.scan__again:active,.scan__cta:active{transform:scale(.97)}
+@media(prefers-reduced-motion:reduce){.scan__scan,.scan__laser,.scan__dot{animation:none}}
+/* тёмная панель сканера не должна наследовать тёмный текст светлой темы */
+#win-scan .win__body p{color:rgba(255,255,255,.74)}
+#win-scan .win__body h2,#win-scan .win__body h3,#win-scan .win__body h4{color:#fff}
+#win-scan .scan__ressub{color:rgba(255,255,255,.6)}
+#win-scan .scan__hint{color:rgba(255,255,255,.9)}

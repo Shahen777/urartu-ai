@@ -444,6 +444,7 @@
     if (!win) return;
     hydrateImages(win);
     if (id === 'win-agents') { if (window.AgentsPanel) window.AgentsPanel.ensure(); }
+    if (id === 'win-scan') { if (window.Scanner) window.Scanner.onOpen(); }
     if (id === 'win-game') ensureGameFrame();
     if (id === 'win-pulse') ensurePulse();
     if (id === 'win-devices') ensureDevices();
@@ -473,6 +474,7 @@
   function hideWindow(id, keepDot) {
     var win = document.getElementById(id);
     if (!win || !win.classList.contains('is-open')) return;
+    if (id === 'win-scan' && window.Scanner) window.Scanner.stop();
     win.classList.add('is-closing');
     win.removeAttribute('aria-modal');
     activateTop();

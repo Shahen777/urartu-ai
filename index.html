@@ -953,6 +953,15 @@
       </div>
     </article>
 
+    <!-- Сканер документов (мобильное демо: камера → локальный ИИ) -->
+    <article class="win win--narrow" id="win-scan" role="dialog" aria-label="Сканер документов">
+      <span class="win__grab" aria-hidden="true"></span>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="scan.title">Сканер документов</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__body win__body--flush">
+        <div class="scan" id="scanRoot"></div>
+      </div>
+    </article>
+
     <!-- Игра «Собери 70B» -->
     <article class="win win--wide" id="win-game" role="dialog" aria-label="Игра — Собери 70B">
       <span class="win__grab" aria-hidden="true"></span>
@@ -1915,6 +1924,7 @@
   <nav class="springboard" aria-label="Приложения">
     <button class="sb-icon" data-win="win-assistant"><picture><source srcset="icons/assistant.webp" type="image/webp"><img src="icons/assistant.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.assistant">Ассистент</span></button>
     <button class="sb-icon" data-win="win-staff"><picture><source srcset="icons/staff.webp" type="image/webp"><img src="icons/staff.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="staff.title">Сотрудники</span></button>
+    <button class="sb-icon sb-icon--scan" data-win="win-scan"><span class="sb-tile" aria-hidden="true"><svg width="52" height="52" viewBox="0 0 48 48" fill="none"><rect x="10" y="6" width="22" height="30" rx="3" fill="#fff" opacity=".95"/><line x1="15" y1="14" x2="27" y2="14" stroke="#5b6472" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="19" x2="27" y2="19" stroke="#5b6472" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="24" x2="22" y2="24" stroke="#5b6472" stroke-width="2" stroke-linecap="round"/><path d="M28 30h4a4 4 0 0 1 4 4v6a2 2 0 0 1-2 2H26a2 2 0 0 1-2-2v-6a4 4 0 0 1 4-4z" fill="#1c1e26"/><circle cx="30" cy="37" r="3.4" fill="none" stroke="#fff" stroke-width="2"/><rect x="27" y="29" width="6" height="2.4" rx="1.2" fill="#1c1e26"/></svg></span><span data-i18n="sb.scan">Сканер</span></button>
     <button class="sb-icon" data-win="win-services"><picture><source srcset="icons/services.webp" type="image/webp"><img src="icons/services.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="menu.services">Услуги</span></button>
     <button class="sb-icon" data-win="win-devices"><picture><source srcset="icons/devices.webp" type="image/webp"><img src="icons/devices.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="dev.title">Устройства</span></button>
     <button class="sb-icon" data-win="win-pulse"><picture><source srcset="icons/pulse.webp" type="image/webp"><img src="icons/pulse.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.pulse">Дашборд</span></button>
@@ -2216,6 +2226,8 @@
 <script src="js/agents.js" defer></script>
 <!-- 3D-офис (three.js r160, MIT) — сам three.js грузится лениво при первом открытии вкладки -->
 <script src="js/office3d.js" defer></script>
+<!-- Мобильное демо «Сканер документов» (чистый getUserMedia, без зависимостей) -->
+<script src="js/scan.js" defer></script>
 <script src="js/lotj.js" defer></script>
 <!-- ЛОТ M: голосовое управление (~13 КБ, локально; распознавание включается только по клику) -->
 <script src="js/voicenav.js" defer></script>
