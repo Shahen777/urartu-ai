@@ -1,8 +1,10 @@
 /* ============================================================
-   ЛОТ I — Дашборд «Пульс компании» (демо-легенда: ООО «Вектор»)
-   Подключается ЛЕНИВО из os.js при первом открытии окна win-pulse.
-   Сам дотягивает vendor/echarts.min.js (Apache-2.0) и
-   vendor/countup.umd.js (MIT) — локально, никаких CDN.
+   ЛОТ N — CRM-панель ООО «Вектор» (окно win-pulse).
+   Полноценная панель руководителя: Обзор / Сотрудники / ROI.
+   Подключается ЛЕНИВО из os.js при первом открытии окна.
+   Сам дотягивает vendor/echarts.min.js (Apache-2.0),
+   vendor/countup.umd.js (MIT) и vendor/tabler/tabler-crm.css
+   (сабсет Tabler, MIT) — локально, никаких CDN.
    Данные — детерминированный генератор с сидом:
    ни одного Math.random в отрисовке (повторяемость для тестов).
    ============================================================ */
@@ -13,20 +15,30 @@
   function lang() { return (window.__lang === 'en') ? 'en' : 'ru'; }
   function loc() { return lang() === 'en' ? 'en-US' : 'ru-RU'; }
   function tr(key) { return (window.I18N && window.I18N.t) ? window.I18N.t(key, lang()) : key; }
+  function T(key, map) {
+    var s = tr(key);
+    Object.keys(map).forEach(function (k) { s = s.replace('{' + k + '}', map[k]); });
+    return s;
+  }
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- ФОРМАТИРОВАНИЕ: рубли + русские даты, EN → $ + en-US ---------- */
   var USD_RATE = 90; // фикс. курс демо-данных: детерминизм важнее точности
   function fmtMoney(rub) {
     var en = lang() === 'en';
-    var v = en ? rub / USD_RATE : rub;
-    return new Intl.NumberFormat(loc(), { style: 'currency', currency: en ? 'USD' : 'RUB', maximumFractionDigits: 0 }).format(v);
+    return new Intl.NumberFormat(loc(), { style: 'currency', currency: en ? 'USD' : 'RUB', maximumFractionDigits: 0 })
+      .format(en ? rub / USD_RATE : rub);
+  }
+  function fmtMoneyC(rub) { // компакт: «4,8 млн ₽» / "$53K"
+    var en = lang() === 'en';
+    return new Intl.NumberFormat(loc(), { style: 'currency', currency: en ? 'USD' : 'RUB', notation: 'compact', maximumFractionDigits: 1 })
+      .format(en ? rub / USD_RATE : rub);
   }
   function fmtInt(v) { return new Intl.NumberFormat(loc(), { maximumFractionDigits: 0 }).format(Math.round(v)); }
   function fmtDate(d) { return new Intl.DateTimeFormat(loc(), { day: 'numeric', month: 'short' }).format(d); }
-  function weekdayName(i, style) { // i: 0=Пн … 6=Вс
+  function weekdayName(i) { // i: 0=Пн … 6=Вс
     var mon = new Date(Date.UTC(2026, 0, 5)); // понедельник
-    return new Intl.DateTimeFormat(loc(), { weekday: style || 'short', timeZone: 'UTC' })
+    return new Intl.DateTimeFormat(loc(), { weekday: 'short', timeZone: 'UTC' })
       .format(new Date(mon.getTime() + i * 86400000));
   }
 
@@ -41,96 +53,68 @@
     };
   }
 
-  var N = 90; // дней истории
-  var ROLES = [
-    { id: 'doc', key: 'pulse.role.doc', base: 44, min: 4,  w: { sales: 0.30, legal: 0.35, support: 0.35 }, color: '#0A84FF' },
-    { id: 'law', key: 'pulse.role.law', base: 11, min: 15, w: { sales: 0.15, legal: 0.85, support: 0    }, color: '#BF5AF2' },
-    { id: 'op',  key: 'pulse.role.op',  base: 78, min: 3,  w: { sales: 0.20, legal: 0,    support: 0.80 }, color: '#32D74B' },
-    { id: 'sec', key: 'pulse.role.sec', base: 17, min: 4,  w: { sales: 0.60, legal: 0.10, support: 0.30 }, color: '#FFD60A' }
-  ];
+  var N = 90;              // дней истории
   var AVG_CHECK = 42500;   // средний чек сделки, ₽
-  var FOT_RATE = 900;      // ₽/час специалиста (ФОТ-эквивалент, с налогами скромно)
-  var SUPPORT_MO = 45000;  // поддержка ИИ, ₽/мес
-  var IMPL_COST = 600000;  // проект целиком: внедрение + станция, ₽ (честная окупаемость ~2,5 мес)
 
-  /* профиль нагрузки по часам: оператор работает и ночью — график сам продаёт */
-  function hourK(roleId, h) {
-    switch (roleId) {
-      case 'op':  return h >= 9 && h <= 19 ? 1 : (h >= 20 || h <= 1 ? 0.55 : 0.35); // 24/7
-      case 'sec': return h >= 9 && h <= 19 ? 1 : (h >= 20 && h <= 23 ? 0.3 : 0.04);
-      case 'law': return h >= 10 && h <= 18 ? 1 : (h >= 19 && h <= 22 ? 0.25 : 0.05);
-      default:    return h >= 9 && h <= 18 ? 1 : (h >= 19 && h <= 23 ? 0.4 : 0.08);  // doc
-    }
-  }
-  function wdRoleK(roleId, wd) { // wd: 0=Пн … 6=Вс
-    if (wd < 5) return 1;
-    return roleId === 'op' ? 0.72 : 0.22; // выходные: поддержка почти не проседает
-  }
-
-  var D = null; // данные, генерируются один раз
+  var D = null;
   function buildData() {
     if (D) return D;
     var rnd = mulberry32(SEED);
     var today = new Date(); today.setHours(12, 0, 0, 0);
-    var days = [], leads = [], conv = [], roles = {};
-    ROLES.forEach(function (r) { roles[r.id] = []; });
+    var days = [], leads = [], deals = [], rev = [], ai = [];
     var wdLeadK = [1.0, 1.12, 1.06, 1.0, 0.94, 0.42, 0.34]; // Пн…Вс
-
     for (var i = 0; i < N; i++) {
       var d = new Date(today.getTime() - (N - 1 - i) * 86400000);
       days.push(d);
-      var wd = (d.getDay() + 6) % 7; // 0=Пн
+      var wd = (d.getDay() + 6) % 7;
       var growth = 1 + i * 0.0035;
       var season = 1 + 0.06 * Math.sin(i / 8.5);
-      leads.push(Math.round(26 * wdLeadK[wd] * growth * season * (0.86 + 0.28 * rnd())));
-      conv.push(+((19.5 + i * 0.028 + 2.2 * Math.sin(i / 11) + (rnd() * 3 - 1.5))).toFixed(1));
-      ROLES.forEach(function (r) {
-        roles[r.id].push(Math.round(r.base * wdRoleK(r.id, wd) * growth * (0.8 + 0.4 * rnd())));
-      });
+      var L = Math.round(26 * wdLeadK[wd] * growth * season * (0.86 + 0.28 * rnd()));
+      var conv = 0.145 + i * 0.0004 + (rnd() * 0.05 - 0.025);
+      var dl = Math.max(0, Math.round(L * conv));
+      leads.push(L);
+      deals.push(dl);
+      rev.push(Math.round(dl * AVG_CHECK * (0.88 + 0.24 * rnd())));
+      ai.push(Math.round(88 * (wd < 5 ? 1 : 0.72) * growth * (0.8 + 0.4 * rnd())));
     }
-
-    /* тепловая карта: по каждой роли своя матрица 7×24 (для фильтра отделов) */
-    var heat = {};
-    ROLES.forEach(function (r) {
-      var m = [];
-      for (var w = 0; w < 7; w++) {
-        var row = [];
-        for (var h = 0; h < 24; h++) {
-          row.push(+(r.base / 10 * hourK(r.id, h) * wdRoleK(r.id, w) * (0.82 + 0.36 * rnd())).toFixed(2));
-        }
-        m.push(row);
+    /* тепловая карта 24×7: люди днём в будни, ИИ — круглосуточно */
+    var rnd2 = mulberry32(SEED ^ 0x9E3779B9);
+    var heat = [];
+    for (var w = 0; w < 7; w++) {
+      var row = [];
+      for (var h = 0; h < 24; h++) {
+        var human = (w < 5 && h >= 9 && h <= 18) ? 1 : 0.05;
+        var aiK = (h >= 9 && h <= 19) ? 1 : (h >= 20 || h <= 1 ? 0.62 : 0.4);
+        if (w >= 5) aiK *= 0.8;
+        row.push(+(2.4 * human + 3.4 * aiK * (0.82 + 0.36 * rnd2())).toFixed(1));
       }
-      heat[r.id] = m;
-    });
-
-    D = { days: days, leads: leads, conv: conv, roles: roles, heat: heat };
+      heat.push(row);
+    }
+    D = { days: days, leads: leads, deals: deals, rev: rev, ai: ai, heat: heat };
     return D;
   }
+  function sum(arr, from, to) { var s = 0; for (var i = from; i < to; i++) s += arr[i]; return s; }
 
-  /* ---------- СОСТОЯНИЕ ФИЛЬТРОВ ---------- */
-  var state = { dept: 'all', range: 30, role: null };
-  function deptW(r) { return state.dept === 'all' ? 1 : (r.w[state.dept] || 0); }
-
-  /* суммы по окну [from, to) с учётом отдела */
-  function sumRole(r, from, to) {
-    var d = buildData(), s = 0, w = deptW(r);
-    for (var i = from; i < to; i++) s += d.roles[r.id][i] * w;
-    return s;
+  /* ---------- ШТАТ ООО «ВЕКТОР»: люди + ИИ вперемешку ---------- */
+  /* humanEq — сколько стоила бы та же рутина живой ставкой (для экономии) */
+  var EMP = [
+    { id: 'h1', nameKey: 'crm.n1', roleKey: 'crm.rl.mgr',  pay: 90000,  done: 47,   unit: 'crm.u.deals', load: 82, st: 'work', hue: 210 },
+    { id: 'documoved', ai: true, nameKey: 'msg.n.documoved', roleKey: 'crm.rl.docs', pay: 15000, done: 1240, unit: 'crm.u.reqs',  load: 71, st: 'a247', humanEq: 55000, aboutKey: 'crm.a.doc' },
+    { id: 'h2', nameKey: 'crm.n2', roleKey: 'crm.rl.head', pay: 150000, done: 26,   unit: 'crm.u.deals', load: 74, st: 'work', hue: 262 },
+    { id: 'support', ai: true, nameKey: 'msg.n.support', roleKey: 'crm.rl.sup', pay: 15000, done: 890, unit: 'crm.u.tick', load: 64, st: 'a247', humanEq: 50000, aboutKey: 'crm.a.sup' },
+    { id: 'h3', nameKey: 'crm.n3', roleKey: 'crm.rl.law',  pay: 120000, done: 34,   unit: 'crm.u.cont',  load: 76, st: 'vac',  hue: 16 },
+    { id: 'secretary', ai: true, nameKey: 'msg.n.secretary', roleKey: 'crm.rl.rec', pay: 15000, done: 320, unit: 'crm.u.call', load: 51, st: 'a247', humanEq: 40000, aboutKey: 'crm.a.sec' },
+    { id: 'h4', nameKey: 'crm.n4', roleKey: 'crm.rl.acc',  pay: 85000,  done: 210,  unit: 'crm.u.docs',  load: 68, st: 'work', hue: 130 },
+    { id: 'lawyer', ai: true, nameKey: 'msg.n.lawyer', roleKey: 'crm.rl.legal', pay: 15000, done: 156, unit: 'crm.u.cont', load: 58, st: 'a247', humanEq: 45000, aboutKey: 'crm.a.law' },
+    { id: 'h5', nameKey: 'crm.n5', roleKey: 'crm.rl.mkt',  pay: 95000,  done: 18,   unit: 'crm.u.camp',  load: 61, st: 'work', hue: 330 },
+    { id: 'content', ai: true, nameKey: 'staff.e5.role', roleKey: 'crm.rl.content', pay: 15000, done: 96, unit: 'crm.u.post', load: 46, st: 'a247', humanEq: 35000, aboutKey: 'crm.a.con' }
+  ];
+  function totals() {
+    var h = 0, a = 0, eq = 0;
+    EMP.forEach(function (e) { if (e.ai) { a += e.pay; eq += e.humanEq; } else h += e.pay; });
+    return { human: h, ai: a, eq: eq, saveMo: eq - a }; // 540 000 / 75 000 / 225 000 / 150 000
   }
-  function kpis(from, to) {
-    var d = buildData();
-    var lead = 0, rev = 0, ans = 0, hrs = 0;
-    var dw = state.dept === 'all' ? 1 : (state.dept === 'sales' ? 0.62 : state.dept === 'support' ? 0.23 : 0.15);
-    for (var i = from; i < to; i++) {
-      lead += d.leads[i] * dw;
-      rev += d.leads[i] * dw * d.conv[i] / 100 * AVG_CHECK;
-    }
-    ROLES.forEach(function (r) {
-      var s = sumRole(r, from, to);
-      ans += s; hrs += s * r.min / 60;
-    });
-    return { leads: lead, rev: rev, ans: ans, hrs: hrs };
-  }
+  var IMPL_COST = 300000; // внедрение ИИ-штата, ₽ → окупаемость 2 мес
 
   /* ---------- ПАЛИТРА ПОД ТЕМУ ---------- */
   function isLight() { return document.documentElement.classList.contains('theme-light'); }
@@ -144,11 +128,8 @@
       tipBg: l ? 'rgba(255,255,255,.96)' : 'rgba(30,30,34,.96)',
       tipTxt: l ? '#1D1D1F' : '#F5F5F7',
       heatLo: l ? '#e8eef7' : '#12203a',
-      heatHi: '#0A84FF',
-      leads: '#0A84FF',
-      conv: '#32D74B',
-      fot: '#32D74B',
-      sup: l ? 'rgba(0,0,0,.22)' : 'rgba(255,255,255,.28)'
+      blue: '#0A84FF', green: '#2fb344', violet: '#5E5CE6', purple: '#BF5AF2',
+      gray: l ? 'rgba(0,0,0,.28)' : 'rgba(255,255,255,.30)'
     };
   }
   function baseText(o) {
@@ -161,126 +142,325 @@
     return o;
   }
 
-  /* ---------- ГРАФИКИ ---------- */
-  var charts = {}; // id → инстанс echarts
+  var charts = {};
   function chart(elId) {
     var el = document.getElementById(elId);
     if (!el || !window.echarts) return null;
     if (!charts[elId]) charts[elId] = window.echarts.init(el, null, { renderer: 'canvas' });
     return charts[elId];
   }
-  function slice(arr) { return arr.slice(N - state.range); }
+  var TABCHARTS = { over: ['crmChMain', 'crmChFunnel'], staff: [], roi: ['crmChDonut', 'crmChBefore', 'crmChHeat'] };
 
-  /* Б2 — заявки и конверсия: бар + линия, зум-брашинг, период = dataZoom */
-  function renderLeads() {
-    var c = chart('pChLeads'); if (!c) return;
+  /* ---------- СОСТОЯНИЕ ---------- */
+  var state = { tab: 'over', range: 90, sort: null, dir: 1, open: null };
+  var rendered = { over: false, staff: false, roi: false };
+
+  /* ================= ВКЛАДКА 1: ОБЗОР ================= */
+  function spark(vals, color) {
+    var n = vals.length, min = Infinity, max = -Infinity, i;
+    for (i = 0; i < n; i++) { if (vals[i] < min) min = vals[i]; if (vals[i] > max) max = vals[i]; }
+    var span = (max - min) || 1, pts = [];
+    for (i = 0; i < n; i++) {
+      pts.push((i / (n - 1) * 100).toFixed(1) + ',' + (24 - (vals[i] - min) / span * 20).toFixed(1));
+    }
+    return '<svg class="crm-kpi__spark" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true">' +
+      '<polygon class="sp-fill" fill="' + color + '" stroke="none" points="0,26 ' + pts.join(' ') + ' 100,26"></polygon>' +
+      '<polyline stroke="' + color + '" points="' + pts.join(' ') + '"></polyline></svg>';
+  }
+  var cuInst = {};
+  function setVal(id, value, fmt) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var opts = { duration: reduceMotion ? 0 : 1.1, formattingFn: fmt };
+    if (window.countUp && window.countUp.CountUp && !reduceMotion) {
+      var cu = new window.countUp.CountUp(el, Math.round(value), opts);
+      if (!cu.error) { cuInst[id] = cu; cu.start(); return; }
+    }
+    el.textContent = fmt(Math.round(value));
+  }
+  function renderKpis() {
+    var box = document.getElementById('crmKpis');
+    if (!box) return;
+    var d = buildData(), p = pal(), t = totals();
+    var rev30 = sum(d.rev, 60, 90), revP = sum(d.rev, 30, 60);
+    var dl30 = sum(d.deals, 60, 90), dlP = sum(d.deals, 30, 60);
+    var ai30 = sum(d.ai, 60, 90), aiP = sum(d.ai, 30, 60);
+    var savePrev = t.saveMo * (aiP / ai30);
+    var K = [
+      { id: 'rev',  l: 'crm.k.rev',   v: rev30,    prev: revP,    money: 1, s: d.rev,   c: p.blue },
+      { id: 'deal', l: 'crm.k.deals', v: dl30,     prev: dlP,     money: 0, s: d.deals, c: p.violet },
+      { id: 'ai',   l: 'crm.k.ai',    v: ai30,     prev: aiP,     money: 0, s: d.ai,    c: p.purple },
+      { id: 'save', l: 'crm.k.save',  v: t.saveMo, prev: savePrev, money: 1, s: d.ai,   c: p.green }
+    ];
+    var html = '';
+    K.forEach(function (k) {
+      var pct = Math.round((k.v - k.prev) / k.prev * 100);
+      html += '<div class="crm-kpi"><span class="crm-kpi__l">' + tr(k.l) + '</span>' +
+        '<span class="crm-kpi__row"><b class="crm-kpi__v" id="crmK-' + k.id + '">—</b>' +
+        '<span class="crm-kpi__d ' + (pct >= 0 ? 'is-up' : 'is-down') + '" title="' + tr('crm.vs') + '">' +
+        (pct >= 0 ? '▲ +' : '▼ ') + pct + '%</span></span>' +
+        spark(k.s.slice(60), k.c) + '</div>';
+    });
+    box.innerHTML = html;
+    K.forEach(function (k) {
+      setVal('crmK-' + k.id, k.v, k.money ? fmtMoneyC : fmtInt);
+    });
+  }
+  function renderMain() {
+    var c = chart('crmChMain'); if (!c) return;
     var d = buildData(), p = pal();
-    var dates = d.days.map(fmtDate);
-    var zoomStart = (1 - state.range / N) * 100;
+    var from = N - state.range;
+    var dates = d.days.slice(from).map(fmtDate);
     c.setOption(baseText({
-      grid: { left: 44, right: 44, top: 26, bottom: 40 },
+      grid: { left: 52, right: 44, top: 30, bottom: 26 },
       legend: { top: 0, textStyle: { color: p.txt, fontSize: 11 }, itemWidth: 14, itemHeight: 9 },
       tooltip: { trigger: 'axis' },
       xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: p.axis } }, axisLabel: { color: p.txtDim, fontSize: 10 } },
       yAxis: [
-        { type: 'value', splitLine: { lineStyle: { color: p.split } }, axisLabel: { color: p.txtDim, fontSize: 10 } },
-        { type: 'value', splitLine: { show: false }, axisLabel: { color: p.txtDim, fontSize: 10, formatter: '{value}%' }, min: 0, max: 40 }
-      ],
-      dataZoom: [
-        { type: 'inside', start: zoomStart, end: 100 },
-        { type: 'slider', start: zoomStart, end: 100, height: 14, bottom: 4, borderColor: 'transparent',
-          backgroundColor: p.split, fillerColor: isLight() ? 'rgba(10,132,255,.18)' : 'rgba(10,132,255,.28)',
-          handleStyle: { color: p.leads }, textStyle: { color: p.txtDim, fontSize: 9 } }
+        { type: 'value', splitLine: { lineStyle: { color: p.split } },
+          axisLabel: { color: p.txtDim, fontSize: 10, formatter: function (v) { return fmtMoneyC(v); } } },
+        { type: 'value', splitLine: { show: false }, axisLabel: { color: p.txtDim, fontSize: 10 } }
       ],
       series: [
-        { name: tr('pulse.s.leads'), type: 'bar', data: d.leads, itemStyle: { color: p.leads, borderRadius: [3, 3, 0, 0] }, barMaxWidth: 14 },
-        { name: tr('pulse.s.conv'), type: 'line', yAxisIndex: 1, data: d.conv, smooth: true, showSymbol: false,
-          lineStyle: { color: p.conv, width: 2 }, itemStyle: { color: p.conv },
-          tooltip: { valueFormatter: function (v) { return v + '%'; } } }
+        { name: tr('crm.s.rev'), type: 'line', data: d.rev.slice(from), smooth: true, showSymbol: false,
+          lineStyle: { color: p.blue, width: 2 }, itemStyle: { color: p.blue },
+          areaStyle: { opacity: 0.12, color: p.blue },
+          tooltip: { valueFormatter: function (v) { return fmtMoney(v); } } },
+        { name: tr('crm.s.deals'), type: 'bar', yAxisIndex: 1, data: d.deals.slice(from),
+          itemStyle: { color: p.green, opacity: 0.75, borderRadius: [2, 2, 0, 0] }, barMaxWidth: 10 }
       ]
     }), true);
   }
-
-  /* Б3 — работа ИИ-сотрудников: стек-бары по ролям; клик по роли → вклад в KPI */
-  function renderRoles() {
-    var c = chart('pChRoles'); if (!c) return;
+  function renderFunnel() {
+    var c = chart('crmChFunnel'); if (!c) return;
     var d = buildData(), p = pal();
-    var dates = slice(d.days).map(fmtDate);
-    var series = ROLES.map(function (r) {
-      var w = deptW(r);
-      var dim = state.role && state.role !== r.id;
-      return {
-        name: tr(r.key), type: 'bar', stack: 'ai',
-        data: slice(d.roles[r.id]).map(function (v) { return Math.round(v * w); }),
-        itemStyle: { color: r.color, opacity: dim ? 0.22 : 1 },
-        emphasis: { focus: 'series' },
-        barMaxWidth: 16
-      };
-    });
+    var leads = sum(d.leads, 60, 90);
+    var qual = Math.round(leads * 0.58);
+    var kp = Math.round(qual * 0.55);
+    var pay = sum(d.deals, 60, 90);
+    var st = [
+      { name: tr('crm.f.lead'), value: leads, itemStyle: { color: p.blue } },
+      { name: tr('crm.f.qual'), value: qual,  itemStyle: { color: p.violet } },
+      { name: tr('crm.f.kp'),   value: kp,    itemStyle: { color: p.purple } },
+      { name: tr('crm.f.pay'),  value: pay,   itemStyle: { color: p.green } }
+    ];
     c.setOption(baseText({
-      grid: { left: 40, right: 10, top: 44, bottom: 24 },
-      legend: { top: 0, textStyle: { color: p.txt, fontSize: 11 }, itemWidth: 14, itemHeight: 9 },
-      tooltip: { trigger: 'axis' },
-      xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: p.axis } }, axisLabel: { color: p.txtDim, fontSize: 10 } },
-      yAxis: { type: 'value', splitLine: { lineStyle: { color: p.split } }, axisLabel: { color: p.txtDim, fontSize: 10 } },
-      series: series
-    }), true);
-    c.off('click');
-    c.on('click', function (ev) {
-      var r = null;
-      ROLES.forEach(function (x) { if (tr(x.key) === ev.seriesName) r = x.id; });
-      state.role = (state.role === r) ? null : r;
-      renderRoles(); renderKpis(false);
-    });
-  }
-
-  /* Б4 — «Экономия»: донат ФОТ-эквивалент vs поддержка + окупаемость в центре */
-  function renderEcon() {
-    var c = chart('pChEcon'); if (!c) return;
-    var p = pal();
-    var k = kpis(N - 30, N);
-    var fot = Math.round(k.hrs * FOT_RATE);
-    var gain = Math.max(1, fot - SUPPORT_MO);
-    var payback = Math.max(0.5, IMPL_COST / gain);
-    var pbTxt = (lang() === 'en')
-      ? tr('pulse.e.pay') + '\n' + payback.toFixed(1) + ' ' + tr('pulse.e.mo')
-      : tr('pulse.e.pay') + '\n' + payback.toFixed(1).replace('.', ',') + ' ' + tr('pulse.e.mo');
-    c.setOption(baseText({
-      tooltip: { trigger: 'item', valueFormatter: function (v) { return fmtMoney(v); } },
-      legend: { bottom: 0, textStyle: { color: p.txt, fontSize: 11 }, itemWidth: 14, itemHeight: 9 },
+      tooltip: {
+        trigger: 'item',
+        formatter: function (ev) {
+          var i = ev.dataIndex, prev = i > 0 ? st[i - 1].value : null;
+          var s = ev.name + ': <b>' + fmtInt(ev.value) + '</b>';
+          if (prev) s += '<br>' + tr('crm.f.conv') + ': ' + Math.round(ev.value / prev * 100) + '%';
+          if (i === st.length - 1) s += '<br>' + tr('crm.f.total') + ': ' + Math.round(ev.value / st[0].value * 100) + '%';
+          return s;
+        }
+      },
       series: [{
-        type: 'pie', radius: ['58%', '80%'], center: ['50%', '44%'],
-        avoidLabelOverlap: true,
-        label: { show: false },
-        itemStyle: { borderColor: 'transparent', borderWidth: 2 },
-        data: [
-          { name: tr('pulse.e.fot'), value: fot, itemStyle: { color: p.fot } },
-          { name: tr('pulse.e.sup'), value: SUPPORT_MO, itemStyle: { color: p.sup } }
-        ]
-      }],
-      graphic: [{
-        type: 'text', left: 'center', top: '36%',
-        style: { text: pbTxt, textAlign: 'center', fill: p.txt, fontSize: 13, fontWeight: 700, lineHeight: 18 }
+        type: 'funnel', sort: 'descending', gap: 4,
+        left: '6%', width: '88%', top: 6, bottom: 6, minSize: '24%',
+        label: { show: true, position: 'inside', color: '#fff', fontSize: 11.5, fontWeight: 600,
+          formatter: function (ev) { return ev.name + '  ·  ' + fmtInt(ev.value); } },
+        itemStyle: { borderColor: 'transparent', borderRadius: 4 },
+        emphasis: { label: { fontSize: 12.5 } },
+        data: st
       }]
     }), true);
   }
 
-  /* Б5 — тепловая карта нагрузки 24×7: видно работу ночью */
+  /* ================= ВКЛАДКА 2: СОТРУДНИКИ ================= */
+  function empName(e) { return tr(e.nameKey); }
+  function initials(name) {
+    var w = name.split(/\s+/), s = '';
+    for (var i = 0; i < w.length && s.length < 2; i++) if (w[i]) s += w[i][0].toUpperCase();
+    return s;
+  }
+  function stBadge(st) {
+    if (st === 'vac') return '<span class="crm-badge crm-badge--vac">' + tr('crm.st.vac') + '</span>';
+    if (st === 'a247') return '<span class="crm-badge crm-badge--247">' + tr('crm.st.247') + '</span>';
+    return '<span class="crm-badge crm-badge--ok">' + tr('crm.st.work') + '</span>';
+  }
+  var SORT_VAL = {
+    name: function (e) { return empName(e); },
+    role: function (e) { return tr(e.roleKey); },
+    type: function (e) { return e.ai ? 1 : 0; },
+    pay:  function (e) { return e.pay; },
+    done: function (e) { return e.done; },
+    load: function (e) { return e.load; },
+    st:   function (e) { return e.st === 'work' ? 0 : e.st === 'a247' ? 1 : 2; }
+  };
+  function sortedEmp() {
+    var list = EMP.slice();
+    if (!state.sort) return list;
+    var get = SORT_VAL[state.sort], dir = state.dir;
+    list.sort(function (a, b) {
+      var x = get(a), y = get(b);
+      if (typeof x === 'string') return x.localeCompare(y, loc()) * dir;
+      return (x - y) * dir;
+    });
+    return list;
+  }
+  function detailRow(e) {
+    var save = e.humanEq - e.pay;
+    return '<tr class="crm-drow"><td colspan="7"><div class="crm-dcard">' +
+      '<img class="crm-ava" src="avatars/' + e.id + '-real.webp" alt="" width="52" height="52" loading="lazy">' +
+      '<div class="crm-dcard__b"><h4>' + empName(e) + ' — ' + tr(e.roleKey) + '</h4>' +
+      '<p>' + tr(e.aboutKey) + '</p>' +
+      '<span class="crm-dcard__save">' + T('crm.d.save', { v: fmtMoney(save) }) + '</span></div>' +
+      '<button type="button" class="wbtn wbtn--primary" data-win="win-staff">' + tr('crm.hire') + '</button>' +
+      '</div></td></tr>';
+  }
+  function renderStaff() {
+    var box = document.getElementById('crmStaff');
+    if (!box) return;
+    var cols = [
+      { k: 'name', l: 'crm.t.emp' }, { k: 'role', l: 'crm.t.role' }, { k: 'type', l: 'crm.t.type' },
+      { k: 'pay', l: 'crm.t.pay' }, { k: 'done', l: 'crm.t.done' }, { k: 'load', l: 'crm.t.load' }, { k: 'st', l: 'crm.t.status' }
+    ];
+    var html = '<table class="crm-table"><thead><tr>';
+    cols.forEach(function (c) {
+      var arr = state.sort === c.k ? '<span class="sort">' + (state.dir > 0 ? '▲' : '▼') + '</span>' : '';
+      var as = state.sort === c.k ? (state.dir > 0 ? 'ascending' : 'descending') : 'none';
+      html += '<th scope="col" data-sort="' + c.k + '" aria-sort="' + as + '">' + tr(c.l) + arr + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    sortedEmp().forEach(function (e) {
+      var name = empName(e);
+      var ava = e.ai
+        ? '<img class="crm-ava" src="avatars/' + e.id + '-real.webp" alt="" width="28" height="28" loading="lazy">'
+        : '<span class="crm-ava crm-ava--ini" style="--h:' + e.hue + '" aria-hidden="true">' + initials(name) + '</span>';
+      html += '<tr' + (e.ai ? ' class="is-ai" data-emp="' + e.id + '" tabindex="0" aria-expanded="' + (state.open === e.id) + '"' : '') + '>' +
+        '<td class="crm-td-emp"><span class="crm-emp">' + ava + '<b>' + name + '</b></span></td>' +
+        '<td data-l="' + tr('crm.t.role') + '">' + tr(e.roleKey) + '</td>' +
+        '<td data-l="' + tr('crm.t.type') + '"><span class="crm-type' + (e.ai ? ' crm-type--ai' : '') + '">' +
+          (e.ai ? '🤖 ' + tr('crm.type.ai') : '👤 ' + tr('crm.type.h')) + '</span></td>' +
+        '<td class="num" data-l="' + tr('crm.t.pay') + '">' + fmtMoney(e.pay) + '</td>' +
+        '<td class="num" data-l="' + tr('crm.t.done') + '">' + fmtInt(e.done) + ' ' + tr(e.unit) + '</td>' +
+        '<td data-l="' + tr('crm.t.load') + '"><span class="crm-load"><span class="crm-load__bar">' +
+          '<i' + (e.load >= 80 ? ' class="hi"' : '') + ' style="width:' + e.load + '%"></i></span>' + e.load + '%</span></td>' +
+        '<td data-l="' + tr('crm.t.status') + '">' + stBadge(e.st) + '</td></tr>';
+      if (e.ai && state.open === e.id) html += detailRow(e);
+    });
+    html += '</tbody></table>';
+    box.innerHTML = html;
+
+    var t = totals();
+    var sumEl = document.getElementById('crmTsum');
+    if (sumEl) {
+      sumEl.innerHTML = T('crm.sum', { h: '<b>' + fmtMoney(t.human) + '</b>', a: '<b>' + fmtMoney(t.ai) + '</b>' }) +
+        ' · <span class="ai">' + tr('crm.sum.ai') + '</span>';
+    }
+  }
+  function bindStaff() {
+    var box = document.getElementById('crmStaff');
+    if (!box) return;
+    function toggle(tr) {
+      var id = tr.getAttribute('data-emp');
+      state.open = (state.open === id) ? null : id;
+      renderStaff();
+    }
+    box.addEventListener('click', function (ev) {
+      var th = ev.target.closest('th[data-sort]');
+      if (th) {
+        var k = th.getAttribute('data-sort');
+        if (state.sort === k) state.dir = -state.dir; else { state.sort = k; state.dir = 1; }
+        renderStaff();
+        return;
+      }
+      if (ev.target.closest('button')) return; // «Нанять такого» — обрабатывает os.js (data-win)
+      var row = ev.target.closest('tr.is-ai');
+      if (row) toggle(row);
+    });
+    box.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      var row = ev.target.closest('tr.is-ai');
+      if (row) { ev.preventDefault(); toggle(row); }
+    });
+  }
+
+  /* ================= ВКЛАДКА 3: ЭКОНОМИЯ / ROI ================= */
+  function renderDonut() {
+    var c = chart('crmChDonut'); if (!c) return;
+    var p = pal(), t = totals();
+    var yr = t.saveMo * 12; // 1 800 000 ₽/год
+    var payback = Math.round(IMPL_COST / t.saveMo); // 2 мес
+    c.setOption(baseText({
+      tooltip: { trigger: 'item', valueFormatter: function (v) { return fmtMoney(v); } },
+      legend: { bottom: 0, textStyle: { color: p.txt, fontSize: 11 }, itemWidth: 14, itemHeight: 9 },
+      series: [{
+        type: 'pie', radius: ['60%', '82%'], center: ['50%', '42%'],
+        label: { show: false },
+        itemStyle: { borderColor: 'transparent', borderWidth: 2 },
+        data: [
+          { name: tr('crm.roi.d.h'), value: t.human, itemStyle: { color: p.gray } },
+          { name: tr('crm.roi.d.a'), value: t.ai, itemStyle: { color: p.green } }
+        ]
+      }],
+      graphic: [{
+        type: 'text', left: 'center', top: '31%',
+        style: {
+          text: '−' + fmtMoneyC(yr) + tr('crm.yr') + '\n' + T('crm.roi.pb', { m: payback }),
+          textAlign: 'center', fill: p.txt, fontSize: 13, fontWeight: 700, lineHeight: 19
+        }
+      }]
+    }), true);
+  }
+  function renderRoiSum() {
+    var el = document.getElementById('crmRoiSum');
+    if (!el) return;
+    var t = totals();
+    el.innerHTML = T('crm.roi.sum', {
+      s: '<b>' + fmtMoney(t.saveMo) + '</b>',
+      y: '<b>−' + fmtMoneyC(t.saveMo * 12) + tr('crm.yr') + '</b>'
+    });
+  }
+  function renderBefore() {
+    var c = chart('crmChBefore'); if (!c) return;
+    var p = pal();
+    var M = [
+      { l: tr('crm.b.hrs'),  b: 58,  a: 14, f: function (v) { return fmtInt(v) + ' ' + tr('crm.b.hrs.u'); } },
+      { l: tr('crm.b.cost'), b: 640, a: 90, f: function (v) { return fmtMoney(v); } },
+      { l: tr('crm.b.resp'), b: 42,  a: 2,  f: function (v) { return fmtInt(v) + ' ' + tr('crm.b.min'); } }
+    ];
+    c.setOption(baseText({
+      grid: { left: 8, right: 14, top: 30, bottom: 8, containLabel: true },
+      legend: { top: 0, textStyle: { color: p.txt, fontSize: 11 }, itemWidth: 14, itemHeight: 9 },
+      tooltip: {
+        trigger: 'axis', axisPointer: { type: 'shadow' },
+        formatter: function (evs) {
+          var m = M[evs[0].dataIndex];
+          return m.l + '<br>' + tr('crm.s.before') + ': <b>' + m.f(m.b) + '</b><br>' +
+            tr('crm.s.after') + ': <b>' + m.f(m.a) + '</b>';
+        }
+      },
+      xAxis: { type: 'value', max: 105, axisLabel: { show: false }, splitLine: { show: false } },
+      yAxis: { type: 'category', data: M.map(function (m) { return m.l; }),
+        axisLine: { show: false }, axisTick: { show: false },
+        axisLabel: { color: p.txt, fontSize: 11 } },
+      series: [
+        { name: tr('crm.s.before'), type: 'bar', barWidth: 12,
+          itemStyle: { color: p.gray, borderRadius: 3 },
+          label: { show: true, position: 'insideRight', color: isLight() ? '#fff' : 'rgba(0,0,0,.75)', fontSize: 10,
+            formatter: function (ev) { return M[ev.dataIndex].f(M[ev.dataIndex].b); } },
+          data: M.map(function () { return 100; }) },
+        { name: tr('crm.s.after'), type: 'bar', barWidth: 12,
+          itemStyle: { color: p.green, borderRadius: 3 },
+          label: { show: true, position: 'right', color: p.txt, fontSize: 10, fontWeight: 700,
+            formatter: function (ev) { return M[ev.dataIndex].f(M[ev.dataIndex].a); } },
+          data: M.map(function (m) { return Math.max(4, Math.round(m.a / m.b * 100)); }) }
+      ]
+    }), true);
+  }
   function renderHeat() {
-    var c = chart('pChHeat'); if (!c) return;
+    var c = chart('crmChHeat'); if (!c) return;
     var d = buildData(), p = pal();
     var data = [], max = 0;
-    for (var w = 0; w < 7; w++) {
-      for (var h = 0; h < 24; h++) {
-        var v = 0;
-        ROLES.forEach(function (r) { v += d.heat[r.id][w][h] * deptW(r); });
-        v = +v.toFixed(1);
-        if (v > max) max = v;
-        data.push([h, w, v]);
-      }
+    for (var w = 0; w < 7; w++) for (var h = 0; h < 24; h++) {
+      var v = d.heat[w][h];
+      if (v > max) max = v;
+      data.push([h, w, v]);
     }
     var hours = []; for (var i = 0; i < 24; i++) hours.push(i);
-    var wdays = []; for (var j = 0; j < 7; j++) wdays.push(weekdayName(j, 'short'));
+    var wdays = []; for (var j = 0; j < 7; j++) wdays.push(weekdayName(j));
     c.setOption(baseText({
       grid: { left: 44, right: 10, top: 8, bottom: 42 },
       tooltip: {
@@ -289,14 +469,14 @@
           return wdays[ev.value[1]] + ' · ' + ev.value[0] + ':00 — <b>' + ev.value[2] + '</b> ' + tr('pulse.heat.u');
         }
       },
-      xAxis: { type: 'category', data: hours, splitArea: { show: false }, axisLine: { show: false }, axisTick: { show: false },
+      xAxis: { type: 'category', data: hours, axisLine: { show: false }, axisTick: { show: false },
         axisLabel: { color: p.txtDim, fontSize: 9, interval: 2, formatter: function (v) { return v + ':00'; } } },
       yAxis: { type: 'category', data: wdays, axisLine: { show: false }, axisTick: { show: false },
         axisLabel: { color: p.txtDim, fontSize: 10 } },
       visualMap: {
         min: 0, max: Math.max(4, max), calculable: false, orient: 'horizontal', left: 'center', bottom: 0,
         itemWidth: 10, itemHeight: 90, textStyle: { color: p.txtDim, fontSize: 9 },
-        inRange: { color: [p.heatLo, p.heatHi] },
+        inRange: { color: [p.heatLo, p.blue] },
         text: [tr('pulse.heat.hi'), tr('pulse.heat.lo')]
       },
       series: [{
@@ -307,171 +487,53 @@
     }), true);
   }
 
-  /* ---------- KPI-СТРОКА (CountUp) ---------- */
-  var cuInst = {};
-  function setVal(id, value, moneyFmt) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    var opts = {
-      duration: reduceMotion ? 0 : 1.1,
-      formattingFn: moneyFmt ? function (v) { return fmtMoney(v); } : function (v) { return fmtInt(v); }
-    };
-    if (window.countUp && window.countUp.CountUp && !reduceMotion) {
-      if (cuInst[id]) { cuInst[id].update(Math.round(value)); return; }
-      var cu = new window.countUp.CountUp(el, Math.round(value), opts);
-      if (!cu.error) { cuInst[id] = cu; cu.start(); return; }
-    }
-    el.textContent = opts.formattingFn(Math.round(value));
+  /* ================= ВКЛАДКИ / СБОРКА ================= */
+  function renderTab(t) {
+    if (t === 'over') { renderKpis(); renderMain(); renderFunnel(); }
+    else if (t === 'staff') { renderStaff(); }
+    else { renderDonut(); renderRoiSum(); renderBefore(); renderHeat(); }
   }
-  function setDelta(id, cur, prev) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    if (!prev) { el.textContent = ''; return; }
-    var pct = Math.round((cur - prev) / prev * 100);
-    var up = pct >= 0;
-    el.textContent = (up ? '▲ +' : '▼ ') + pct + '%';
-    el.className = 'pkpi__d ' + (up ? 'is-up' : 'is-down');
-  }
-  function renderKpis(animate) {
-    var cur = kpis(N - 30, N), prev = kpis(N - 60, N - 30);
-    setVal('pkV-rev', cur.rev, true);
-    setVal('pkV-leads', cur.leads, false);
-    setVal('pkV-ans', cur.ans, false);
-    setVal('pkV-hrs', cur.hrs, false);
-    setDelta('pkD-rev', cur.rev, prev.rev);
-    setDelta('pkD-leads', cur.leads, prev.leads);
-    setDelta('pkD-ans', cur.ans, prev.ans);
-    setDelta('pkD-hrs', cur.hrs, prev.hrs);
-
-    /* вклад выбранной роли в KPI (клик по стек-бару) */
-    var hlA = document.getElementById('pkH-ans'), hlH = document.getElementById('pkH-hrs');
-    var cardA = hlA && hlA.closest('.pkpi'), cardH = hlH && hlH.closest('.pkpi');
-    if (state.role) {
-      var r = null; ROLES.forEach(function (x) { if (x.id === state.role) r = x; });
-      var s = sumRole(r, N - 30, N);
-      var shareA = cur.ans ? Math.round(s / cur.ans * 100) : 0;
-      var hrsR = s * r.min / 60;
-      var shareH = cur.hrs ? Math.round(hrsR / cur.hrs * 100) : 0;
-      if (hlA) { hlA.hidden = false; hlA.textContent = tr(r.key) + ': ' + fmtInt(s) + ' · ' + shareA + '%'; hlA.style.color = r.color; }
-      if (hlH) { hlH.hidden = false; hlH.textContent = tr(r.key) + ': ' + fmtInt(hrsR) + ' ' + tr('pulse.h') + ' · ' + shareH + '%'; hlH.style.color = r.color; }
-      if (cardA) cardA.classList.add('is-hl');
-      if (cardH) cardH.classList.add('is-hl');
-    } else {
-      if (hlA) hlA.hidden = true;
-      if (hlH) hlH.hidden = true;
-      if (cardA) cardA.classList.remove('is-hl');
-      if (cardH) cardH.classList.remove('is-hl');
-    }
-  }
-
-  /* ---------- ЛЕНТА «ИИ-ИНСАЙТОВ» с печатью ---------- */
-  var feedGen = 0;
-  function insightTexts() {
-    var d = buildData();
-    /* пик нагрузки */
-    var bw = 0, bh = 0, bv = -1;
-    for (var w = 0; w < 5; w++) for (var h = 8; h < 20; h++) {
-      var v = 0; ROLES.forEach(function (r) { v += d.heat[r.id][w][h]; });
-      if (v > bv) { bv = v; bw = w; bh = h; }
-    }
-    var all = kpis(N - 30, N);
-    var opS = 0; ROLES.forEach(function (r) { if (r.id === 'op') opS = sumRole(r, N - 30, N); });
-    var opPct = all.ans ? Math.round(opS / all.ans * 100) : 0;
-    /* доля ночи и выходных */
-    var night = 0, total = 0;
-    for (var w2 = 0; w2 < 7; w2++) for (var h2 = 0; h2 < 24; h2++) {
-      var vv = 0; ROLES.forEach(function (r) { vv += d.heat[r.id][w2][h2]; });
-      total += vv;
-      if (w2 >= 5 || h2 >= 22 || h2 < 7) night += vv;
-    }
-    var nightPct = Math.round(night / total * 100);
-    var lawWeek = Math.round(sumRole(ROLES[1], N - 7, N));
-    var risks = Math.max(2, Math.round(lawWeek * 0.09));
-    var convA = 0, convB = 0;
-    for (var i = 0; i < 30; i++) { convA += d.conv[i]; convB += d.conv[N - 30 + i]; }
-    convA = (convA / 30).toFixed(1); convB = (convB / 30).toFixed(1);
-    var fte = (all.hrs / 160).toFixed(1);
-    var fot = Math.round(all.hrs * FOT_RATE);
-    var payback = Math.max(0.5, IMPL_COST / Math.max(1, fot - SUPPORT_MO)).toFixed(1);
-    if (lang() !== 'en') { convA = convA.replace('.', ','); convB = convB.replace('.', ','); fte = fte.replace('.', ','); payback = payback.replace('.', ','); }
-
-    function T(key, map) {
-      var s = tr(key);
-      Object.keys(map).forEach(function (k) { s = s.replace('{' + k + '}', map[k]); });
-      return s;
-    }
-    return [
-      T('pulse.i1', { d: weekdayName(bw, 'long'), h: bh + ':00', p: opPct }),
-      T('pulse.i2', { n: risks }),
-      T('pulse.i3', { p: nightPct }),
-      T('pulse.i4', { h: fmtInt(all.hrs), f: fte }),
-      T('pulse.i5', { a: convA, b: convB }),
-      T('pulse.i6', { m: payback })
-    ];
-  }
-  function renderFeed(retype) {
-    var ul = document.getElementById('pFeed');
-    if (!ul) return;
-    var items = insightTexts();
-    feedGen += 1;
-    var gen = feedGen;
-    ul.innerHTML = '';
-    if (reduceMotion || document.hidden || !retype) {
-      items.forEach(function (t) {
-        var li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
-      });
-      return;
-    }
-    var i = 0;
-    (function nextItem() {
-      if (gen !== feedGen || i >= items.length) return;
-      var li = document.createElement('li');
-      li.className = 'is-typing';
-      ul.appendChild(li);
-      var text = items[i], ci = 0;
-      (function ch() {
-        if (gen !== feedGen) return;
-        if (ci <= text.length) {
-          li.textContent = text.slice(0, ci);
-          ci += 2;
-          setTimeout(ch, 14);
-        } else {
-          li.textContent = text;
-          li.classList.remove('is-typing');
-          i += 1;
-          setTimeout(nextItem, 260);
-        }
-      })();
-    })();
-  }
-
-  /* ---------- СБОРКА ---------- */
-  var built = false;
-  function renderAll(retypeFeed) {
-    renderKpis(true);
-    renderLeads();
-    renderRoles();
-    renderEcon();
-    renderHeat();
-    renderFeed(retypeFeed);
-  }
-  function resizeAll() {
-    Object.keys(charts).forEach(function (k) { try { charts[k].resize(); } catch (e) {} });
-  }
-
-  function bindFilters() {
-    var dp = document.getElementById('pulseDept');
-    if (dp) dp.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-dept]'); if (!b) return;
-      state.dept = b.dataset.dept;
-      Array.prototype.forEach.call(dp.querySelectorAll('.pchip'), function (x) {
-        var sel = x === b;
-        x.classList.toggle('is-sel', sel);
-        x.setAttribute('aria-checked', sel ? 'true' : 'false');
-      });
-      renderKpis(false); renderRoles(); renderEcon(); renderHeat();
+  function resizeActive() {
+    (TABCHARTS[state.tab] || []).forEach(function (id) {
+      if (charts[id]) { try { charts[id].resize(); } catch (e) {} }
     });
-    var rp = document.getElementById('pulseRange');
+  }
+  function showTab(t) {
+    state.tab = t;
+    var tabs = document.querySelectorAll('#crmTabs .crm-tab');
+    Array.prototype.forEach.call(tabs, function (b) {
+      var sel = b.dataset.tab === t;
+      b.classList.toggle('is-sel', sel);
+      b.setAttribute('aria-selected', sel ? 'true' : 'false');
+    });
+    ['over', 'staff', 'roi'].forEach(function (x) {
+      var pane = document.getElementById('crmPane-' + x);
+      if (pane) pane.hidden = (x !== t);
+    });
+    requestAnimationFrame(function () {
+      if (!rendered[t]) { rendered[t] = true; renderTab(t); }
+      else resizeActive();
+    });
+  }
+  function rerenderAll() {
+    Object.keys(rendered).forEach(function (t) { if (rendered[t]) renderTab(t); });
+  }
+
+  var built = false;
+  function build() {
+    if (built) return;
+    built = true;
+    var loading = document.getElementById('pulseLoading');
+    var root = document.getElementById('crmRoot');
+    if (loading) loading.hidden = true;
+    if (root) root.hidden = false;
+
+    var tabs = document.getElementById('crmTabs');
+    if (tabs) tabs.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-tab]');
+      if (b) showTab(b.dataset.tab);
+    });
+    var rp = document.getElementById('crmRange');
     if (rp) rp.addEventListener('click', function (e) {
       var b = e.target.closest('[data-range]'); if (!b) return;
       state.range = +b.dataset.range;
@@ -480,43 +542,36 @@
         x.classList.toggle('is-sel', sel);
         x.setAttribute('aria-checked', sel ? 'true' : 'false');
       });
-      renderLeads(); renderRoles();
+      renderMain();
     });
-  }
+    bindStaff();
 
-  function build() {
-    if (built) return;
-    built = true;
-    var loading = document.getElementById('pulseLoading');
-    var grid = document.getElementById('pulseGrid');
-    if (loading) loading.hidden = true;
-    if (grid) grid.hidden = false;
-    bindFilters();
-    renderAll(true);
+    rendered.over = true;
+    renderTab('over');
 
     /* ресайз окна (drag-resize / развернуть) → перерисовать графики */
     var body = document.querySelector('#win-pulse .win__body');
     if (body && 'ResizeObserver' in window) {
       var t = null;
       new ResizeObserver(function () {
-        clearTimeout(t); t = setTimeout(resizeAll, 120);
+        clearTimeout(t); t = setTimeout(resizeActive, 120);
       }).observe(body);
     }
-    window.addEventListener('resize', function () { setTimeout(resizeAll, 180); });
+    window.addEventListener('resize', function () { setTimeout(resizeActive, 180); });
 
-    /* смена темы: перерисовать с палитрой новой темы */
+    /* смена темы: перерисовать графики с палитрой новой темы */
     var wasLight = isLight();
     new MutationObserver(function () {
       if (isLight() !== wasLight) {
         wasLight = isLight();
-        renderAll(false);
+        rerenderAll();
       }
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
-    /* смена языка: подписи, валюта, даты, инсайты */
+    /* смена языка: подписи, валюта, даты */
     document.addEventListener('i18n:change', function () {
-      cuInst = {}; // форматтер валюты сменился — пересоздать счётчики
-      renderAll(true);
+      cuInst = {};
+      rerenderAll();
     });
   }
 
@@ -531,10 +586,23 @@
       document.head.appendChild(s);
     });
   }
+  function styles(href) {
+    return new Promise(function (res, rej) {
+      if (document.querySelector('link[data-tabler]')) { res(); return; }
+      var l = document.createElement('link');
+      l.rel = 'stylesheet'; l.href = href; l.setAttribute('data-tabler', '1');
+      l.onload = res;
+      l.onerror = function () { l.remove(); rej(new Error(href + ' failed')); };
+      document.head.appendChild(l);
+    });
+  }
   function ensureLibs() {
-    if (window.echarts) return Promise.resolve();
+    if (window.echarts && document.querySelector('link[data-tabler]')) return Promise.resolve();
     if (libsP) return libsP;
-    libsP = script('vendor/echarts.min.js')
+    libsP = Promise.all([
+      window.echarts ? Promise.resolve() : script('vendor/echarts.min.js'),
+      styles('vendor/tabler/tabler-crm.css')
+    ])
       .then(function () { return script('vendor/countup.umd.js').catch(function () {}); })
       .catch(function (e) { libsP = null; throw e; });
     return libsP;
@@ -563,7 +631,7 @@
   function open() {
     if (built) {
       /* окно было закрыто/свёрнуто — размеры могли обнулиться */
-      requestAnimationFrame(resizeAll);
+      requestAnimationFrame(resizeActive);
       return;
     }
     ensureLibs().then(build, showError);
@@ -573,11 +641,12 @@
   if (DEV) {
     window.__pulse = {
       data: buildData,
-      kpis: function () { return kpis(N - 30, N); },
+      staff: EMP,
+      totals: totals,
       state: state,
       charts: function () { return Object.keys(charts); },
       inst: function (id) { return charts[id]; },
-      insights: insightTexts
+      showTab: showTab
     };
   }
 })();

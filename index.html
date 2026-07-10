@@ -386,7 +386,7 @@
         </div>
         <p class="hero-proof" data-i18n="readme.badge">Каждый ответ — со ссылкой на пункт документа. Можно проверить.</p>
         <button class="readme-touch" type="button" data-win="win-appstore"><span aria-hidden="true">▶</span> <span data-i18n="readme.try">Всё на этом сайте можно потрогать: чат, проверка договора, голос, генератор →</span></button>
-        <button class="readme-touch" type="button" data-win="win-pulse"><span aria-hidden="true">▶</span> <span data-i18n="readme.pulse">Посмотреть дашборд «Пульс компании» →</span></button>
+        <button class="readme-touch" type="button" data-win="win-pulse"><span aria-hidden="true">▶</span> <span data-i18n="readme.pulse">Открыть CRM-панель ООО «Вектор» →</span></button>
         <button class="readme-touch" type="button" data-act="vn-open"><span aria-hidden="true">🎙</span> <span data-i18n="readme.voice">Управляйте сайтом голосом — скажите «открой тарифы» →</span></button>
         <button class="readme-touch readme-touch--tour" type="button" data-act="tour"><span aria-hidden="true">▶</span> <span data-i18n="tour.readme">Пройти экскурсию по системе</span></button>
       </div>
@@ -1431,72 +1431,81 @@
     <!-- ЛОТ I: Дашборд «Пульс компании» (ECharts грузится лениво при первом открытии) -->
     <article class="win win--wide win--pulse" id="win-pulse" role="dialog" aria-label="Пульс компании">
       <span class="win__grab" aria-hidden="true"></span>
-      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="pulse.title">Пульс компании</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
+      <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="pulse.title">CRM «Вектор»</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
       <div class="win__body">
-        <h2 data-i18n="pulse.h1">Пульс компании — панель руководителя</h2>
-        <p class="lead" data-i18n="pulse.lead">ООО «Вектор» — вымышленная компания, где ИИ-сотрудники работают уже месяц. Все цифры — живые: фильтруйте, приближайте, кликайте по ролям.</p>
+        <h2 data-i18n="pulse.h1">ООО «Вектор» — живая CRM-панель руководителя</h2>
+        <p class="lead" data-i18n="pulse.lead">Вымышленная компания, где месяц работают ИИ-сотрудники: штат и зарплаты, сделки и воронка, экономия. Переключайте вкладки, сортируйте таблицу, кликайте по ИИ-строкам.</p>
 
-        <!-- фильтры: отдел + период -->
-        <div class="pulse-bar">
-          <div class="pulse-chips" id="pulseDept" role="radiogroup" aria-label="Отдел">
-            <button type="button" class="pchip is-sel" role="radio" aria-checked="true" data-dept="all" data-i18n="pulse.d.all">Все отделы</button>
-            <button type="button" class="pchip" role="radio" aria-checked="false" data-dept="sales" data-i18n="pulse.d.sales">Продажи</button>
-            <button type="button" class="pchip" role="radio" aria-checked="false" data-dept="legal" data-i18n="pulse.d.legal">Юротдел</button>
-            <button type="button" class="pchip" role="radio" aria-checked="false" data-dept="support" data-i18n="pulse.d.sup">Поддержка</button>
-          </div>
-          <div class="pulse-chips pulse-chips--range" id="pulseRange" role="radiogroup" aria-label="Период">
-            <button type="button" class="pchip" role="radio" aria-checked="false" data-range="7" data-i18n="pulse.r7">7 дней</button>
-            <button type="button" class="pchip is-sel" role="radio" aria-checked="true" data-range="30" data-i18n="pulse.r30">30 дней</button>
-            <button type="button" class="pchip" role="radio" aria-checked="false" data-range="90" data-i18n="pulse.r90">90 дней</button>
-          </div>
-        </div>
-
-        <!-- блок 1: KPI-строка -->
-        <div class="pulse-kpis" id="pulseKpis">
-          <div class="pkpi"><span class="pkpi__l" data-i18n="pulse.k.rev">Выручка</span><b class="pkpi__v" id="pkV-rev">—</b><span class="pkpi__d" id="pkD-rev"></span></div>
-          <div class="pkpi"><span class="pkpi__l" data-i18n="pulse.k.leads">Заявки</span><b class="pkpi__v" id="pkV-leads">—</b><span class="pkpi__d" id="pkD-leads"></span></div>
-          <div class="pkpi"><span class="pkpi__l" data-i18n="pulse.k.ans">Ответов ИИ</span><b class="pkpi__v" id="pkV-ans">—</b><span class="pkpi__d" id="pkD-ans"></span><span class="pkpi__hl" id="pkH-ans" hidden></span></div>
-          <div class="pkpi"><span class="pkpi__l" data-i18n="pulse.k.hrs">Сэкономлено часов</span><b class="pkpi__v" id="pkV-hrs">—</b><span class="pkpi__d" id="pkD-hrs"></span><span class="pkpi__hl" id="pkH-hrs" hidden></span></div>
-        </div>
-        <p class="pulse-sub" data-i18n="pulse.k.mo">за 30 дней · ▲▼ — к прошлому месяцу · клик по роли в графике покажет её вклад</p>
-
-        <!-- заставка ленивой загрузки ECharts -->
+        <!-- заставка ленивой загрузки ECharts + Tabler-CSS -->
         <div class="pulse-loading" id="pulseLoading" role="status">
           <span class="pulse-spin" aria-hidden="true"></span>
           <span data-i18n="pulse.loading">Собираю графики… (~1,1 МБ, локально, без интернета)</span>
         </div>
 
-        <!-- блоки 2–6 -->
-        <div class="pulse-grid" id="pulseGrid" hidden>
-          <section class="pulse-card pulse-card--wide">
-            <h3 class="pulse-card__t" data-i18n="pulse.b2.t">Заявки и конверсия</h3>
-            <div class="pulse-chart pulse-chart--tall" id="pChLeads"></div>
-          </section>
-          <section class="pulse-card">
-            <h3 class="pulse-card__t" data-i18n="pulse.b3.t">Работа ИИ-сотрудников</h3>
-            <div class="pulse-chart" id="pChRoles"></div>
-          </section>
-          <section class="pulse-card">
-            <h3 class="pulse-card__t" data-i18n="pulse.b4.t">Экономия за месяц</h3>
-            <div class="pulse-chart" id="pChEcon"></div>
-          </section>
-          <section class="pulse-card pulse-card--wide">
-            <h3 class="pulse-card__t" data-i18n="pulse.b5.t">Нагрузка по часам · 24×7</h3>
-            <div class="pulse-chart pulse-chart--heat" id="pChHeat"></div>
-          </section>
-          <section class="pulse-card pulse-card--wide">
-            <h3 class="pulse-card__t" data-i18n="pulse.b6.t">ИИ-инсайты</h3>
-            <ul class="pulse-feed" id="pFeed" aria-live="polite"></ul>
-          </section>
-        </div>
-
-        <!-- продающая плашка -->
-        <div class="pulse-sell">
-          <p><b data-i18n="pulse.sellH">Такую панель собираем под ваш бизнес</b><br><span data-i18n="pulse.sell">Ваши источники — 1С, CRM, телефония, сайт; ваши метрики и ИИ-инсайты. Работает в вашем контуре — от 120 000 ₽.</span></p>
-          <div class="win-actions">
-            <button class="wbtn wbtn--primary" data-win="win-calendar" data-i18n="pulse.chip.demo">Записаться</button>
-            <button class="wbtn" data-win="win-calc" data-i18n="pulse.chip.calc">Калькулятор</button>
+        <!-- CRM-панель: три вкладки -->
+        <div class="crm" id="crmRoot" hidden>
+          <div class="crm-head">
+            <span class="crm-brand"><span class="crm-brand__logo" aria-hidden="true">В</span><span data-i18n="crm.company">ООО «Вектор» · CRM</span></span>
+            <div class="crm-tabs" id="crmTabs" role="tablist" aria-label="Разделы панели">
+              <button type="button" class="crm-tab is-sel" role="tab" aria-selected="true" id="crmTabB-over" aria-controls="crmPane-over" data-tab="over" data-i18n="crm.tab.over">Обзор</button>
+              <button type="button" class="crm-tab" role="tab" aria-selected="false" id="crmTabB-staff" aria-controls="crmPane-staff" data-tab="staff" data-i18n="crm.tab.staff">Сотрудники</button>
+              <button type="button" class="crm-tab" role="tab" aria-selected="false" id="crmTabB-roi" aria-controls="crmPane-roi" data-tab="roi" data-i18n="crm.tab.roi">Экономия и ROI</button>
+            </div>
           </div>
+
+          <!-- вкладка 1: Обзор -->
+          <section class="crm-pane" id="crmPane-over" role="tabpanel" aria-labelledby="crmTabB-over">
+            <div class="crm-kpis" id="crmKpis"></div>
+            <div class="crm-card">
+              <div class="crm-card__h">
+                <h3 data-i18n="crm.ch.main">Выручка и сделки</h3>
+                <div class="pulse-chips" id="crmRange" role="radiogroup" aria-label="Период">
+                  <button type="button" class="pchip" role="radio" aria-checked="false" data-range="30" data-i18n="pulse.r30">30 дней</button>
+                  <button type="button" class="pchip is-sel" role="radio" aria-checked="true" data-range="90" data-i18n="pulse.r90">90 дней</button>
+                </div>
+              </div>
+              <div class="crm-chart crm-chart--main" id="crmChMain"></div>
+            </div>
+            <div class="crm-card">
+              <div class="crm-card__h"><h3 data-i18n="crm.ch.funnel">Воронка продаж · 30 дней</h3></div>
+              <div class="crm-chart crm-chart--funnel" id="crmChFunnel"></div>
+            </div>
+          </section>
+
+          <!-- вкладка 2: Сотрудники (люди + ИИ) -->
+          <section class="crm-pane" id="crmPane-staff" role="tabpanel" aria-labelledby="crmTabB-staff" hidden>
+            <div class="crm-card">
+              <div class="crm-tablewrap" id="crmStaff"></div>
+              <div class="crm-tsum" id="crmTsum"></div>
+            </div>
+            <p class="crm-note" data-i18n="crm.t.hint">Сортировка — клик по заголовку столбца. Клик по строке с 🤖 — карточка ИИ-сотрудника.</p>
+          </section>
+
+          <!-- вкладка 3: Экономия / ROI -->
+          <section class="crm-pane" id="crmPane-roi" role="tabpanel" aria-labelledby="crmTabB-roi" hidden>
+            <div class="crm-roigrid">
+              <div class="crm-card">
+                <div class="crm-card__h"><h3 data-i18n="crm.roi.donut">ФОТ людей vs ИИ-штат · месяц</h3></div>
+                <div class="crm-chart" id="crmChDonut"></div>
+                <p class="crm-roi__sum" id="crmRoiSum"></p>
+              </div>
+              <div class="crm-card">
+                <div class="crm-card__h"><h3 data-i18n="crm.roi.before">До и после ИИ</h3></div>
+                <div class="crm-chart" id="crmChBefore"></div>
+              </div>
+            </div>
+            <div class="crm-card">
+              <div class="crm-card__h"><h3 data-i18n="crm.roi.heat">Нагрузка 24×7 — ИИ работает и ночью</h3></div>
+              <div class="crm-chart crm-chart--heat" id="crmChHeat"></div>
+            </div>
+            <div class="crm-cta">
+              <p><b data-i18n="pulse.sellH">Такую панель собираем под ваш бизнес</b><br><span data-i18n="pulse.sell">Ваши источники — 1С, CRM, телефония, сайт; ваши метрики и ИИ-инсайты. Работает в вашем контуре — от 120 000 ₽.</span></p>
+              <div class="win-actions">
+                <button class="wbtn wbtn--primary" data-win="win-calendar" data-i18n="pulse.chip.demo">Записаться</button>
+                <button class="wbtn" data-win="win-calc" data-i18n="pulse.chip.calc">Калькулятор</button>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </article>
@@ -1739,7 +1748,7 @@
   <button class="dock__app" data-win="win-services" data-name="Услуги" data-name-i18n="menu.services" aria-label="Услуги"><picture><source srcset="icons/services.webp" type="image/webp"><img src="icons/services.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-devices" data-name="Устройства" data-name-i18n="dev.title" aria-label="Устройства"><picture><source srcset="icons/devices.webp" type="image/webp"><img src="icons/devices.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-calc" data-name="Калькулятор" data-name-i18n="sb.calc" aria-label="Калькулятор проекта"><picture><source srcset="icons/calc.webp" type="image/webp"><img src="icons/calc.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
-  <button class="dock__app dock__mobhide" data-win="win-pulse" data-name="Пульс компании" data-name-i18n="pulse.title" aria-label="Пульс компании — дашборд"><picture><source srcset="icons/pulse.webp" type="image/webp"><img src="icons/pulse.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
+  <button class="dock__app dock__mobhide" data-win="win-pulse" data-name="CRM «Вектор»" data-name-i18n="pulse.title" aria-label="CRM «Вектор» — дашборд"><picture><source srcset="icons/pulse.webp" type="image/webp"><img src="icons/pulse.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-appstore" data-name="App Store" data-name-i18n="as.short" aria-label="App Store — витрина продуктов"><picture><source srcset="icons/appstore.webp" type="image/webp"><img src="icons/appstore.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-calendar" data-name="Календарь" data-name-i18n="cal.title" aria-label="Календарь — запись на демо"><picture><source srcset="icons/calendar.webp" type="image/webp"><img src="icons/calendar.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>
   <button class="dock__app dock__mobhide" data-win="win-faq" data-name="Вопросы" data-name-i18n="menu.faq" aria-label="Вопросы"><picture><source srcset="icons/faq.webp" type="image/webp"><img src="icons/faq.png" alt="" width="128" height="128" decoding="async"></picture><span class="dock__dot"></span></button>

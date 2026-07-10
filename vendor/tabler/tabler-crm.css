@@ -1,0 +1,130 @@
+/* ============================================================
+   tabler-crm.css — компонентный сабсет в стиле Tabler
+   (по мотивам tabler/tabler @tabler/core v1.4.0, MIT © Tabler).
+   Взяты паттерны карточек/таблиц/бейджей/аватаров/прогрессов,
+   адаптированы под темы сайта и заскоуплены под #win-pulse.
+   Локальный файл, грузится ЛЕНИВО при первом открытии окна.
+   ============================================================ */
+
+.win--pulse{max-width:1120px}
+
+/* ---------- шапка: бренд + вкладки ---------- */
+.crm-head{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin:14px 0 12px}
+.crm-brand{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.01em}
+.crm-brand__logo{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;
+  background:linear-gradient(135deg,#0A84FF,#5E5CE6);color:#fff;font-size:13px;font-weight:800}
+.crm-tabs{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring);
+  max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.crm-tabs::-webkit-scrollbar{display:none}
+.crm-tab{border:0;cursor:pointer;font:inherit;font-size:12px;font-weight:600;color:var(--text-dim);
+  padding:6px 14px;border-radius:8px;background:transparent;white-space:nowrap;transition:background .15s,color .15s}
+.crm-tab:hover{color:var(--text);background:var(--surface-btn-hover)}
+.crm-tab.is-sel{color:#fff;background:#0A84FF;box-shadow:0 1px 4px rgba(10,132,255,.35)}
+:root.theme-light .crm-tab.is-sel{background:#0A6DDB}
+
+/* ---------- карточки (Tabler card) ---------- */
+.crm-pane{display:flex;flex-direction:column;gap:12px}
+.crm-pane[hidden]{display:none}
+.crm-card{border-radius:12px;background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);padding:12px 14px}
+.crm-card__h{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;margin:0 0 4px}
+.crm-card__h h3{margin:0;font-size:12.5px;font-weight:700}
+.crm-chart{width:100%;height:230px}
+.crm-chart--main{height:260px}
+.crm-chart--funnel{height:230px}
+.crm-chart--heat{height:240px}
+.crm-note{margin:0;font-size:11px;color:var(--text-dim)}
+
+/* ---------- KPI-карточки со спарклайнами ---------- */
+.crm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.crm-kpi{position:relative;border-radius:12px;background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
+  padding:10px 12px 8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.crm-kpi__l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim)}
+.crm-kpi__row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.crm-kpi__v{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.crm-kpi__d{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:999px}
+.crm-kpi__d.is-up{color:#2fb344;background:rgba(47,179,68,.12)}
+.crm-kpi__d.is-down{color:#d63939;background:rgba(214,57,57,.12)}
+.crm-kpi__spark{width:100%;height:26px;margin-top:4px;display:block}
+.crm-kpi__spark polyline{fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.crm-kpi__spark .sp-fill{opacity:.14}
+
+/* ---------- таблица штата (Tabler table) ---------- */
+.crm-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.crm-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.crm-table th{padding:7px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--text-dim);border-bottom:1px solid var(--ring-strong);white-space:nowrap;
+  cursor:pointer;user-select:none}
+.crm-table th:hover{color:var(--text)}
+.crm-table th .sort{font-size:9px;margin-left:3px;color:#0A84FF}
+.crm-table td{padding:8px 10px;border-bottom:1px solid var(--ring);vertical-align:middle;white-space:nowrap}
+.crm-table tbody tr{transition:background .12s}
+.crm-table tbody tr:hover{background:var(--surface)}
+.crm-table tr.is-ai{cursor:pointer}
+.crm-table td.num{font-variant-numeric:tabular-nums}
+.crm-emp{display:flex;align-items:center;gap:9px;min-width:0}
+.crm-emp b{font-weight:650;font-size:12.5px}
+.crm-ava{width:28px;height:28px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 1px var(--ring-strong)}
+.crm-ava--ini{display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff;
+  background:hsl(var(--h,215),46%,46%)}
+.crm-type{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--surface)}
+.crm-type--ai{color:#0A84FF;background:rgba(10,132,255,.10)}
+:root.theme-light .crm-type--ai{color:#0A6DDB}
+.crm-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px}
+.crm-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.crm-badge--ok{color:#2fb344;background:rgba(47,179,68,.12)}
+.crm-badge--vac{color:#f59f00;background:rgba(245,159,0,.13)}
+.crm-badge--247{color:#2fb344;background:rgba(47,179,68,.12)}
+.crm-load{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-variant-numeric:tabular-nums}
+.crm-load__bar{width:56px;height:4px;border-radius:2px;background:var(--surface-btn);overflow:hidden;flex:none}
+.crm-load__bar i{display:block;height:100%;border-radius:2px;background:#0A84FF}
+.crm-load__bar i.hi{background:#f59f00}
+
+/* итоговая строка ФОТ */
+.crm-tsum{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin-top:10px;padding:9px 12px;
+  border-radius:10px;background:var(--surface);font-size:12px}
+.crm-tsum b{font-variant-numeric:tabular-nums}
+.crm-tsum .ai{color:#2fb344;font-weight:700}
+
+/* мини-карточка ИИ-сотрудника */
+.crm-drow td{padding:0 10px 10px;white-space:normal}
+.crm-dcard{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;
+  background:var(--surface);box-shadow:inset 0 0 0 1px var(--ring)}
+.crm-dcard .crm-ava{width:52px;height:52px;border-radius:12px}
+.crm-dcard__b{flex:1 1 200px;min-width:0}
+.crm-dcard__b h4{margin:0 0 3px;font-size:13px}
+.crm-dcard__b p{margin:0 0 4px;font-size:12px;line-height:1.45;color:var(--text-dim)}
+.crm-dcard__save{font-size:12px;font-weight:700;color:#2fb344}
+.crm-dcard .wbtn{flex:none;align-self:center}
+
+/* ---------- ROI ---------- */
+.crm-roigrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.crm-roi__sum{margin:4px 0 0;font-size:12px;text-align:center;color:var(--text-dim)}
+.crm-roi__sum b{color:#2fb344}
+.crm-cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:14px 16px;border-radius:12px;
+  background:linear-gradient(120deg,rgba(10,132,255,.14),rgba(94,92,230,.10));box-shadow:inset 0 0 0 1px var(--ring)}
+.crm-cta p{margin:0;font-size:12.5px;line-height:1.5;flex:1 1 260px}
+.crm-cta .win-actions{margin:0}
+
+/* ---------- мобильный: вкладки скроллом, таблица карточками ---------- */
+@media (max-width:760px){
+  .crm-kpis{grid-template-columns:1fr 1fr}
+  .crm-roigrid{grid-template-columns:1fr}
+  .crm-chart{height:210px}
+  .crm-chart--main{height:230px}
+  .crm-table thead{display:none}
+  .crm-table,.crm-table tbody{display:block}
+  .crm-table tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;padding:10px 4px;border-bottom:1px solid var(--ring)}
+  .crm-table tbody tr td{display:block;border:0;padding:2px 0;white-space:normal}
+  .crm-table td[data-l]::before{content:attr(data-l);display:block;font-size:9.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim)}
+  .crm-table td.crm-td-emp{grid-column:1/-1}
+  .crm-drow{display:block;padding:0 0 10px}
+  .crm-drow td{grid-column:1/-1}
+}
+@media (max-width:420px){
+  .crm-kpis{grid-template-columns:1fr 1fr}
+  .crm-kpi__v{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .crm-tab,.crm-table tbody tr{transition:none}
+}
