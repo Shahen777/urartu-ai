@@ -41,7 +41,7 @@
 
   function available() {
     if (healthy !== null && (Date.now() - checkedAt) < 60000) return Promise.resolve(healthy);
-    if (base) {
+    if (base !== null) {
       return probe(base).then(function (ok) { healthy = ok; checkedAt = Date.now(); return ok; });
     }
     /* без явного адреса: если сайт и агент опубликованы на одном хосте
@@ -60,7 +60,7 @@
   }
 
   function reply(agent, message, history, voice) {
-    if (!base) return Promise.reject('no-api');
+    if (base === null) return Promise.reject('no-api');
     var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var t = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 55000) : 0;
     return fetch(base + '/api/voice', {
