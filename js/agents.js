@@ -481,6 +481,26 @@
     thinkRows = logBoth('lead', esc(L('Разбираю задачу на шаги и распределяю…', 'Breaking the task into steps and delegating…')), null, false, true);
     var base = reduceMotion() ? 0 : 750, step = reduceMotion() ? 0 : 620;
 
+    /* Кто участвует — быстрый локальный разбор (route, работает всегда,
+       даже без бэкенда). А ЧТО именно сотрудник сделал — если умный агент
+       доступен, реальный ответ от LLM (своя роль/промпт), иначе — прежняя
+       заготовка pk.res (честный офлайн-фолбэк). Запрашиваем сразу для всех
+       picks параллельно, чтобы не копить задержку. */
+    var resolvers = picks.map(function (pk) {
+      if (!window.AgentAPI) return Promise.resolve(pk.res);
+      return window.AgentAPI.available().then(function (ok) {
+        if (!ok) return pk.res;
+        var prompt = L(
+          'Задача от руководителя: «' + text + '». Одним предложением, в прошедшем времени, конкретно опиши, что именно ты только что сделал(а) по этой задаче.',
+          'Task from the lead: "' + text + '". In one sentence, past tense, describe specifically what you just did about this task.'
+        );
+        return window.AgentAPI.reply(pk.id, prompt, [], false).then(
+          function (r) { return (r && r.text) ? r.text : pk.res; },
+          function () { return pk.res; }
+        );
+      }, function () { return pk.res; });
+    });
+
     picks.forEach(function (pk, i) {
       setTimeout(function () {
         if (office) { var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]'); if (pod && pod.__assign) pod.__assign(pk.sub); }
@@ -489,19 +509,22 @@
       }, base + i * step);
     });
     var after = base + picks.length * step + step;
-    picks.forEach(function (pk, i) {
-      setTimeout(function () {
-        if (office) { var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]'); if (pod && pod.__done) pod.__done(pk.res); }
-        if (has3d) window.Office3D.done(pk.id, pk.res);
-        logBoth('done', '<b>' + esc(tr(nameKeyOf(pk.id))) + '</b> — ' + esc(pk.res), pk.id, true);
-      }, after + i * step);
+    var doneAt = picks.map(function (pk, i) {
+      var minDelay = after + i * step;
+      var timerP = new Promise(function (res) { setTimeout(res, minDelay); });
+      return Promise.all([timerP, resolvers[i]]).then(function (arr) {
+        var realRes = arr[1];
+        if (office) { var pod = office.querySelector('.office__pod[data-pod="' + pk.id + '"]'); if (pod && pod.__done) pod.__done(realRes); }
+        if (has3d) window.Office3D.done(pk.id, realRes);
+        logBoth('done', '<b>' + esc(tr(nameKeyOf(pk.id))) + '</b> — ' + esc(realRes), pk.id, true);
+      });
     });
-    setTimeout(function () {
+    Promise.all(doneAt).then(function () {
       thinkRows.forEach(function (r) { if (r && r.parentNode) r.remove(); });
       logBoth('lead', esc(L('Готово. Свёл результат — можно проверить и подтвердить.', 'Done. I combined the result — review and confirm.')), null, true);
       if (office) office.classList.remove('is-dispatch');
       dispatching = false;
-    }, after + picks.length * step + step);
+    });
   }
   var runDispatch = dispatchAll;
 
