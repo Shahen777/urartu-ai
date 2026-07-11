@@ -3184,7 +3184,10 @@
       stopRec();
       if (!audioUrl) { speak(text, then); return; }
       var w = $('aiAvaWrap');
-      var a = new Audio(); curAudio = a;
+      /* переиспользуем ОДИН и тот же <audio>, разблокированный в клике
+         (unlockAudio) — на iOS Safari разрешение на звук привязано к
+         конкретному элементу, а не к домену/странице */
+      var a = agentAudioEl || new Audio(); curAudio = a;
       var subbed = false, doneCalled = false;
       var done = function () {
         if (doneCalled) return; doneCalled = true;
@@ -3194,6 +3197,7 @@
       a.onplay = function () { if (!subbed) { subbed = true; sub('ai', text); speakingNow = true; setStatus('ai.st.speak'); if (w) w.classList.add('is-talk'); } };
       a.onended = done;
       a.onerror = function () { curAudio = null; if (!subbed) speak(text, then); else done(); };
+      a.volume = 1;
       a.src = audioUrl;
       var p = a.play(); if (p && p.catch) p.catch(function () { curAudio = null; if (!subbed) speak(text, then); });
     }
@@ -3246,14 +3250,18 @@
        синтез — секунды) браузер молча блокирует автовоспроизведение со
        звуком, и код тихо откатывается на старый системный голос. Разово
        проигрываем беззвучный WAV строго в обработчике клика — дальше
-       воспроизведение звука разрешено всю сессию. */
+       воспроизведение звука разрешено всю сессию.
+       Safari/iOS строже Chrome: разрешение привязано к КОНКРЕТНОМУ элементу
+       <audio>, а не к домену/странице — поэтому переиспользуем ОДИН и тот же
+       элемент для разблокировки и для реальной речи агента (не создаём новый). */
     var audioUnlocked = false;
+    var agentAudioEl = null;
     function unlockAudio() {
       if (audioUnlocked) return;
       try {
-        var a = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
-        a.volume = 0;
-        var p = a.play();
+        agentAudioEl = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+        agentAudioEl.volume = 0;
+        var p = agentAudioEl.play();
         if (p && p.catch) p.catch(function () {});
         audioUnlocked = true;
       } catch (e) {}
