@@ -3290,10 +3290,12 @@
     function unlockAudio() {
       if (audioUnlocked) return;
       try {
-        agentAudioEl = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+        if (!agentAudioEl) agentAudioEl = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
         agentAudioEl.volume = 0;
         var p = agentAudioEl.play();
-        if (p && p.catch) p.catch(function () {});
+        /* флаг только при реальном успехе play() — иначе следующий настоящий
+           тап сможет повторить попытку разблокировки */
+        if (p && p.then) { p.then(function () { audioUnlocked = true; }, function () {}); return; }
         audioUnlocked = true;
       } catch (e) {}
     }

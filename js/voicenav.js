@@ -73,7 +73,13 @@
     howMuch:  /(сколько стоит|сколько это стоит|почем|how much|what does it cost|what's the price)/,
     next:     /(следующ\S* страниц|страницу дальше|листай дальше|next page)/,
     prev:     /(предыдущ\S* страниц|страницу назад|previous page)/,
-    up:       /(наверх|в начало|to the top|scroll up|go up)/
+    up:       /(наверх|в начало|to the top|scroll up|go up)/,
+    help:     /(что ты умеешь|что умеешь|список команд|голосовые команды|help|what can you do|list commands)/,
+    repeat:   /(повтори|что ты сказал|скажи ещё раз|repeat that|say that again|what did you say)/,
+    timeQ:    /(который час|сколько времени|скажи время|what time is it|current time)/,
+    dateQ:    /(какое сегодня число|какой сегодня день|what.?s the date|today.?s date)/,
+    reload:   /(обнови страницу|перезагрузи страницу|перезапусти сайт|refresh the page|reload the page)/,
+    interrupt:/(замолчи|тихо|хватит говорить|stop talking|shut up|cancel that)/
   };
 
   /* списки токенов там, где нужна граница слова у кириллицы (regex \b
@@ -113,7 +119,13 @@
     if (!t) return null;
     var m;
 
+    if (RE.interrupt.test(t)) return { t: 'interrupt' };
     if (RE.stop.test(t)) return { t: 'stopListen' };
+    if (RE.help.test(t)) return { t: 'help' };
+    if (RE.repeat.test(t)) return { t: 'repeat' };
+    if (RE.timeQ.test(t)) return { t: 'time' };
+    if (RE.dateQ.test(t)) return { t: 'date' };
+    if (RE.reload.test(t)) return { t: 'reload' };
 
     /* прямые сценарии — раньше открытия окон */
     if (RE.callSec.test(t) && RE.secr.test(t)) return { t: 'call' };
@@ -175,11 +187,14 @@
   function unlockAgentAudio() {
     if (agentAudioUnlocked) return;
     try {
-      agentAudioEl = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+      if (!agentAudioEl) agentAudioEl = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
       agentAudioEl.volume = 0;
       var p = agentAudioEl.play();
-      if (p && p.catch) p.catch(function () {});
-      agentAudioUnlocked = true;
+      /* флаг только при реальном успехе — иначе следующий настоящий тап
+         сможет повторить попытку (иначе автоплей молча остаётся заблокирован
+         на всю сессию, а код думает, что звук разрешён) */
+      if (p && p.then) p.then(function () { agentAudioUnlocked = true; }, function () {});
+      else agentAudioUnlocked = true;
     } catch (e) {}
   }
   function rank(v) {
@@ -377,8 +392,7 @@
     document.head.appendChild(s);
   }
 
-  function fallbackAsk(text) {
-    setAct(tr('vn.think'));
+  function localAskFallback(text) {
     ensureAI(function () {
       if (!window.LocalAI) return;
       var fin = function (res) {
@@ -394,6 +408,25 @@
     });
   }
 
+  /* свободный вопрос голосом: сначала настоящий агент (kie.ai LLM), тот же
+     паттерн, что уже используется в чате/звонке — иначе честный офлайн-фолбэк */
+  function fallbackAsk(text) {
+    setAct(tr('vn.think'));
+    if (window.AgentAPI) {
+      window.AgentAPI.available().then(function (ok) {
+        if (!ok) { localAskFallback(text); return; }
+        window.AgentAPI.reply('secretary', text, [], false).then(function (r) {
+          var t = (r && r.text) ? String(r.text).trim() : '';
+          if (!t) { localAskFallback(text); return; }
+          setAct(t);
+          speak(t);
+        }, function () { localAskFallback(text); });
+      });
+      return;
+    }
+    localAskFallback(text);
+  }
+
   /* ============================================================
      ИСПОЛНЕНИЕ КОМАНД
      ============================================================ */
@@ -403,7 +436,8 @@
     open.sort(function (a, b) { return (+b.style.zIndex || 0) - (+a.style.zIndex || 0); });
     return open[0];
   }
-  function say(text) { setAct(text); speak(text); }
+  var lastSaid = '';
+  function say(text) { lastSaid = text; setAct(text); speak(text); }
 
   function exec(cmd) {
     if (!cmd) return false;
@@ -511,6 +545,34 @@
           dots[idx].click();
         }
         say(tr('vn.page'));
+        return true;
+
+      case 'help':
+        say(tr('vn.help'));
+        return true;
+
+      case 'repeat':
+        if (lastSaid) { setAct(lastSaid); speak(lastSaid); } else say(tr('vn.norepeat'));
+        return true;
+
+      case 'time':
+        say(new Date().toLocaleTimeString(lang() === 'en' ? 'en-US' : 'ru-RU', { hour: '2-digit', minute: '2-digit' }));
+        return true;
+
+      case 'date':
+        say(new Date().toLocaleDateString(lang() === 'en' ? 'en-US' : 'ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }));
+        return true;
+
+      case 'reload':
+        say(tr('vn.reload'));
+        setTimeout(function () { location.reload(); }, 600);
+        return true;
+
+      case 'interrupt':
+        try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+        try { if (agentAudioEl) agentAudioEl.pause(); } catch (e) {}
+        speaking = false; syncDot();
+        resumeRec();
         return true;
     }
     return false;
