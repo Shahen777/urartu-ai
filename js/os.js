@@ -1595,6 +1595,7 @@
     var btnVideo = document.getElementById('callVideo');
     var btnEnd = document.getElementById('callEnd');
     var btnCopy = document.getElementById('callCopy');
+    var liveTg = document.getElementById('callLiveTg');
     if (!home || !live || !stage) return;
 
     var HOST = 'https://meet.jit.si/';
@@ -1630,6 +1631,9 @@
       live.hidden = false;
       win.classList.add('is-live');
       if (statusEl) statusEl.textContent = tr('call.connected');
+      /* «Позвать в Telegram» во время звонка — с реальной ссылкой на комнату,
+         иначе кнопка ничего не сообщает о ТЕКУЩЕМ звонке (была статичной) */
+      if (liveTg) liveTg.href = 'https://t.me/Shahen_kazaryan?text=' + encodeURIComponent(tr('call.tg.live').replace('{u}', roomUrl()));
     }
 
     /* Кладём трубку: убираем iframe, иначе микрофон останется включённым. */
@@ -1639,6 +1643,7 @@
       home.hidden = false;
       win.classList.remove('is-live');
       room = null;
+      if (liveTg) liveTg.href = 'https://t.me/Shahen_kazaryan'; /* сбросить — комнаты больше нет */
     }
 
     if (btnAudio) btnAudio.addEventListener('click', function () { start(false); });
@@ -1724,16 +1729,20 @@
     function fmtRub(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
     function fmtUsd(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
     function toUsd(rub) { return Math.round(rub / RATES.usd / 10) * 10; }
+    /* «Контент-фабрика» — единственная услуга с абонентской (не разовой)
+       ценой; суффикс «/мес» должен быть виден везде, где показана сумма —
+       не только на карточке услуги, но и в самом расчёте и в смете. */
+    function moSuffix() { return (state.svc === 'content') ? (lang() === 'en' ? '/mo' : '/мес') : ''; }
 
     /* нарисовать сумму (rub) в текущем языке: RU — «от X ₽» + «≈ $Y», EN — наоборот */
     function paint(rub) {
-      var usd = toUsd(rub);
+      var usd = toUsd(rub), suf = moSuffix();
       if (lang() === 'en') {
-        elSum.textContent = tr('calc.from') + ' $' + fmtUsd(usd);
-        elAlt.textContent = '≈ ' + fmtRub(rub) + ' ₽';
+        elSum.textContent = tr('calc.from') + ' $' + fmtUsd(usd) + suf;
+        elAlt.textContent = '≈ ' + fmtRub(rub) + ' ₽' + suf;
       } else {
-        elSum.textContent = tr('calc.from') + ' ' + fmtRub(rub) + ' ₽';
-        elAlt.textContent = '≈ $' + fmtUsd(usd);
+        elSum.textContent = tr('calc.from') + ' ' + fmtRub(rub) + ' ₽' + suf;
+        elAlt.textContent = '≈ $' + fmtUsd(usd) + suf;
       }
     }
 
@@ -1757,10 +1766,10 @@
 
     /* текст расчёта для Telegram — собирается из тех же i18n-строк */
     function tgHref() {
-      var t = total();
+      var t = total(), suf = moSuffix();
       var sum = (lang() === 'en')
-        ? tr('calc.from') + ' $' + fmtUsd(toUsd(t)) + ' (≈ ' + fmtRub(t) + ' ₽)'
-        : tr('calc.from') + ' ' + fmtRub(t) + ' ₽';
+        ? tr('calc.from') + ' $' + fmtUsd(toUsd(t)) + ' (≈ ' + fmtRub(t) + ' ₽)' + suf
+        : tr('calc.from') + ' ' + fmtRub(t) + ' ₽' + suf;
       var opts = [];
       if (state.hw) opts.push(tr('calc.optHw').replace(/^\+\s*/, ''));
       if (state.sup) opts.push(tr('calc.optSup').replace(/^\+\s*/, '') + ' (' + tr('calc.moLine') + ')');
@@ -1888,6 +1897,7 @@
     var contactEl = document.getElementById('calContact');
     var submitBtn = document.getElementById('calSubmit');
     var errEl = document.getElementById('calErr');
+    var okEl = document.getElementById('calOk');
 
     /* названия месяцев — локальные данные (офлайн, без Intl-сюрпризов) */
     var MONTHS = {
@@ -1898,7 +1908,14 @@
       ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
     };
 
-    var today = new Date(); today.setHours(0, 0, 0, 0);
+    /* слоты — московское время (МСК, UTC+3, без перехода на летнее) —
+       «сегодня»/«прошло» тоже должны считаться по МСК, а не по часовому
+       поясу браузера гостя, иначе гость из другого пояса увидит не те
+       дни/слоты как «сегодня» и сможет забронировать прошедшее время. */
+    function mskNow() { return new Date(Date.now() + 3 * 3600000); } // читать через getUTC*
+    var todayMsk = mskNow();
+    var today = new Date(todayMsk.getUTCFullYear(), todayMsk.getUTCMonth(), todayMsk.getUTCDate());
+    today.setHours(0, 0, 0, 0);
     var RANGE = 2;                                   // навигация до +2 месяцев вперёд
     var minKey = today.getFullYear() * 12 + today.getMonth();
     var maxKey = minKey + RANGE;
@@ -1970,6 +1987,7 @@
       renderSlots();
       panel.hidden = false;
       pickedLine.hidden = true;
+      okEl.hidden = true;
       updateSubmit();
       if (!reduceMotion && panel.scrollIntoView) {
         try { panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
@@ -1978,7 +1996,16 @@
 
     function renderSlots() {
       slotsEl.innerHTML = '';
+      var isToday = sameDay(selDate, today);
+      var curH = -1, curM = -1;
+      if (isToday) { var mn = mskNow(); curH = mn.getUTCHours(); curM = mn.getUTCMinutes(); }
+      var shown = 0;
       SLOTS.forEach(function (tm) {
+        if (isToday) {
+          var p = tm.split(':'), sh = +p[0], sm = +p[1];
+          if (sh < curH || (sh === curH && sm <= curM)) return; // слот уже прошёл (время МСК)
+        }
+        shown++;
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'calx__slot';
@@ -1995,11 +2022,17 @@
             all[i].setAttribute('aria-checked', on ? 'true' : 'false');
           }
           pickedLine.hidden = false;
-          pickedLine.textContent = '✓ ' + humanDate(selDate) + ' · ' + selTime;
+          pickedLine.textContent = '✓ ' + humanDate(selDate) + ' · ' + selTime + ' ' + (lang() === 'en' ? 'MSK' : 'МСК');
           updateSubmit();
         });
         slotsEl.appendChild(b);
       });
+      if (!shown) {
+        var empty = document.createElement('p');
+        empty.className = 'calx__slotsempty';
+        empty.textContent = tr('cal.slots.none');
+        slotsEl.appendChild(empty);
+      }
     }
 
     function updateSubmit() {
@@ -2018,20 +2051,24 @@
       return 'https://t.me/Shahen_kazaryan?text=' + encodeURIComponent(msg);
     }
 
-    /* .ics VEVENT на 30 минут (плавающее локальное время) */
+    /* .ics VEVENT на 30 минут — абсолютное время в UTC (МСК = UTC+3, без
+       перехода на летнее), а не «плавающее» локальное: иначе календарь гостя
+       из другого часового пояса показал бы встречу в НЕ то время суток. */
     function icsStamp(dt) {
       return dt.getUTCFullYear() + pad2(dt.getUTCMonth() + 1) + pad2(dt.getUTCDate()) +
         'T' + pad2(dt.getUTCHours()) + pad2(dt.getUTCMinutes()) + pad2(dt.getUTCSeconds()) + 'Z';
     }
-    function icsLocal(y, mo, d, h, mi) {
-      return y + pad2(mo + 1) + pad2(d) + 'T' + pad2(h) + pad2(mi) + '00';
+    function mskToUtcStamp(y, mo, d, h, mi) {
+      var dt = new Date(Date.UTC(y, mo, d, h, mi) - 3 * 3600000);
+      return icsStamp(dt);
     }
     function downloadIcs() {
       var parts = selTime.split(':');
       var h = +parts[0], mi = +parts[1];
-      var startL = icsLocal(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), h, mi);
+      var y = selDate.getFullYear(), mo = selDate.getMonth(), d = selDate.getDate();
+      var startU = mskToUtcStamp(y, mo, d, h, mi);
       var endM = mi + 30, endH = h + Math.floor(endM / 60); endM = endM % 60;
-      var endL = icsLocal(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), endH, endM);
+      var endU = mskToUtcStamp(y, mo, d, endH, endM);
       var uid = selDate.getTime() + '-' + h + mi + '-urartu@shahen777.github.io';
       var lines = [
         'BEGIN:VCALENDAR',
@@ -2042,8 +2079,8 @@
         'BEGIN:VEVENT',
         'UID:' + uid,
         'DTSTAMP:' + icsStamp(new Date()),
-        'DTSTART:' + startL,
-        'DTEND:' + endL,
+        'DTSTART:' + startU,
+        'DTEND:' + endU,
         'SUMMARY:' + tr('cal.ics.summary'),
         'DESCRIPTION:' + tr('cal.ics.desc'),
         'END:VEVENT',
@@ -2072,11 +2109,16 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (submitBtn.disabled) return; /* защита от двойного клика/сабмита */
       if (!selDate || !selTime) { errEl.hidden = false; errEl.textContent = tr('cal.err.slot'); return; }
       if (!nameEl.value.trim()) { errEl.hidden = false; errEl.textContent = tr('cal.err.name'); nameEl.focus(); return; }
       errEl.hidden = true;
       downloadIcs();                                 // встреча падает в календарь клиента
       window.open(tgHref(), '_blank', 'noopener');   // и уходит запрос в Telegram
+      okEl.hidden = false;
+      okEl.textContent = tr('cal.ok').replace('{d}', humanDate(selDate)).replace('{t}', selTime);
+      submitBtn.disabled = true;
+      setTimeout(function () { updateSubmit(); }, 4000); // разблокировать (если слот/имя всё ещё заполнены)
     });
 
     document.addEventListener('i18n:change', function () {
@@ -2357,11 +2399,18 @@
     }
     function clearTyping() { if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl); typingEl = null; }
 
-    function push(m) {
-      threads[cur] = threads[cur] || [];
-      threads[cur].push(m);
-      var th = el('msgThread'); if (th) { th.appendChild(bubble(m)); scrollDown(); }
-      var c = find(cur); if (c) c._lastText = textOf(m);
+    /* threadId — куда именно писать (может отличаться от cur, если пользователь
+       успел переключиться на другой диалог, пока ответ ещё летел); в видимый
+       DOM пузырь добавляется, только если этот тред сейчас открыт — иначе
+       ответ молча уходит в чужой (тогдашний) тред и не «протекает» в текущий. */
+    function push(m, threadId) {
+      var tid = threadId || cur;
+      threads[tid] = threads[tid] || [];
+      threads[tid].push(m);
+      if (tid === cur) {
+        var th = el('msgThread'); if (th) { th.appendChild(bubble(m)); scrollDown(); }
+      }
+      var c = find(tid); if (c) c._lastText = textOf(m);
       refreshPreviews();
     }
 
@@ -2369,10 +2418,10 @@
       // Страховка от гигантской вставки (LocalAI.ask ~O(n²) + layout пузыря):
       // поле и так имеет maxlength=2000, но режем и программные вызовы.
       text = String(text || '').slice(0, 2000).trim(); if (!text || !cur) return;
-      push({ who: 'me', text: text });
+      var agent = cur;
+      push({ who: 'me', text: text }, agent);
       showTyping();
       var delay = reduceMotion ? 0 : (800 + Math.random() * 700); // 0.8–1.5с
-      var agent = cur;
       setTimeout(function () {
         var fin = function (res) {
           clearTyping();
@@ -2380,13 +2429,13 @@
           // markdown-it → DOMPurify → DOM. Готовые html-ответы (BM25/юрист) не трогаем.
           if (res && res.source === 'webllm' && res.text && !res.html && window.LotJ && window.LotJ.md) {
             window.LotJ.md(res.text).then(function (html) {
-              push({ who: 'them', html: html, text: res.text, chips: res.chips || [], source: res.source });
+              push({ who: 'them', html: html, text: res.text, chips: res.chips || [], source: res.source }, agent);
             }, function () {
-              push({ who: 'them', text: res.text, chips: res.chips || [], source: res.source });
+              push({ who: 'them', text: res.text, chips: res.chips || [], source: res.source }, agent);
             });
             return;
           }
-          push({ who: 'them', text: res.text, html: res.html, chips: res.chips || [], source: res.source });
+          push({ who: 'them', text: res.text, html: res.html, chips: res.chips || [], source: res.source }, agent);
         };
         function localChat() {
           if (window.LocalAI && window.LocalAI.askAsync) {
@@ -3151,7 +3200,7 @@
     }
 
     function listen() {
-      if (!on || muted || speakingNow) return;
+      if (!on || muted || speakingNow || thinking) return; /* ждём ответ агента — не запускаем распознавание поверх */
       stopRec();   // на случай если предыдущий rec ещё не завершён — максимум один экземпляр
       setStatus('ai.st.listen');
       recWanted = true;
@@ -3411,7 +3460,7 @@
         done();
         if (!starting) { s.getTracks().forEach(function (t) { t.stop(); }); return; } // окно уже закрыли — не оживать
         starting = false; stream = s; begin();
-      }, function () { done(); starting = false; showFb('voice.denied'); });
+      }, function () { done(); if (!starting) return; starting = false; showFb('voice.denied'); }); // окно уже закрыли — не показываем «отказано» задним числом
     }
 
     function begin() {

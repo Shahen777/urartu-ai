@@ -34,12 +34,17 @@
   var pendingProbe = null;    // in-flight промис — гасит параллельные дубли /api/health
 
   function probe(b) {
-    return fetch(b + '/api/health', { method: 'GET' })
-      .then(function (r) { return r.ok ? r.json() : null; })
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var t = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 7000) : 0;
+    return fetch(b + '/api/health', { method: 'GET', signal: ctrl && ctrl.signal })
+      .then(function (r) { if (t) clearTimeout(t); return r.ok ? r.json() : null; })
       .then(function (j) { return !!(j && j.ok && j.has_key); })
-      .catch(function () { return false; });
+      .catch(function () { if (t) clearTimeout(t); return false; });
   }
 
+  /* pendingProbe освобождается ВСЕГДА — и при успехе, и при обрыве по
+     таймауту — иначе повисший /api/health навсегда блокирует available()
+     (и все места сайта, которые её вызывают) до перезагрузки страницы. */
   function available() {
     if (healthy !== null && (Date.now() - checkedAt) < 60000) return Promise.resolve(healthy);
     if (pendingProbe) return pendingProbe;

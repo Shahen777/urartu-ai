@@ -10,6 +10,7 @@
       /* meta */
       'meta.title': 'Локальные ИИ-сотрудники 24/7 | 152-ФЗ | Urartu AI',
       'meta.desc': 'Цифровые ИИ-агенты на вашем сервере отвечают клиентам и проверяют документы 24/7. Данные не покидают компанию. 152-ФЗ. Пилот — 2 недели.',
+      'meta.og.title': 'Локальные ИИ-сотрудники 24/7 для бизнеса — свой ИИ на вашем сервере | 152-ФЗ | Urartu AI',
       'meta.og.desc': 'Внедряем локальных ИИ-сотрудников 24/7: цифровые агенты на сервере компании — отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Данные не уходят в облако. Локальный ИИ, 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.',
 
       /* меню-бар: сгруппированные меню */
@@ -354,8 +355,11 @@
       'cal.form.submit': 'Записаться',
       'cal.err.slot': 'Сначала выберите день и время.',
       'cal.err.name': 'Пожалуйста, укажите имя.',
-      'cal.note': '30 минут онлайн · без презентаций и обязательств · подтверждение придёт в Telegram. Встреча сразу скачается в ваш календарь (.ics).',
-      'cal.tg.msg': 'Здравствуйте! Хочу записаться на демо {d} в {t}. Меня зовут {n}{c}.',
+      'cal.note': '30 минут онлайн (время московское, МСК) · без презентаций и обязательств · подтверждение придёт в Telegram. Встреча сразу скачается в ваш календарь (.ics) — время конвертируется под ваш часовой пояс.',
+      'cal.tg.msg': 'Здравствуйте! Хочу записаться на демо {d} в {t} МСК. Меня зовут {n}{c}.',
+      'cal.ok': 'Готово — встреча {d} в {t} МСК сохранена в ваш календарь. Откроется Telegram для подтверждения.',
+      'cal.slots.tz': 'Время указано по Москве (МСК, UTC+3)',
+      'cal.slots.none': 'На сегодня свободных слотов больше нет — выберите другой день.',
       'cal.ics.summary': 'Демо Urartu AI · локальные ИИ-сотрудники',
       'cal.ics.desc': 'Демонстрация локальных ИИ-сотрудников. Подтверждение придёт в Telegram: @Shahen_kazaryan',
 
@@ -392,6 +396,7 @@
       'call.audioAria': 'Позвонить голосом', 'call.videoAria': 'Позвонить с видео',
       'call.hint': 'Звонок идёт прямо из браузера — устанавливать ничего не нужно. Если не отвечу сразу, нажмите «Позвать в Telegram»: увижу и подключусь.',
       'call.tg': 'Позвать в Telegram', 'call.phone': 'Позвонить по телефону',
+      'call.tg.live': 'Здравствуйте! Звоню через сайт, подключитесь: {u}',
       'call.connecting': 'Соединение…',
       'call.connected': 'Комната создана — подключаюсь',
       'call.copy': 'Скопировать ссылку', 'call.copied': 'Ссылка скопирована',
@@ -959,6 +964,7 @@
       /* meta */
       'meta.title': 'Local AI Employees 24/7 | 152-FZ | Urartu AI',
       'meta.desc': 'Digital AI agents on your own server answer clients and review documents 24/7. Data never leaves your company. 152-FZ compliant. Pilot in 2 weeks.',
+      'meta.og.title': 'Local AI employees 24/7 for business — your own AI on your own server | 152-FZ | Urartu AI',
       'meta.og.desc': 'We deploy local AI employees that work 24/7 — digital agents on your own server: answer from your policies, review contracts and run customer support. On-premise AI, never sends data to the cloud. 152-FZ compliant. Pilot in 2 weeks. Moscow and all of Russia.',
 
       /* menu bar: grouped menus */
@@ -1303,8 +1309,11 @@
       'cal.form.submit': 'Book',
       'cal.err.slot': 'Please pick a day and time first.',
       'cal.err.name': 'Please enter your name.',
-      'cal.note': '30 minutes online · no slides, no obligations · confirmation comes via Telegram. The meeting downloads straight into your calendar (.ics).',
-      'cal.tg.msg': 'Hello! I’d like to book a demo on {d} at {t}. My name is {n}{c}.',
+      'cal.note': '30 minutes online (Moscow time, MSK) · no slides, no obligations · confirmation comes via Telegram. The meeting downloads straight into your calendar (.ics) — the time is converted to your own time zone.',
+      'cal.tg.msg': 'Hello! I’d like to book a demo on {d} at {t} MSK. My name is {n}{c}.',
+      'cal.ok': 'Done — {d} at {t} MSK is saved to your calendar. Telegram will open to confirm.',
+      'cal.slots.tz': 'Times are shown in Moscow time (MSK, UTC+3)',
+      'cal.slots.none': 'No slots left for today — please pick another day.',
       'cal.ics.summary': 'Urartu AI demo · local AI employees',
       'cal.ics.desc': 'A demo of local AI employees. Confirmation will come via Telegram: @Shahen_kazaryan',
 
@@ -1341,6 +1350,7 @@
       'call.audioAria': 'Start an audio call', 'call.videoAria': 'Start a video call',
       'call.hint': 'The call runs in your browser — nothing to install. If I don’t pick up right away, tap “Ping me on Telegram” and I’ll join.',
       'call.tg': 'Ping me on Telegram', 'call.phone': 'Call by phone',
+      'call.tg.live': 'Hi! I’m calling via the site, please join: {u}',
       'call.connecting': 'Connecting…',
       'call.connected': 'Room created — I’m joining',
       'call.copy': 'Copy link', 'call.copied': 'Link copied',
@@ -1962,7 +1972,7 @@
     /* meta / title */
     document.title = t('meta.title', l);
     setMeta('description', t('meta.desc', l));
-    setMeta('og:title', t('meta.title', l), 'property');
+    setMeta('og:title', t('meta.og.title', l), 'property');
     setMeta('og:description', t('meta.og.desc', l), 'property');
     setMeta('og:locale', l === 'en' ? 'en_US' : 'ru_RU', 'property');
 

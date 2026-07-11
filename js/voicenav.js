@@ -74,9 +74,9 @@
     next:     /(следующ\S* страниц|страницу дальше|листай дальше|next page)/,
     prev:     /(предыдущ\S* страниц|страницу назад|previous page)/,
     up:       /(наверх|в начало|to the top|scroll up|go up)/,
-    help:     /(что ты умеешь|что умеешь|список команд|голосовые команды|help|what can you do|list commands)/,
+    help:     /(что ты умеешь|что умеешь|список команд|голосовые команды|what can you do|list commands|^help$)/,
     repeat:   /(повтори|что ты сказал|скажи ещё раз|repeat that|say that again|what did you say)/,
-    timeQ:    /(который час|сколько времени|скажи время|what time is it|current time)/,
+    timeQ:    /(?:который час|сколько(?: сейчас)? времени|скажи время)\s*$|^what time is it$|^current time$/,
     dateQ:    /(какое сегодня число|какой сегодня день|what.?s the date|today.?s date)/,
     reload:   /(обнови страницу|перезагрузи страницу|перезапусти сайт|refresh the page|reload the page)/,
     interrupt:/(замолчи|тихо|хватит говорить|stop talking|shut up|cancel that)/
@@ -121,18 +121,22 @@
 
     if (RE.interrupt.test(t)) return { t: 'interrupt' };
     if (RE.stop.test(t)) return { t: 'stopListen' };
-    if (RE.help.test(t)) return { t: 'help' };
-    if (RE.repeat.test(t)) return { t: 'repeat' };
-    if (RE.timeQ.test(t)) return { t: 'time' };
-    if (RE.dateQ.test(t)) return { t: 'date' };
     if (RE.reload.test(t)) return { t: 'reload' };
 
-    /* прямые сценарии — раньше открытия окон */
+    /* прямые бизнес-сценарии — РАНЬШЕ help/time/repeat, иначе они
+       перехватывают реальные вопросы («help me schedule a demo»,
+       «сколько времени занимает внедрение» — не должны попадать
+       в шаблонный help/clock, а идти в свой сценарий или к LLM */
     if (RE.callSec.test(t) && RE.secr.test(t)) return { t: 'call' };
     if (RE.demoVerb.test(t) && (hasList(t, TOK_DEMO) || /запиши меня|запишите меня|book me/.test(t))) return { t: 'demo' };
     if (RE.contract.test(t) && RE.contrObj.test(t)) return { t: 'contract' };
     if (RE.howMuch.test(t)) return { t: 'open', w: byId('win-pricing') };
     if ((m = RE.search.exec(t))) return { t: 'search', q: m[1].trim() };
+
+    if (RE.help.test(t)) return { t: 'help' };
+    if (RE.repeat.test(t)) return { t: 'repeat' };
+    if (RE.timeQ.test(t)) return { t: 'time' };
+    if (RE.dateQ.test(t)) return { t: 'date' };
 
     /* система */
     if (hasList(t, TOK_THEME)) {
@@ -169,6 +173,16 @@
      ГОЛОС ПОДТВЕРЖДЕНИЯ: нейроголос (если загружен) → системный
      ============================================================ */
   var speaking = false, unlocked = false;
+  /* thinking — идёт ожидание ответа LLM (fallbackAsk); гасит гонки, если
+     пользователь замьютил/размьютил микрофон или сказал что-то новое,
+     пока предыдущий запрос ещё летит. Таймер — подстраховка на случай
+     мёртвого конца в цепочке колбэков (пустой ответ, LocalAI не загрузился). */
+  var thinking = false, thinkTimer = null;
+  function setThinking(v) {
+    thinking = v;
+    if (thinkTimer) { clearTimeout(thinkTimer); thinkTimer = null; }
+    if (v) thinkTimer = setTimeout(function () { thinking = false; thinkTimer = null; }, 20000);
+  }
   function unlockTTS() {
     if (unlocked || !window.speechSynthesis) return;
     try {
@@ -216,6 +230,7 @@
   }
 
   function speak(text, then) {
+    setThinking(false); /* ответ готов к озвучке — период ожидания закончен */
     /* сперва настоящий живой голос (edge-tts, тот же, что в звонке) —
        если бэкенд-агент доступен; иначе — прежний VITS/системный путь */
     if (window.AgentAPI && lang() === 'ru') {
@@ -394,13 +409,12 @@
 
   function localAskFallback(text) {
     ensureAI(function () {
-      if (!window.LocalAI) return;
+      if (!window.LocalAI) { setThinking(false); return; }
       var fin = function (res) {
         var t = (res && res.text) ? String(res.text) : '';
         t = t.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        if (!t) return;
-        setAct(t);
-        speak(t);
+        if (!t) { setThinking(false); return; }
+        say(t);
       };
       if (window.LocalAI.askAsync) {
         window.LocalAI.askAsync('secretary', text, lang()).then(fin, function () { fin(window.LocalAI.ask('secretary', text, lang())); });
@@ -409,17 +423,19 @@
   }
 
   /* свободный вопрос голосом: сначала настоящий агент (kie.ai LLM), тот же
-     паттерн, что уже используется в чате/звонке — иначе честный офлайн-фолбэк */
+     паттерн, что уже используется в чате/звонке — иначе честный офлайн-фолбэк.
+     thinking=true всё время ожидания ответа — handle() не даёт запустить
+     параллельный запрос, пока этот не завершится (say()/speak() снимут флаг). */
   function fallbackAsk(text) {
     setAct(tr('vn.think'));
+    setThinking(true);
     if (window.AgentAPI) {
       window.AgentAPI.available().then(function (ok) {
         if (!ok) { localAskFallback(text); return; }
         window.AgentAPI.reply('secretary', text, [], false).then(function (r) {
           var t = (r && r.text) ? String(r.text).trim() : '';
           if (!t) { localAskFallback(text); return; }
-          setAct(t);
-          speak(t);
+          say(t);
         }, function () { localAskFallback(text); });
       });
       return;
@@ -583,7 +599,8 @@
     text = String(text || '').trim();
     if (!text) return;
     var cmd = parse(text);
-    if (cmd) { exec(cmd); return; }
+    if (cmd) { exec(cmd); return; } /* детерминированные команды (в т.ч. interrupt/stop) работают всегда */
+    if (thinking) return; /* уже ждём ответ агента — не дублируем LLM-запрос */
     fallbackAsk(text);
   }
 

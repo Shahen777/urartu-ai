@@ -814,6 +814,7 @@
           <div class="call-live__stage" id="callStage"></div>
           <div class="call-live__bar">
             <span class="call-live__status" id="callStatus" data-i18n="call.connecting">Соединение…</span>
+            <a class="call-live__copy" id="callLiveTg" href="https://t.me/Shahen_kazaryan" target="_blank" rel="noopener" data-i18n="call.tg">Позвать в Telegram</a>
             <button class="call-live__copy" id="callCopy" data-i18n="call.copy">Скопировать ссылку</button>
             <button class="call-live__end" id="callEnd" data-i18n="call.end">Завершить</button>
           </div>
@@ -1689,6 +1690,7 @@
 
         <div class="calx__panel" id="calPanel" hidden>
           <h3 class="calx__slotsh"><span data-i18n="cal.slots.h">Свободное время</span> · <span id="calPickedDay"></span></h3>
+          <p class="calx__tz" data-i18n="cal.slots.tz">Время указано по Москве (МСК, UTC+3)</p>
           <div class="calx__slots" id="calSlots" role="radiogroup" aria-label="Время демо"></div>
 
           <form class="calx__form" id="calForm" novalidate>
@@ -1701,10 +1703,11 @@
             </label>
             <button class="wbtn wbtn--primary calx__submit" id="calSubmit" type="submit" disabled data-i18n="cal.form.submit">Записаться</button>
             <p class="calx__err" id="calErr" hidden role="alert"></p>
+            <p class="calx__ok" id="calOk" hidden role="status" aria-live="polite"></p>
           </form>
         </div>
 
-        <p class="note" data-i18n="cal.note">30 минут онлайн · без презентаций и обязательств · подтверждение придёт в Telegram. Встреча сразу скачается в ваш календарь (.ics).</p>
+        <p class="note" data-i18n="cal.note">30 минут онлайн (МСК) · без презентаций и обязательств · подтверждение придёт в Telegram. Встреча сразу скачается в ваш календарь (.ics).</p>
       </div>
     </article>
 

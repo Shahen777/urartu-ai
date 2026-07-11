@@ -49,9 +49,9 @@
 
   function comfort(station, emp) {
     var m = META[station];
-    if (!m.ladder) return { key: 'dev.ix.macAlt', warn: false };
     if (emp > m.empMax) return { key: 'dev.ix.tight', warn: true };
     if (emp >= Math.round(m.empMax * 0.8)) return { key: 'dev.ix.nearTop', warn: true };
+    if (!m.ladder) return { key: 'dev.ix.macAlt', warn: false };
     return { key: 'dev.ix.comfy', warn: false };
   }
 
