@@ -27,7 +27,7 @@
 
   var CLOUD_PER_EMP = { rub: 2500, usd: 28 }; /* ориентировочная абонплата облака на 1 пользователя/мес */
 
-  var state = { emp: 6, station: 'start', task: 'support', side: 'own' };
+  var state = { emp: 6, station: 'start', task: 'support', side: 'own', pinned: false };
   var bound = false;
 
   function t(k) { return (window.I18N && window.I18N.t) ? window.I18N.t(k) : k; }
@@ -80,6 +80,8 @@
     var cf = comfort(st, state.emp);
     var cb = $('dvxComfort');
     if (cb) { cb.textContent = t(cf.key); cb.classList.toggle('is-warn', cf.warn); }
+    var showRec = $('dvxShowRec');
+    if (showRec) showRec.hidden = !(state.pinned && cf.warn);
 
     /* задачи: перекраска по способностям станции */
     var tiles = document.querySelectorAll('#dvxTasks .dvx-task');
@@ -131,7 +133,11 @@
     var slider = $('dvxEmp');
     if (slider) slider.addEventListener('input', function () {
       state.emp = Math.max(1, Math.min(100, parseInt(slider.value, 10) || 1));
-      state.station = ladder(state.emp);
+      /* если станция закреплена явным выбором карточки — НЕ переключаем её
+         автоматически, иначе директор никогда не увидит реальную перегрузку
+         (UI сам «самоисцелялся», меняя станцию раньше, чем численность её
+         превысит) */
+      if (!state.pinned) state.station = ladder(state.emp);
       render();
     });
 
@@ -143,6 +149,14 @@
       if (!META[id]) return;
       state.station = id;
       state.emp = META[id].rep;
+      state.pinned = true;
+      render();
+    });
+
+    var showRec = $('dvxShowRec');
+    if (showRec) showRec.addEventListener('click', function () {
+      state.pinned = false;
+      state.station = ladder(state.emp);
       render();
     });
 
