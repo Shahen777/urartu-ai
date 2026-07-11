@@ -232,8 +232,11 @@
   function speak(text, then) {
     setThinking(false); /* ответ готов к озвучке — период ожидания закончен */
     /* сперва настоящий живой голос (edge-tts, тот же, что в звонке) —
-       если бэкенд-агент доступен; иначе — прежний VITS/системный путь */
-    if (window.AgentAPI && lang() === 'ru') {
+       если бэкенд-агент доступен; иначе — прежний VITS/системный путь.
+       Бэкенд умеет и RU, и EN нейроголоса — раньше EN-пользователи никогда
+       не получали живой голос (только текст), хотя LLM-ответ уже был на EN. */
+    if (window.AgentAPI) {
+      var ttsVoice = (lang() === 'en') ? 'en-US-AriaNeural' : 'ru-RU-SvetlanaNeural';
       window.AgentAPI.available().then(function (ok) {
         if (!ok) { speakFallback(text, then); return; }
         pauseRec(); speaking = true; syncDot();
@@ -244,7 +247,7 @@
           if (then) { try { then(); } catch (e) {} }
           resumeRec();
         };
-        window.AgentAPI.tts(text, 'ru-RU-SvetlanaNeural').then(function (r) {
+        window.AgentAPI.tts(text, ttsVoice).then(function (r) {
           if (!r || !r.audio) { finished = true; speaking = false; syncDot(); speakFallback(text, then); return; }
           var a = agentAudioEl || new Audio(); a.volume = 1;
           a.onended = done; a.onerror = function () { finished = true; speaking = false; syncDot(); speakFallback(text, then); };

@@ -30,11 +30,13 @@
       'cta.demo': 'Записаться на демо',
 
       /* пункт управления */
+      'cc.title': 'Пункт управления',
       'cc.theme': 'Тема', 'cc.lang': 'Язык',
       'cc.theme.dark': 'Тёмная', 'cc.theme.light': 'Светлая',
       'cc.wifi': 'Wi-Fi: не нужен ассистенту', 'cc.demo': 'Записаться на демо',
 
       /* README */
+      'readme.title': 'README.txt',
       'readme.tag': 'Локальное развёртывание · 152-ФЗ',
       'readme.h1': 'Локальные ИИ-сотрудники. Работают 24/7. Данные не покидают компанию.',
       'readme.lead': 'Устанавливаем и настраиваем ИИ-агентов — цифровых сотрудников на вашем сервере: отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Без облаков, без утечек, без выходных.',
@@ -984,11 +986,13 @@
       'cta.demo': 'Book a demo',
 
       /* control center */
+      'cc.title': 'Control Center',
       'cc.theme': 'Theme', 'cc.lang': 'Language',
       'cc.theme.dark': 'Dark', 'cc.theme.light': 'Light',
       'cc.wifi': 'Wi-Fi: not needed by the assistant', 'cc.demo': 'Book a demo',
 
       /* README */
+      'readme.title': 'README.txt',
       'readme.tag': 'On-premise deployment · 152-FZ',
       'readme.h1': 'Local AI employees. Working 24/7. Data never leaves the company.',
       'readme.lead': 'We install and configure AI agents — digital employees on your own server: they answer from your policies, review contracts and run customer support. No clouds, no leaks, no days off.',
