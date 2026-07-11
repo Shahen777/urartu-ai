@@ -494,10 +494,15 @@
           'Задача от руководителя: «' + text + '». Одним предложением, в прошедшем времени, конкретно опиши, что именно ты только что сделал(а) по этой задаче.',
           'Task from the lead: "' + text + '". In one sentence, past tense, describe specifically what you just did about this task.'
         );
-        return window.AgentAPI.reply(pk.id, prompt, [], false).then(
+        /* локальный таймаут 9с — не даём панели «висеть» дольше на медленном
+           бэкенде; серверный abort в agentapi.js (55с) остаётся отдельной
+           защитой от реально зависшего соединения */
+        var reqP = window.AgentAPI.reply(pk.id, prompt, [], false).then(
           function (r) { return (r && r.text) ? r.text : pk.res; },
           function () { return pk.res; }
         );
+        var timeoutP = new Promise(function (res) { setTimeout(function () { res(pk.res); }, 9000); });
+        return Promise.race([reqP, timeoutP]);
       }, function () { return pk.res; });
     });
 
