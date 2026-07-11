@@ -2280,6 +2280,12 @@
       if (m.html) { b.classList.add('msg__bubble--rich'); b.innerHTML = sanitizeHTML(m.html); } // ЛОТ J: любой html проходит через DOMPurify (mark из BM25 выживает)
       else b.textContent = textOf(m);
       row.appendChild(b);
+      if (m.who === 'them' && (m.source === 'agent' || m.source === 'webllm')) {
+        var srcTag = document.createElement('span');
+        srcTag.className = 'msg__src-tag';
+        srcTag.textContent = tr('ai.src.agent');
+        row.appendChild(srcTag);
+      }
       if (m.chips && m.chips.length) {
         var cr = document.createElement('div');
         cr.className = 'msg__chips';
@@ -2365,13 +2371,13 @@
           // markdown-it → DOMPurify → DOM. Готовые html-ответы (BM25/юрист) не трогаем.
           if (res && res.source === 'webllm' && res.text && !res.html && window.LotJ && window.LotJ.md) {
             window.LotJ.md(res.text).then(function (html) {
-              push({ who: 'them', html: html, text: res.text, chips: res.chips || [] });
+              push({ who: 'them', html: html, text: res.text, chips: res.chips || [], source: res.source });
             }, function () {
-              push({ who: 'them', text: res.text, chips: res.chips || [] });
+              push({ who: 'them', text: res.text, chips: res.chips || [], source: res.source });
             });
             return;
           }
-          push({ who: 'them', text: res.text, html: res.html, chips: res.chips || [] });
+          push({ who: 'them', text: res.text, html: res.html, chips: res.chips || [], source: res.source });
         };
         function localChat() {
           if (window.LocalAI && window.LocalAI.askAsync) {
@@ -2383,13 +2389,17 @@
             fin(window.LocalAI ? window.LocalAI.ask(agent, text, lang()) : { text: text, chips: [] });
           }
         }
-        /* умный агент (kie.ai LLM), если бэкенд доступен — иначе локально */
+        /* умный агент (kie.ai LLM), если бэкенд доступен — иначе локально.
+           Чипы (Калькулятор/Календарь/FAQ) считаем локальным интентом ПАРАЛЛЕЛЬНО
+           реальному ответу — так реальный текст не теряет полезную навигацию. */
         if (window.AgentAPI) {
           var hist = (threads[agent] || []).slice(-8).map(function (m) { return { role: m.who === 'me' ? 'user' : 'assistant', content: m.text || '' }; }).filter(function (m) { return m.content; });
+          var hintChips = (window.LocalAI ? (window.LocalAI.ask(agent, text, lang()).chips || []) : []);
           window.AgentAPI.available().then(function (ok) {
             if (!ok) { localChat(); return; }
             window.AgentAPI.reply(agent, text, hist, false).then(function (r) {
-              fin({ text: r.text, chips: [] });
+              fin({ text: r.text, chips: hintChips, source: 'agent' });
+              updateDemoBanner();
             }, function () { localChat(); });
           });
         } else {
