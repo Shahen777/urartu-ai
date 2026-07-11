@@ -186,6 +186,9 @@
     for (var i = 0; i < TASKS.length; i++) if (TASKS[i].id === id) return TASKS[i];
     return null;
   }
+  /* заголовок задачи: у сид-данных — через i18n-ключ k, у созданных
+     пользователем — сырой текст title (не переводится, это ввод человека) */
+  function taskTitle(t) { return t.title || tr(t.k); }
 
   /* ---------- АКТИВЫ ---------- */
   var ASSETS = [
@@ -298,7 +301,10 @@
     var box = document.getElementById('crmKpis');
     if (!box) return;
     var d = buildData(), f = buildFin(), p = pal(), t = totals();
-    var rev30 = sum(d.rev, 60, 90), revP = sum(d.rev, 30, 60);
+    /* «Выручка» — тот же источник, что и вкладка «Финансы» (f.rev[11]),
+       иначе два экрана одной и той же компании показывают разные цифры за
+       примерно один период. Дневной ряд оставляем только для формы спарклайна. */
+    var rev30 = f.rev[11], revP = f.rev[10];
     var leads30 = sum(d.leads, 60, 90);
     var act = Math.round(leads30 * 0.58 * 0.55); // сделки в работе (квал.→КП)
     var actP = Math.round(sum(d.leads, 30, 60) * 0.58 * 0.55);
@@ -415,7 +421,7 @@
       var d = dayOff(t.due);
       html += '<li class="crm-next__i">' +
         '<span class="crm-next__d' + (t.due <= 1 ? ' is-soon' : '') + '">' + fmtDate(d) + '</span>' +
-        '<span class="crm-next__t">' + tr(t.k) + '</span>' +
+        '<span class="crm-next__t">' + taskTitle(t) + '</span>' +
         '<span class="crm-next__w">' + miniAva(e) + (e.ai ? '<i class="crm-aitag">🤖</i>' : '') + '</span></li>';
     });
     if (!list.length) html = '<li class="crm-next__i crm-empty">' + tr('crm.filt.none') + '</li>';
@@ -535,8 +541,10 @@
         html += '<article class="kb-card' + (ai ? ' is-ai' : '') + '" draggable="' + (!isTouch) + '" data-task="' + t.id + '" tabindex="0">' +
           '<div class="kb-card__top">' + prBadge(t.pr) +
           '<span class="kb-due' + (t.due <= 1 && t.col !== 'done' ? ' is-soon' : '') + '">' +
-          (t.col === 'done' ? '✓ ' : tr('crm.tk.due') + ' ') + fmtDate(d) + '</span></div>' +
-          '<h4>' + tr(t.k) + '</h4>' +
+          (t.col === 'done' ? '✓ ' : tr('crm.tk.due') + ' ') + fmtDate(d) + '</span>' +
+          (t.custom ? '<button type="button" class="kb-card__del" data-del="' + t.id + '" title="' + tr('crm.tk.del') + '" aria-label="' + tr('crm.tk.del') + '">✕</button>' : '') +
+          '</div>' +
+          '<h4>' + taskTitle(t) + '</h4>' +
           '<div class="kb-card__who">' + miniAva(e) + '<span>' + tr(e.nameKey) + '</span>' +
           (ai ? '<i class="crm-aitag" title="' + tr('crm.tk.ai') + '">🤖</i>' : '') + '</div>' +
           (doneAi ? '<div class="kb-card__ai">' + T('crm.tk.aiMin', { m: t.aiMin }) + '</div>' : '') +
@@ -547,9 +555,35 @@
     box.innerHTML = html;
   }
   var dragId = null;
+  /* создать новую задачу (client-side, честный CRUD без сервера) */
+  var taskSeq = 0;
+  function addTask(data) {
+    taskSeq++;
+    var t = { id: 'tnew' + taskSeq, title: data.title, who: data.who, col: 'new', due: data.due, pr: data.pr || 'mid', custom: true };
+    TASKS.push(t);
+    renderKanban();
+    if (cal) rebuildCalEvents();
+    if (rendered.over) { renderKpis(); renderNext(); }
+    return t;
+  }
+  function removeTask(id) {
+    var t = taskById(id);
+    if (!t) return;
+    if (t.col === 'done') { var emp = empById(t.who); if (emp) emp.done -= 1; }
+    var i = TASKS.indexOf(t);
+    if (i > -1) TASKS.splice(i, 1);
+    renderKanban();
+    if (cal) rebuildCalEvents();
+    if (rendered.over) { renderKpis(); renderNext(); }
+    if (rendered.staff) renderStaff();
+  }
   function bindKanban() {
     var box = document.getElementById('crmKanban');
     if (!box) return;
+    box.addEventListener('click', function (ev) {
+      var del = ev.target.closest('[data-del]');
+      if (del) { ev.stopPropagation(); removeTask(del.getAttribute('data-del')); }
+    });
     box.addEventListener('dragstart', function (ev) {
       var card = ev.target.closest('.kb-card');
       if (!card) return;
@@ -575,7 +609,17 @@
       if (!col || !dragId) return;
       ev.preventDefault();
       var t = taskById(dragId);
-      if (t) { t.col = col.getAttribute('data-col'); }
+      if (t) {
+        var newCol = col.getAttribute('data-col');
+        var wasDone = t.col === 'done', isDone = newCol === 'done';
+        t.col = newCol;
+        /* счётчик «Выполнено» у сотрудника должен реально реагировать на
+           перетаскивание — иначе профиль сотрудника расходится с канбаном */
+        if (wasDone !== isDone) {
+          var emp = empById(t.who);
+          if (emp) { emp.done += isDone ? 1 : -1; if (rendered.staff) renderStaff(); }
+        }
+      }
       dragId = null;
       renderKanban();
       if (rendered.over) { renderKpis(); renderNext(); }
@@ -593,7 +637,7 @@
       var e = empById(t.who);
       evs.push({
         id: t.id,
-        title: (e.ai ? '🤖 ' : '') + tr(t.k),
+        title: (e.ai ? '🤖 ' : '') + taskTitle(t),
         start: isoDay(dayOff(t.due)),
         allDay: true,
         color: colColor[t.col],
@@ -668,6 +712,61 @@
       if (b) showView(b.dataset.view);
     });
     bindKanban();
+    bindTaskForm();
+  }
+
+  /* попап «Новая задача»: заголовок, исполнитель (из EMP), срок, приоритет */
+  function taskFormHtml() {
+    var opts = EMP.map(function (e) { return '<option value="' + e.id + '">' + esc(empName(e)) + (e.ai ? ' 🤖' : '') + '</option>'; }).join('');
+    return '' +
+      '<div class="crm-taskform__box">' +
+        '<h3>' + tr('crm.tk.form.title') + '</h3>' +
+        '<label class="crm-taskform__lbl">' + tr('crm.tk.form.what') + '</label>' +
+        '<input type="text" id="crmTfWhat" maxlength="80" placeholder="' + esc(tr('crm.tk.form.what.ph')) + '">' +
+        '<label class="crm-taskform__lbl">' + tr('crm.tk.form.who') + '</label>' +
+        '<select id="crmTfWho">' + opts + '</select>' +
+        '<label class="crm-taskform__lbl">' + tr('crm.tk.form.due') + '</label>' +
+        '<input type="number" id="crmTfDue" min="0" max="30" value="3">' +
+        '<div class="crm-taskform__pr">' +
+          '<button type="button" class="pchip" data-pr="lo">' + tr('crm.pr.lo') + '</button>' +
+          '<button type="button" class="pchip is-sel" data-pr="mid">' + tr('crm.pr.mid') + '</button>' +
+          '<button type="button" class="pchip" data-pr="hi">' + tr('crm.pr.hi') + '</button>' +
+        '</div>' +
+        '<div class="crm-taskform__foot">' +
+          '<button type="button" class="wbtn" id="crmTfCancel">' + tr('crm.tk.form.cancel') + '</button>' +
+          '<button type="button" class="wbtn wbtn--primary" id="crmTfGo">' + tr('crm.tk.form.create') + '</button>' +
+        '</div>' +
+      '</div>';
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+  function bindTaskForm() {
+    var btn = document.getElementById('crmAddTask'), pop = document.getElementById('crmTaskForm');
+    if (!btn || !pop) return;
+    var pr = 'mid';
+    function open() {
+      pop.innerHTML = taskFormHtml();
+      pop.hidden = false;
+      pr = 'mid';
+      pop.querySelectorAll('[data-pr]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          pop.querySelectorAll('[data-pr]').forEach(function (x) { x.classList.remove('is-sel'); });
+          b.classList.add('is-sel'); pr = b.getAttribute('data-pr');
+        });
+      });
+      var cancel = document.getElementById('crmTfCancel'); if (cancel) cancel.addEventListener('click', close);
+      var go = document.getElementById('crmTfGo');
+      if (go) go.addEventListener('click', function () {
+        var what = (document.getElementById('crmTfWhat').value || '').trim();
+        if (!what) { document.getElementById('crmTfWhat').focus(); return; }
+        var who = document.getElementById('crmTfWho').value;
+        var due = Math.max(0, parseInt(document.getElementById('crmTfDue').value, 10) || 0);
+        addTask({ title: what, who: who, due: due, pr: pr });
+        close();
+      });
+      setTimeout(function () { var w = document.getElementById('crmTfWhat'); if (w) w.focus(); }, 30);
+    }
+    function close() { pop.hidden = true; pop.innerHTML = ''; }
+    btn.addEventListener('click', function () { if (pop.hidden) open(); else close(); });
   }
 
   /* ================= РАЗДЕЛ 3: СОТРУДНИКИ ================= */
@@ -720,7 +819,7 @@
       var extra = done && t.aiMin ? ' · ' + T('crm.tk.aiMin', { m: t.aiMin }) : '';
       feed += '<li class="crm-dtask crm-dtask--' + t.col + '">' +
         '<span class="crm-dtask__st" aria-hidden="true">' + (done ? '✓' : '•') + '</span>' +
-        '<span class="crm-dtask__t">' + tr(t.k) + '</span>' +
+        '<span class="crm-dtask__t">' + taskTitle(t) + '</span>' +
         '<span class="crm-dtask__d">' + (done ? '' : tr('crm.tk.due') + ' ') + fmtDate(dayOff(t.due)) + extra + '</span></li>';
     });
     feed += '</ul>';

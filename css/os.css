@@ -2735,3 +2735,27 @@ html.is-locked, html.is-locked body{overflow:hidden}
 #win-scan .win__body h2,#win-scan .win__body h3,#win-scan .win__body h4{color:#fff}
 #win-scan .scan__ressub{color:rgba(255,255,255,.6)}
 #win-scan .scan__hint{color:rgba(255,255,255,.9)}
+
+/* --- CRM «Пульс»: создание задачи + удаление пользовательской карточки --- */
+.crm-addtask{margin-left:auto;padding:8px 16px;font-size:13px;min-height:36px}
+.kb-card__del{margin-left:auto;flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:0;cursor:pointer;
+  background:rgba(255,255,255,.08);color:var(--text-dim);font-size:11px;line-height:1;display:grid;place-items:center;
+  transition:background .14s,color .14s}
+.kb-card__del:hover{background:var(--red-btn);color:#fff}
+.crm-taskform{position:absolute;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+@media(min-width:640px){.crm-taskform{align-items:center}}
+.crm-taskform__box{width:100%;max-width:420px;padding:20px 18px calc(20px + env(safe-area-inset-bottom));
+  border-radius:18px 18px 0 0;background:var(--glass-window);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 0 0 .5px var(--ring-strong),0 -10px 30px rgba(0,0,0,.3)}
+@media(min-width:640px){.crm-taskform__box{border-radius:18px}}
+.crm-taskform__box h3{font-size:17px;font-weight:650;margin:0 0 12px}
+.crm-taskform__lbl{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dim);
+  font-weight:600;margin:12px 0 6px}
+.crm-taskform__box input,.crm-taskform__box select{width:100%;box-sizing:border-box;padding:10px 12px;font:inherit;
+  font-size:14px;border-radius:10px;border:0;background:var(--glass);color:var(--text);
+  box-shadow:inset 0 0 0 1px var(--ring-strong)}
+.crm-taskform__box input:focus,.crm-taskform__box select:focus{outline:none;box-shadow:inset 0 0 0 2px var(--red-btn)}
+.crm-taskform__pr{display:flex;gap:8px;margin-top:12px}
+.crm-taskform__foot{display:flex;gap:10px;margin-top:18px}
+.crm-taskform__foot .wbtn{flex:1;min-height:44px}
