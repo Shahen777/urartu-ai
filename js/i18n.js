@@ -473,6 +473,7 @@
       'ai.llm.badge': 'Локальный ИИ включён',
       'ai.src.intent': 'демо-сценарий',
       'ai.src.webllm': 'локальная модель в вашем браузере (WebLLM)',
+      'ai.src.agent': '🟢 настоящая ИИ-модель',
       'ai.kb.src': 'демо-база юрфирмы «Вектор Права»',
       'ai.src.faq': 'FAQ этого сайта',
 
@@ -1404,6 +1405,7 @@
       'ai.llm.badge': 'Local AI is on',
       'ai.src.intent': 'demo scenario',
       'ai.src.webllm': 'local model in your browser (WebLLM)',
+      'ai.src.agent': '🟢 real AI model',
       'ai.kb.src': 'demo base of the Vektor Prava law firm',
       'ai.src.faq': 'this site’s FAQ',
 

@@ -490,23 +490,41 @@
       .replace(/\{cta\}/g, pick(sp.cta, n + 2))
       .replace(/\{thanks\}/g, pick(sp.thanks, n + 1));
   }
-  /* generate -> Promise<{text, source:'webllm'|'template'}> */
+  var GEN_KINDS = { post: { ru: 'пост для соцсетей', en: 'a social media post' }, card: { ru: 'карточку товара', en: 'a product card' }, review: { ru: 'вежливый ответ на отзыв клиента', en: 'a polite reply to a customer review' } };
+  var GEN_TONES = { biz: { ru: 'деловой тон', en: 'business tone' }, fun: { ru: 'дружелюбный тон', en: 'friendly tone' } };
+  function genPrompt(opts, lang) {
+    return (lang === 'en')
+      ? 'Write ' + GEN_KINDS[opts.format].en + ' (' + GEN_TONES[opts.tone].en + ') about: ' + opts.topic
+      : 'Напиши ' + GEN_KINDS[opts.format].ru + ' (' + GEN_TONES[opts.tone].ru + ') на тему: ' + opts.topic;
+  }
+  function genViaWebLLM(opts, lang) {
+    if (AI.webllm.state !== 'ready') return null;
+    var sys = lang === 'en'
+      ? 'You are a marketing copywriter. Write in English. Be concise (up to 120 words), no markdown headings.'
+      : 'Ты маркетинговый копирайтер. Пиши по-русски. Коротко (до 120 слов), без markdown-заголовков.';
+    return AI.webllm.chat([{ role: 'system', content: sys }, { role: 'user', content: genPrompt(opts, lang) }])
+      .then(function (text) { return { text: text, source: 'webllm' }; })
+      .catch(function () { return genFallback(opts, lang); });
+  }
+  function genFallback(opts, lang) {
+    var w = genViaWebLLM(opts, lang);
+    return w || Promise.resolve({ text: fillTpl(opts.format, opts.tone, opts.topic, lang), source: 'template' });
+  }
+  /* generate -> Promise<{text, source:'agent'|'webllm'|'template'}>
+     Приоритет: настоящий серверный агент (kie.ai, не требует загрузки) →
+     локальный WebLLM (если пользователь его включил) → шаблон-заготовка. */
   AI.generate = function (opts) {
     var lang = opts.lang === 'en' ? 'en' : 'ru';
-    if (AI.webllm.state === 'ready') {
-      var sys = lang === 'en'
-        ? 'You are a marketing copywriter. Write in English. Be concise (up to 120 words), no markdown headings.'
-        : 'Ты маркетинговый копирайтер. Пиши по-русски. Коротко (до 120 слов), без markdown-заголовков.';
-      var kinds = { post: { ru: 'пост для соцсетей', en: 'a social media post' }, card: { ru: 'карточку товара', en: 'a product card' }, review: { ru: 'вежливый ответ на отзыв клиента', en: 'a polite reply to a customer review' } };
-      var tones = { biz: { ru: 'деловой тон', en: 'business tone' }, fun: { ru: 'дружелюбный тон', en: 'friendly tone' } };
-      var user = (lang === 'en')
-        ? 'Write ' + kinds[opts.format].en + ' (' + tones[opts.tone].en + ') about: ' + opts.topic
-        : 'Напиши ' + kinds[opts.format].ru + ' (' + tones[opts.tone].ru + ') на тему: ' + opts.topic;
-      return AI.webllm.chat([{ role: 'system', content: sys }, { role: 'user', content: user }])
-        .then(function (text) { return { text: text, source: 'webllm' }; })
-        .catch(function () { return { text: fillTpl(opts.format, opts.tone, opts.topic, lang), source: 'template' }; });
+    if (window.AgentAPI) {
+      return window.AgentAPI.available().then(function (ok) {
+        if (!ok) return genFallback(opts, lang);
+        return window.AgentAPI.reply('content', genPrompt(opts, lang), [], false).then(
+          function (r) { return (r && r.text) ? { text: r.text, source: 'agent' } : genFallback(opts, lang); },
+          function () { return genFallback(opts, lang); }
+        );
+      }, function () { return genFallback(opts, lang); });
     }
-    return Promise.resolve({ text: fillTpl(opts.format, opts.tone, opts.topic, lang), source: 'template' });
+    return genFallback(opts, lang);
   };
 
   /* ---------- WebLLM: настоящая локальная модель, ТОЛЬКО по кнопке ---------- */

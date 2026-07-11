@@ -3550,7 +3550,7 @@
           if (!window.LocalAI || !window.LocalAI.generate) { go.disabled = false; return; }
           window.LocalAI.generate({ format: fmt, tone: tone, topic: topic, lang: lang() }).then(function (r) {
             go.disabled = false;
-            if (src) src.textContent = (r.source === 'webllm') ? tr('ai.src.webllm') : tr('ai.src.intent');
+            if (src) src.textContent = (r.source === 'agent') ? tr('ai.src.agent') : (r.source === 'webllm') ? tr('ai.src.webllm') : tr('ai.src.intent');
             typeOut(txt, r.text);
           }, function () { go.disabled = false; });
         });
