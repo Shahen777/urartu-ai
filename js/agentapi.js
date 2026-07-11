@@ -31,6 +31,7 @@
   var healthy = null;         // null=неизвестно, true, false
   var checkedAt = 0;
   var sameOriginTried = false;
+  var pendingProbe = null;    // in-flight промис — гасит параллельные дубли /api/health
 
   function probe(b) {
     return fetch(b + '/api/health', { method: 'GET' })
@@ -41,19 +42,22 @@
 
   function available() {
     if (healthy !== null && (Date.now() - checkedAt) < 60000) return Promise.resolve(healthy);
+    if (pendingProbe) return pendingProbe;
     if (base !== null) {
-      return probe(base).then(function (ok) { healthy = ok; checkedAt = Date.now(); return ok; });
+      pendingProbe = probe(base).then(function (ok) { healthy = ok; checkedAt = Date.now(); pendingProbe = null; return ok; });
+      return pendingProbe;
     }
     /* без явного адреса: если сайт и агент опубликованы на одном хосте
        (напр. сайт-ОС и агент развёрнуты вместе на VPS), находим агента
        рядом — на том же домене, без ручной настройки. */
     if (!sameOriginTried) {
       sameOriginTried = true;
-      return probe('').then(function (ok) {
-        healthy = ok; checkedAt = Date.now();
+      pendingProbe = probe('').then(function (ok) {
+        healthy = ok; checkedAt = Date.now(); pendingProbe = null;
         if (ok) base = '';
         return ok;
       });
+      return pendingProbe;
     }
     healthy = false; checkedAt = Date.now();
     return Promise.resolve(false);
