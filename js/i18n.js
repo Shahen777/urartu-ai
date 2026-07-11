@@ -125,7 +125,7 @@
       'pricing.sup.price': 'от 15 000 ₽/мес',
       'pricing.sup.l1': 'Обновления базы', 'pricing.sup.l2': 'Мониторинг',
       'pricing.sup.l3': 'Консультации', 'pricing.sup.l4': 'Отчёт ежемесячно',
-      'pricing.budget': 'Ориентир полного бюджета: внедрение от 150 000 ₽ + железо 300–400 000 ₽ (разово, остаётся у вас).',
+      'pricing.budget': 'Ориентир полного бюджета: внедрение от 150 000 ₽ + железо 180 000–450 000 ₽ в зависимости от размера команды (разово, остаётся у вас; см. «Устройства»).',
       'pricing.note': 'Железо — по закупочной цене с прозрачной наценкой, только под проект. Точная смета — после демо-встречи: зависит от объёма документов и числа пользователей.',
 
       /* FAQ */
@@ -135,7 +135,7 @@
       'faq.q2': 'Наши данные точно никуда не уходят?',
       'faq.a2': 'Да. Модель и база знаний физически находятся на вашем оборудовании, персональные данные обрабатываются в контуре компании — как требует 152-ФЗ. Наружу не уходит ничего: это проверяется на приёмке (можно отключить интернет и убедиться).',
       'faq.q3': 'Какое железо нужно?',
-      'faq.a3': 'Для команды до 10–20 человек достаточно одной машины с современной видеокартой (порядка 300–400 тыс. ₽, если покупать новую). Часто подходит уже имеющийся сервер. Подбор — часть проекта.',
+      'faq.a3': 'Для команды до 10–20 человек достаточно одной машины с современной видеокартой (порядка 180–450 тыс. ₽, если покупать новую — зависит от размера команды). Часто подходит уже имеющийся сервер. Подбор — часть проекта.',
       'faq.q4': 'А если ассистент ошибётся?',
       'faq.a4': 'Ассистент отвечает только по вашей базе и всегда даёт ссылку на пункт документа — ответ легко проверить. Сдача проекта проходит по тестовому набору ваших вопросов с зафиксированной в договоре точностью.',
       'faq.q5': 'Сколько длится внедрение?',
@@ -1062,7 +1062,7 @@
       'pricing.sup.price': 'from 15 000 ₽/mo',
       'pricing.sup.l1': 'Knowledge base updates', 'pricing.sup.l2': 'Monitoring',
       'pricing.sup.l3': 'Consulting', 'pricing.sup.l4': 'Monthly report',
-      'pricing.budget': 'Full-budget benchmark: implementation from 150 000 ₽ + hardware 300–400 000 ₽ (one-off, stays with you).',
+      'pricing.budget': 'Full-budget benchmark: implementation from 150 000 ₽ + hardware 180 000–450 000 ₽ depending on team size (one-off, stays with you; see “Devices”).',
       'pricing.note': 'Hardware — at cost with a transparent markup, only for the project. An exact quote comes after the demo call: it depends on the volume of documents and the number of users.',
 
       /* FAQ */
@@ -1072,7 +1072,7 @@
       'faq.q2': 'Is our data really staying put?',
       'faq.a2': 'Yes. The model and the knowledge base physically live on your hardware, and personal data is processed inside your perimeter — as required by 152-FZ. Nothing goes out: it’s verified at acceptance (you can disconnect the internet and see for yourself).',
       'faq.q3': 'What hardware do we need?',
-      'faq.a3': 'For a team of up to 10–20 people, a single machine with a modern GPU is enough (around 300–400k ₽ if bought new). Often an existing server will do. Selecting it is part of the project.',
+      'faq.a3': 'For a team of up to 10–20 people, a single machine with a modern GPU is enough (around 180–450k ₽ if bought new, depending on team size). Often an existing server will do. Selecting it is part of the project.',
       'faq.q4': 'What if the assistant makes a mistake?',
       'faq.a4': 'The assistant answers only from your base and always links to the document clause — the answer is easy to check. The project is accepted against a test set of your questions, with accuracy fixed in the contract.',
       'faq.q5': 'How long does deployment take?',
