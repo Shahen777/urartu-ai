@@ -3241,6 +3241,24 @@
       } catch (e) {}
     }
 
+    /* То же самое для <audio> (голос умного агента, mp3 от бэкенда):
+       без этого play() после долгого ожидания ответа (микрофон + kie.ai +
+       синтез — секунды) браузер молча блокирует автовоспроизведение со
+       звуком, и код тихо откатывается на старый системный голос. Разово
+       проигрываем беззвучный WAV строго в обработчике клика — дальше
+       воспроизведение звука разрешено всю сессию. */
+    var audioUnlocked = false;
+    function unlockAudio() {
+      if (audioUnlocked) return;
+      try {
+        var a = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+        a.volume = 0;
+        var p = a.play();
+        if (p && p.catch) p.catch(function () {});
+        audioUnlocked = true;
+      } catch (e) {}
+    }
+
     /* Переключатель голоса: показываем, только если системе есть из чего
        выбирать. Подсказку — когда играет роботизированная Milena.
        V7.2: при активном нейроголосе ходим по дикторам VITS
@@ -3327,6 +3345,7 @@
     function start() {
       if (on) return;
       unlockTTS();                     // строго синхронно, пока держится жест
+      unlockAudio();                   // то же для <audio> живого голоса агента
       if (!SR) {
         showFb('voice.nosr');
         setTimeout(function () { sayOnce(tr('voice.nosr.say')); }, 120);
