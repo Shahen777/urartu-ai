@@ -3122,6 +3122,7 @@
 
     function listen() {
       if (!on || muted || speakingNow) return;
+      stopRec();   // на случай если предыдущий rec ещё не завершён — максимум один экземпляр
       setStatus('ai.st.listen');
       recWanted = true;
       rec = new SR();
@@ -3165,18 +3166,22 @@
         else fin(window.LocalAI ? window.LocalAI.ask('secretary', txt, lang()) : { text: txt });
       }
 
-      /* умный голосовой агент (kie.ai LLM + живой голос) — если сервис доступен */
+      /* умный голосовой агент (kie.ai LLM + живой голос) — если сервис доступен.
+         Снимок истории ДО push: message и history не должны дублировать
+         одну и ту же реплику (сервер сам добавляет message последним ходом). */
       if (window.AgentAPI) {
+        var histForReq = callHist.slice();
         callHist.push({ role: 'user', content: txt });
         window.AgentAPI.available().then(function (ok) {
-          if (!ok || !on) { return localReply(); }
-          window.AgentAPI.reply('secretary', txt, callHist, true).then(function (r) {
-            if (!on) return;
+          if (!on) return;               // звонок уже завершили, пока проверяли доступность
+          if (!ok) { localReply(); return; }
+          window.AgentAPI.reply('secretary', txt, histForReq, true).then(function (r) {
+            if (!on) return;             // завершили звонок, пока ждали ответ агента
             callHist.push({ role: 'assistant', content: r.text });
             if (sched) openWindow('win-calendar', $('aiCallBtn'));
             if (human) { try { window.open('https://t.me/Shahen_kazaryan', '_blank', 'noopener'); } catch (e) {} }
             speakAgent(r.text, r.audio, function () { if (goodbye) end(); });
-          }, function () { localReply(); });
+          }, function () { if (on) localReply(); });
         });
         return;
       }
@@ -3355,6 +3360,7 @@
       } catch (e) {}
     }
 
+    var starting = false;
     function start() {
       if (on) return;
       unlockTTS();                     // строго синхронно, пока держится жест
@@ -3365,12 +3371,15 @@
         return;
       }
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showFb('voice.denied'); return; }
+      starting = true;
       var btn = $('aiCallBtn');
       if (btn) { btn.disabled = true; btn.classList.add('is-wait'); } // ждём разрешения микрофона
       var done = function () { if (btn) { btn.disabled = false; btn.classList.remove('is-wait'); } };
       navigator.mediaDevices.getUserMedia({ audio: true }).then(function (s) {
-        done(); stream = s; begin();
-      }, function () { done(); showFb('voice.denied'); });
+        done();
+        if (!starting) { s.getTracks().forEach(function (t) { t.stop(); }); return; } // окно уже закрыли — не оживать
+        starting = false; stream = s; begin();
+      }, function () { done(); starting = false; showFb('voice.denied'); });
     }
 
     function begin() {
@@ -3398,11 +3407,12 @@
       iosT = setInterval(function () { try { if (window.speechSynthesis && speechSynthesis.speaking) speechSynthesis.resume(); } catch (e) {} }, 5000);
       meter();
       setStatus('ai.st.speak');
-      var greetLocal = function () { speak(tr('ai.greet')); };
+      var greetLocal = function () { if (on) speak(tr('ai.greet')); };
       var greet = function () {
         if (!window.AgentAPI) { greetLocal(); return; }
         window.AgentAPI.available().then(function (ok) {
-          if (!ok || !on) { greetLocal(); return; }
+          if (!on) return;               // окно закрыли, пока проверяли доступность
+          if (!ok) { greetLocal(); return; }
           window.AgentAPI.reply('secretary', 'Клиент только что подключился к звонку. Поприветствуй его коротко и представься.', [], true).then(function (r) {
             if (!on) return;
             callHist.push({ role: 'assistant', content: r.text });
@@ -3414,7 +3424,9 @@
     }
 
     function end() {
-      if (!on && live.hidden) return;
+      var wasStarting = starting;
+      starting = false;
+      if (!on && live.hidden && !wasStarting) return;
       on = false; thinking = false;
       stopRec();
       if (curAudio) { try { curAudio.pause(); } catch (e) {} curAudio = null; }
