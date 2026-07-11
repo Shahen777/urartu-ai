@@ -501,7 +501,7 @@
           function (r) { return (r && r.text) ? r.text : pk.res; },
           function () { return pk.res; }
         );
-        var timeoutP = new Promise(function (res) { setTimeout(function () { res(pk.res); }, 9000); });
+        var timeoutP = new Promise(function (res) { setTimeout(function () { res(pk.res); }, 16000); }); // Gemini через kie.ai обычно отвечает за ~10-12с даже без TTS
         return Promise.race([reqP, timeoutP]);
       }, function () { return pk.res; });
     });
