@@ -716,10 +716,11 @@
       <span class="win__grab" aria-hidden="true"></span>
       <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть"></button><button class="tl__min" data-act="min" aria-label="Свернуть"></button><button class="tl__max" data-act="max" aria-label="Развернуть"></button></span><span class="win__title" data-i18n="term.title">Терминал — bash</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
       <div class="win__body">
-        <p style="font-size:15px;color:var(--text-dim);font-weight:400;margin-bottom:12px" class="mono" data-i18n="term.head">// доказательство: всё локально</p>
+        <p style="font-size:15px;color:var(--text-dim);font-weight:400;margin-bottom:12px" class="mono" data-i18n="term.head">// иллюстрация локального контура</p>
         <div class="term" id="term"
           data-lines="$ ollama run qwen2.5||модель загружена локально ✔||интернет: не требуется ✔||данные наружу: 0 байт||контур компании: замкнут"
           data-lines-en="$ ollama run qwen2.5||model loaded locally ✔||internet: not required ✔||data sent outside: 0 bytes||company perimeter: closed"></div>
+        <p class="note mono" data-i18n="term.disclaimer">Иллюстрация: так выглядит консоль на сервере клиента. Реального запроса к модели здесь не происходит.</p>
       </div>
     </article>
 

@@ -146,7 +146,8 @@
       'faq.a7': 'Обновление базы знаний, мониторинг качества, консультации и ежемесячный отчёт. Первые месяцы поддержки входят в внедрение; дальше — по желанию.',
 
       /* Терминал */
-      'term.title': 'Терминал — bash', 'term.head': '// доказательство: всё локально',
+      'term.title': 'Терминал — bash', 'term.head': '// иллюстрация локального контура',
+      'term.disclaimer': 'Иллюстрация: так выглядит консоль на сервере клиента. Реального запроса к модели здесь не происходит.',
 
       /* Почта */
       'mail.title': 'Почта — Новое сообщение',
@@ -1082,7 +1083,8 @@
       'faq.a7': 'Knowledge base updates, quality monitoring, consulting and a monthly report. The first months of support are included in the deployment; after that it’s optional.',
 
       /* Terminal */
-      'term.title': 'Terminal — bash', 'term.head': '// proof: everything is local',
+      'term.title': 'Terminal — bash', 'term.head': '// illustration of the local perimeter',
+      'term.disclaimer': 'Illustration: this is what the console looks like on the client’s server. No real model request happens here.',
 
       /* Mail */
       'mail.title': 'Mail — New message',
