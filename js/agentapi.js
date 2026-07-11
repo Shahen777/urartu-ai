@@ -72,10 +72,19 @@
     }).then(function (r) { if (t) clearTimeout(t); if (!r.ok) throw r.status; return r.json(); });
   }
 
+  function tts(text, voice) {
+    if (base === null) return Promise.reject('no-api');
+    return fetch(base + '/api/tts', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text || '', voice: voice || 'ru-RU-SvetlanaNeural' })
+    }).then(function (r) { if (!r.ok) throw r.status; return r.json(); });
+  }
+
   window.AgentAPI = {
     base: function () { return base; },
     setBase: function (u) { base = norm(u); healthy = null; try { localStorage.setItem('urartu_agent_api', base); } catch (e) {} },
     available: available,
-    reply: reply
+    reply: reply,
+    tts: tts
   };
 })();

@@ -2906,7 +2906,7 @@
      ============================================================ */
   var VoiceCall = (function () {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    var home, live, fb, on = false, muted = false, speakingNow = false;
+    var home, live, fb, on = false, muted = false, speakingNow = false, thinking = false;
     var callHist = [], curAudio = null;   // история диалога + текущий аудио-ответ (умный агент)
     var stream = null, actx = null, analyser = null, raf = 0;
     var rec = null, recWanted = false;
@@ -3044,6 +3044,7 @@
     }
 
     function speak(text, then) {
+      thinking = false;
       sub('ai', text);
       stopRec();
 
@@ -3135,16 +3136,19 @@
         if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { end(); showFb('voice.denied'); }
       };
       rec.onend = function () { // перезапуск после каждой фразы
-        if (on && recWanted && !speakingNow && !muted) setTimeout(function () { if (on && recWanted && !speakingNow && !muted) listen(); }, 150);
+        if (on && recWanted && !speakingNow && !muted && !thinking) setTimeout(function () { if (on && recWanted && !speakingNow && !muted && !thinking) listen(); }, 150);
       };
       try { rec.start(); } catch (e) {}
-      /* молчание 8с → мягкое приглашение */
+      /* молчание 8с → мягкое приглашение (не во время «думает» — ответ
+         умного агента занимает 10-15с, дольше 8с, иначе старая фраза
+         «Вы здесь?» звучит ПОВЕРХ настоящего ответа агента) */
       if (silT) clearTimeout(silT);
-      silT = setTimeout(function () { if (on && !speakingNow && !muted) speak(tr('ai.silence')); }, 8000);
+      silT = setTimeout(function () { if (on && !speakingNow && !muted && !thinking) speak(tr('ai.silence')); }, 8000);
     }
 
     function handle(txt) {
       if (silT) { clearTimeout(silT); silT = 0; }
+      thinking = true;   // ждём ответ (умный агент может занять 10-15с) — не мешаем тишиной/перезапуском
       setStatus('ai.st.think');
       var low = txt.toLowerCase();
       var goodbye = /до свидан|пока\b|прощай|goodbye|bye\b/.test(low);
@@ -3181,6 +3185,7 @@
 
     /* проговорить ответ умного агента: живой mp3 (edge-tts) с липсинком, иначе синтез */
     function speakAgent(text, audioUrl, then) {
+      thinking = false;
       stopRec();
       if (!audioUrl) { speak(text, then); return; }
       var w = $('aiAvaWrap');
@@ -3410,7 +3415,7 @@
 
     function end() {
       if (!on && live.hidden) return;
-      on = false;
+      on = false; thinking = false;
       stopRec();
       if (curAudio) { try { curAudio.pause(); } catch (e) {} curAudio = null; }
       try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}

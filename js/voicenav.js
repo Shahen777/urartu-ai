@@ -167,6 +167,21 @@
       unlocked = true;
     } catch (e) {}
   }
+  /* тот же живой голос (edge-tts), что в звонке — только озвучка без «мозга»
+     LLM (короткие подтверждения команд, не нужен разговор). Safari/iOS: звук
+     разрешён только для элемента, разблокированного в жесте — переиспользуем
+     ОДИН <audio>, разблокированный синхронно по клику на кнопку микрофона. */
+  var agentAudioEl = null, agentAudioUnlocked = false;
+  function unlockAgentAudio() {
+    if (agentAudioUnlocked) return;
+    try {
+      agentAudioEl = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+      agentAudioEl.volume = 0;
+      var p = agentAudioEl.play();
+      if (p && p.catch) p.catch(function () {});
+      agentAudioUnlocked = true;
+    } catch (e) {}
+  }
   function rank(v) {
     var n = v.name || '';
     if (/enhanced|premium|siri|neural/i.test(n)) return 0;
@@ -186,6 +201,34 @@
   }
 
   function speak(text, then) {
+    /* сперва настоящий живой голос (edge-tts, тот же, что в звонке) —
+       если бэкенд-агент доступен; иначе — прежний VITS/системный путь */
+    if (window.AgentAPI && lang() === 'ru') {
+      window.AgentAPI.available().then(function (ok) {
+        if (!ok) { speakFallback(text, then); return; }
+        pauseRec(); speaking = true; syncDot();
+        var finished = false;
+        var done = function () {
+          if (finished) return; finished = true;
+          speaking = false; syncDot();
+          if (then) { try { then(); } catch (e) {} }
+          resumeRec();
+        };
+        window.AgentAPI.tts(text, 'ru-RU-SvetlanaNeural').then(function (r) {
+          if (!r || !r.audio) { finished = true; speaking = false; syncDot(); speakFallback(text, then); return; }
+          var a = agentAudioEl || new Audio(); a.volume = 1;
+          a.onended = done; a.onerror = function () { finished = true; speaking = false; syncDot(); speakFallback(text, then); };
+          a.src = r.audio;
+          var p = a.play(); if (p && p.catch) p.catch(function () { finished = true; speaking = false; syncDot(); speakFallback(text, then); });
+        }, function () { finished = true; speaking = false; syncDot(); speakFallback(text, then); });
+      });
+      return;
+    }
+    speakFallback(text, then);
+  }
+
+  /* прежний путь: нейроголос VITS (если загружен) → системный синтез */
+  function speakFallback(text, then) {
     pauseRec(); /* K3 — не ловить собственный TTS */
     speaking = true; syncDot();
     var finished = false;
@@ -486,7 +529,7 @@
      СТАРТ / СТОП
      ============================================================ */
   function startListen() {
-    unlockTTS(); /* строго в жесте пользователя */
+    unlockTTS(); unlockAgentAudio(); /* строго в жесте пользователя */
     showPanel();
     note(null);
     if (!SR) { note('vn.nosr'); syncDot(); return; }
@@ -525,7 +568,7 @@
     if (!panel) return;
 
     var btn = $('vnBtn');
-    if (btn) btn.addEventListener('click', function (e) { e.stopPropagation(); unlockTTS(); toggle(); });
+    if (btn) btn.addEventListener('click', function (e) { e.stopPropagation(); unlockTTS(); unlockAgentAudio(); toggle(); });
 
     /* README-чип, карточка App Store, плитка Пункта управления iOS */
     document.addEventListener('click', function (e) {
