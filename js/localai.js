@@ -494,8 +494,10 @@
   var GEN_TONES = { biz: { ru: 'деловой тон', en: 'business tone' }, fun: { ru: 'дружелюбный тон', en: 'friendly tone' } };
   function genPrompt(opts, lang) {
     return (lang === 'en')
-      ? 'Write ' + GEN_KINDS[opts.format].en + ' (' + GEN_TONES[opts.tone].en + ') about: ' + opts.topic
-      : 'Напиши ' + GEN_KINDS[opts.format].ru + ' (' + GEN_TONES[opts.tone].ru + ') на тему: ' + opts.topic;
+      ? 'Write ' + GEN_KINDS[opts.format].en + ' (' + GEN_TONES[opts.tone].en + ') about: ' + opts.topic +
+        '. Output ONLY the finished text itself — no intro, no "here is a draft", no follow-up questions, no options to choose from. Up to 100 words.'
+      : 'Напиши ' + GEN_KINDS[opts.format].ru + ' (' + GEN_TONES[opts.tone].ru + ') на тему: ' + opts.topic +
+        '. Выведи ТОЛЬКО готовый текст — без вступления, без «вот черновик», без уточняющих вопросов и без предложенных вариантов на выбор. Не более 100 слов.';
   }
   function genViaWebLLM(opts, lang) {
     if (AI.webllm.state !== 'ready') return null;
