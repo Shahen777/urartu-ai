@@ -2538,10 +2538,21 @@
         if (size) size.textContent = '(' + szLabel() + ')';
         if (hint && !hint.hidden) hint.textContent = tr('ai.llm.hint').replace('{size}', szLabel());
       };
-      if (navigator.gpu && window.LocalAI.webllm.state === 'idle') { // без WebGPU честно не показываем
+      /* WebLLM — офлайн-резерв. Если настоящий серверный агент уже отвечает
+         (window.AgentAPI), не предлагаем скачивать 950 МБ модели параллельно —
+         показываем кнопку только когда сервера нет/недоступен. */
+      function maybeShowBtn() {
+        if (!navigator.gpu || window.LocalAI.webllm.state !== 'idle') return; // без WebGPU честно не показываем
+        if (window.AgentAPI) {
+          window.AgentAPI.available().then(function (ok) {
+            if (!ok) { btn.hidden = false; if (hint) { hint.hidden = false; hint.textContent = tr('ai.llm.hint').replace('{size}', szLabel()); } }
+          });
+          return;
+        }
         btn.hidden = false;
         if (hint) { hint.hidden = false; hint.textContent = tr('ai.llm.hint').replace('{size}', szLabel()); }
       }
+      maybeShowBtn();
       document.addEventListener('i18n:change', refresh);
       refresh();
       btn.addEventListener('click', function () {
