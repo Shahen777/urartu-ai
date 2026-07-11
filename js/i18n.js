@@ -8,8 +8,9 @@
   var DICT = {
     ru: {
       /* meta */
-      'meta.title': 'Локальные ИИ-сотрудники 24/7 для бизнеса — свой ИИ на вашем сервере | 152-ФЗ | Urartu AI',
-      'meta.desc': 'Внедряем локальных ИИ-сотрудников 24/7: цифровые агенты на сервере компании — отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Данные не уходят в облако. Локальный ИИ, 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.',
+      'meta.title': 'Локальные ИИ-сотрудники 24/7 | 152-ФЗ | Urartu AI',
+      'meta.desc': 'Цифровые ИИ-агенты на вашем сервере отвечают клиентам и проверяют документы 24/7. Данные не покидают компанию. 152-ФЗ. Пилот — 2 недели.',
+      'meta.og.desc': 'Внедряем локальных ИИ-сотрудников 24/7: цифровые агенты на сервере компании — отвечают по регламентам, проверяют договоры, ведут поддержку клиентов. Данные не уходят в облако. Локальный ИИ, 152-ФЗ. Пилот за 2 недели. Москва и вся РФ.',
 
       /* меню-бар: сгруппированные меню */
       'mb.product': 'Продукт', 'mb.company': 'Компания', 'mb.help': 'Помощь', 'mb.contact': 'Связаться',
@@ -24,6 +25,7 @@
       'status.local': 'ЛОКАЛЬНО · 152-ФЗ',
       'wifi.tip': 'интернет ассистенту не нужен',
       'ui.back': '‹ Назад',
+      'ui.close': 'Закрыть', 'ui.minimize': 'Свернуть', 'ui.maximize': 'Развернуть',
       'cta.demo': 'Записаться на демо',
 
       /* пункт управления */
@@ -945,8 +947,9 @@
 
     en: {
       /* meta */
-      'meta.title': 'Local AI Employees, working 24/7 — On-Premise AI for Business | 152-FZ | Urartu AI',
-      'meta.desc': 'We deploy local AI employees that work 24/7 — digital agents on your own server: answer from your policies, review contracts and run customer support. On-premise AI, never sends data to the cloud. 152-FZ compliant. Pilot in 2 weeks. Moscow and all of Russia.',
+      'meta.title': 'Local AI Employees 24/7 | 152-FZ | Urartu AI',
+      'meta.desc': 'Digital AI agents on your own server answer clients and review documents 24/7. Data never leaves your company. 152-FZ compliant. Pilot in 2 weeks.',
+      'meta.og.desc': 'We deploy local AI employees that work 24/7 — digital agents on your own server: answer from your policies, review contracts and run customer support. On-premise AI, never sends data to the cloud. 152-FZ compliant. Pilot in 2 weeks. Moscow and all of Russia.',
 
       /* menu bar: grouped menus */
       'mb.product': 'Product', 'mb.company': 'Company', 'mb.help': 'Help', 'mb.contact': 'Contact',
@@ -961,6 +964,7 @@
       'status.local': 'LOCAL · 152-FZ',
       'wifi.tip': "the assistant doesn't need the internet",
       'ui.back': '‹ Back',
+      'ui.close': 'Close', 'ui.minimize': 'Minimize', 'ui.maximize': 'Maximize',
       'cta.demo': 'Book a demo',
 
       /* control center */
@@ -1928,12 +1932,18 @@
     for (var n = 0; n < names.length; n++) {
       names[n].setAttribute('data-name', t(names[n].getAttribute('data-name-i18n'), l));
     }
+    /* aria-label (data-i18n-aria) — раньше не обрабатывался: скринридер
+       на EN видел русские названия окон/кнопок */
+    var arias = document.querySelectorAll('[data-i18n-aria]');
+    for (var q = 0; q < arias.length; q++) {
+      arias[q].setAttribute('aria-label', t(arias[q].getAttribute('data-i18n-aria'), l));
+    }
 
     /* meta / title */
     document.title = t('meta.title', l);
     setMeta('description', t('meta.desc', l));
     setMeta('og:title', t('meta.title', l), 'property');
-    setMeta('og:description', t('meta.desc', l), 'property');
+    setMeta('og:description', t('meta.og.desc', l), 'property');
     setMeta('og:locale', l === 'en' ? 'en_US' : 'ru_RU', 'property');
 
     /* переключатель языка */

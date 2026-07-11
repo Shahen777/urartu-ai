@@ -438,6 +438,15 @@
       im.removeAttribute('data-src');
     });
   }
+  /* SEO: только портфолио (9 фото кейсов, самое ценное для индексации/картиночного
+     поиска) получает реальный src сразу — .win скрыт через opacity/visibility,
+     а не display:none, поэтому loading="lazy" НЕ откладывает реальную загрузку
+     (браузер всё равно её видит «в области просмотра»). Раздутие веса всей
+     страницы (~250 КБ на все 25 иконок) неприемлемо — гидрируем точечно. */
+  window.requestAnimationFrame(function () {
+    var pf = document.getElementById('win-portfolio');
+    if (pf) hydrateImages(pf);
+  });
 
   function openWindow(id, trigger) {
     var win = document.getElementById(id);
