@@ -11,10 +11,16 @@
     start:  { kp: 'd1', model: 'Qwen3 14B',          tps: 35, wps: 26, resp: 5,  rub: 180000,  usd: 1800,  empMax: 10,  rep: 6,  ladder: true },
     pro:    { kp: 'd2', model: 'Qwen3 32B',          tps: 38, wps: 28, resp: 4,  rub: 450000,  usd: 4500,  empMax: 30,  rep: 22, ladder: true },
     max:    { kp: 'd3', model: 'Qwen3 32B / 70B',    tps: 20, wps: 15, resp: 8,  rub: 650000,  usd: 6500,  empMax: 50,  rep: 42, ladder: true },
-    mac:    { kp: 'd4', model: 'Qwen 70B',           tps: 8,  wps: 6,  resp: 20, rub: 450000,  usd: 4500,  empMax: 40,  rep: 38, ladder: false },
-    server: { kp: 'd5', model: 'GLM-5 · DeepSeek V4', tps: 50, wps: 37, resp: 3,  rub: 1500000, usd: 15000, empMax: 100, rep: 80, ladder: true }
+    mac:    { kp: 'd4', model: 'Qwen 70B',           tps: 8,  wps: 6,  resp: 20, rub: 450000,  usd: 4500,  empMax: 40,  rep: 38, ladder: false, altKey: 'dev.ix.macAlt' },
+    server: { kp: 'd5', model: 'GLM-5 · DeepSeek V4', tps: 50, wps: 37, resp: 3,  rub: 1500000, usd: 15000, empMax: 100, rep: 80, ladder: true },
+    /* Готовые устройства NVIDIA (не наша сборка) — честные цифры из офиц. спеков:
+       Spark ограничен пропускной способностью памяти (273 ГБ/с) — держит огромные
+       модели, но не самый быстрый; Station — реальный ~$85-100тыс, только через
+       OEM-партнёров (Dell/ASUS/Supermicro), энтерпрайз-класс, не для типового МСБ. */
+    dgxspark:   { kp: 'd6', model: 'Qwen/Llama до 200B (FP4)',        tps: 12, wps: 9,  resp: 10, rub: 400000,  usd: 4000,  empMax: 35,  rep: 25,  ladder: false, altKey: 'dev.ix.sparkAlt' },
+    dgxstation: { kp: 'd7', model: 'GLM-5 · DeepSeek V4 (до 1 трлн)', tps: 55, wps: 41, resp: 3,  rub: 8000000, usd: 80000, empMax: 150, rep: 120, ladder: false, altKey: 'dev.ix.stationAlt' }
   };
-  var ORDER = ['start', 'pro', 'max', 'mac', 'server'];
+  var ORDER = ['start', 'pro', 'max', 'mac', 'server', 'dgxspark', 'dgxstation'];
 
   /* Матрица возможностей: 2 = с запасом, 1 = тянет, 0 = нужна мощнее. */
   var CAP = {
@@ -22,12 +28,33 @@
     pro:    { support: 2, rag: 2, summary: 2, generate: 2, contracts: 1, voice: 2 },
     max:    { support: 2, rag: 2, summary: 2, generate: 2, contracts: 2, voice: 1 },
     mac:    { support: 2, rag: 2, summary: 2, generate: 2, contracts: 2, voice: 0 },
-    server: { support: 2, rag: 2, summary: 2, generate: 2, contracts: 2, voice: 2 }
+    server: { support: 2, rag: 2, summary: 2, generate: 2, contracts: 2, voice: 2 },
+    /* Spark: огромная модель влезает, но узкое место по памяти бьёт по генерации/голосу */
+    dgxspark:   { support: 2, rag: 2, summary: 2, generate: 1, contracts: 2, voice: 1 },
+    dgxstation: { support: 2, rag: 2, summary: 2, generate: 2, contracts: 2, voice: 2 }
   };
 
   var CLOUD_PER_EMP = { rub: 2500, usd: 28 }; /* ориентировочная абонплата облака на 1 пользователя/мес */
 
-  var state = { emp: 6, station: 'start', task: 'support', side: 'own', pinned: false };
+  /* Кастомный конфигуратор кластера (T3) — формула, не lookup по фиксированной
+     станции. Точка отсчёта (2 GPU) согласована с существующей карточкой
+     «Сервер Multi-GPU» (от 1,5 млн ₽), дальше растёт линейно — честный порядок
+     величины для планирования, не биржевая цена конкретных карт. */
+  function customCalc(gpus) {
+    var rub = 1500000 + (gpus - 2) * 500000;
+    var usd = 15000 + (gpus - 2) * 5000;
+    var tps = 50 + (gpus - 2) * 8;
+    var wps = Math.round(tps * 0.74);
+    var model;
+    if (gpus <= 2) model = '70B';
+    else if (gpus <= 4) model = '200B (MoE)';
+    else if (gpus <= 6) model = '400B (MoE)';
+    else model = '671B+ (GLM-5 / DeepSeek целиком)';
+    return { rub: rub, usd: usd, tps: tps, wps: wps, model: model };
+  }
+  var CUSTOM_MODEL_EN = { '70B': '70B', '200B (MoE)': '200B (MoE)', '400B (MoE)': '400B (MoE)', '671B+ (GLM-5 / DeepSeek целиком)': '671B+ (full GLM-5 / DeepSeek)' };
+
+  var state = { emp: 6, station: 'start', task: 'support', side: 'own', pinned: false, gpu: 4 };
   var bound = false;
 
   function t(k) { return (window.I18N && window.I18N.t) ? window.I18N.t(k) : k; }
@@ -51,7 +78,9 @@
     var m = META[station];
     if (emp > m.empMax) return { key: 'dev.ix.tight', warn: true };
     if (emp >= Math.round(m.empMax * 0.8)) return { key: 'dev.ix.nearTop', warn: true };
-    if (!m.ladder) return { key: 'dev.ix.macAlt', warn: false };
+    /* у каждой станции вне «лестницы» — своё сообщение (altKey), а не общее
+       на всех — иначе NVIDIA-устройства унаследовали бы текст про Mac Studio */
+    if (!m.ladder) return { key: m.altKey || 'dev.ix.macAlt', warn: false };
     return { key: 'dev.ix.comfy', warn: false };
   }
 
@@ -125,6 +154,18 @@
       var on = b.getAttribute('data-side') === state.side;
       b.classList.toggle('is-sel', on); b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
+
+    renderCustom();
+  }
+
+  function renderCustom() {
+    var gpuN = $('dvxGpuN'); if (gpuN) gpuN.textContent = state.gpu;
+    var slider = $('dvxGpu'); if (slider && +slider.value !== state.gpu) slider.value = state.gpu;
+    var c = customCalc(state.gpu);
+    var modelEl = $('dvxCustomModel');
+    if (modelEl) modelEl.textContent = isEn() ? (CUSTOM_MODEL_EN[c.model] || c.model) : c.model;
+    var speedEl = $('dvxCustomSpeed'); if (speedEl) speedEl.textContent = '~' + c.wps + ' ' + t('dev.ix.wps');
+    var priceEl = $('dvxCustomPrice'); if (priceEl) priceEl.textContent = '≈ ' + money(c);
   }
 
   function bind() {
@@ -139,6 +180,12 @@
          превысит) */
       if (!state.pinned) state.station = ladder(state.emp);
       render();
+    });
+
+    var gpuSlider = $('dvxGpu');
+    if (gpuSlider) gpuSlider.addEventListener('input', function () {
+      state.gpu = Math.max(2, Math.min(8, parseInt(gpuSlider.value, 10) || 2));
+      renderCustom();
     });
 
     var grid = $('devGrid');

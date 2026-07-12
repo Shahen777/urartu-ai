@@ -1285,7 +1285,38 @@
             </span>
             <span class="dev-card__pick" data-i18n="dev.ix.picked" aria-hidden="true">Выбрано ↓</span>
           </button>
+          <button type="button" class="dev-card" data-station="dgxspark" aria-pressed="false">
+            <span class="dev-card__badge" data-i18n="dev.d6.badge">Готовое решение NVIDIA</span>
+            <span class="dev-card__shot" aria-hidden="true"><img data-src="images/devices/dgxspark.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="dev-card__body">
+              <span class="dev-card__name" data-i18n="dev.d6.name">NVIDIA DGX Spark</span>
+              <span class="dev-card__spec" data-i18n="dev.d6.spec">GB10 Grace Blackwell · 128 ГБ unified</span>
+              <span class="dev-chain">
+                <span class="dev-chain__r"><i data-i18n="dev.ch.model">Модель</i><b>Qwen / Llama до 200B</b></span>
+                <span class="dev-chain__r"><i data-i18n="dev.ch.equiv">≈ уровня</i><b data-i18n="dev.d6.equiv">Держит огромные модели, не самый быстрый*</b></span>
+                <span class="dev-chain__r"><i data-i18n="dev.ch.team">Команда</i><b data-i18n="dev.d6.chTeam">до 35 чел.</b></span>
+              </span>
+              <span class="dev-card__price" data-i18n="dev.d6.price">от 400 000 ₽</span>
+            </span>
+            <span class="dev-card__pick" data-i18n="dev.ix.picked" aria-hidden="true">Выбрано ↓</span>
+          </button>
+          <button type="button" class="dev-card" data-station="dgxstation" aria-pressed="false">
+            <span class="dev-card__badge" data-i18n="dev.d7.badge">Энтерпрайз · под заказ</span>
+            <span class="dev-card__shot" aria-hidden="true"><img data-src="images/devices/dgxstation.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="dev-card__body">
+              <span class="dev-card__name" data-i18n="dev.d7.name">NVIDIA DGX Station</span>
+              <span class="dev-card__spec" data-i18n="dev.d7.spec">GB300 Grace Blackwell Ultra · 748 ГБ unified</span>
+              <span class="dev-chain">
+                <span class="dev-chain__r"><i data-i18n="dev.ch.model">Модель</i><b>GLM-5 · DeepSeek V4</b></span>
+                <span class="dev-chain__r"><i data-i18n="dev.ch.equiv">≈ уровня</i><b data-i18n="dev.d7.equiv">До 1 трлн параметров</b></span>
+                <span class="dev-chain__r"><i data-i18n="dev.ch.team">Команда</i><b data-i18n="dev.d7.chTeam">150+ чел.</b></span>
+              </span>
+              <span class="dev-card__price" data-i18n="dev.d7.price">под заказ, от 8 млн ₽</span>
+            </span>
+            <span class="dev-card__pick" data-i18n="dev.ix.picked" aria-hidden="true">Выбрано ↓</span>
+          </button>
         </div>
+        <p class="dev-note" data-i18n="dev.nvNote">NVIDIA DGX Spark и DGX Station — реальные готовые устройства NVIDIA (не наша сборка). Spark ограничен пропускной способностью памяти — держит гигантские модели, но не самый быстрый вариант в линейке. Station продаётся только через партнёров NVIDIA (Dell/ASUS/Supermicro) без фиксированной цены — цифра ориентировочная.</p>
         <p class="dev-note" data-i18n="dev.equivNote">* «≈ уровня GPT-4o / Sonnet» — для типовых бизнес-задач (поддержка, документы, RAG), не для самых сложных рассуждений. Frontier-класс (GLM-5, DeepSeek V4) — уже серверное железо. Цифры — честный порядок величины из бенчмарков.</p>
 
         <!-- T2. ИНТЕРАКТИВ: на что способна станция -->
@@ -1370,6 +1401,33 @@
           </div>
         </section>
 
+        <!-- T3. Кастомный конфигуратор — кластер под сверхсложные задачи -->
+        <section class="dvx dvx-custom" id="dvxCustomSec" aria-label="Кастомный конфигуратор кластера">
+          <div class="dvx__head">
+            <span class="eyebrow dvx__eb" data-i18n="dev.custom.eb">Кастомный конфигуратор</span>
+            <h3 class="dvx__h" data-i18n="dev.custom.title">Соберите станцию для сверхсложных задач</h3>
+            <p class="dvx__sub" data-i18n="dev.custom.sub">Для задач, которые не тянет ни одна готовая станция, — кластер из нескольких GPU. Двигайте ползунок — пересчитаем мощность и цену живьём.</p>
+          </div>
+
+          <div class="dvx-slider">
+            <label class="dvx-slider__lab" for="dvxGpu"><span data-i18n="dev.custom.gpus">GPU в кластере:</span> <b id="dvxGpuN">4</b></label>
+            <input type="range" id="dvxGpu" min="2" max="8" value="4" step="1" aria-describedby="dvxCustomRec">
+            <div class="dvx-slider__scale"><span>2</span><span>4</span><span>6</span><span>8</span></div>
+          </div>
+
+          <div class="dvx-rec" id="dvxCustomRec" role="status" aria-live="polite">
+            <div class="dvx-rec__main">
+              <span class="dvx-rec__lab" data-i18n="dev.custom.modelLab">Потянет модели до</span>
+              <span class="dvx-rec__name" id="dvxCustomModel">200B (MoE)</span>
+              <span class="dvx-rec__model" id="dvxCustomSpeed">~89 слов/сек</span>
+            </div>
+            <div class="dvx-rec__side">
+              <span class="dvx-rec__price" id="dvxCustomPrice">≈ 2 500 000 ₽</span>
+            </div>
+          </div>
+          <p class="dev-note" data-i18n="dev.custom.note">Ориентировочный расчёт для планирования — точная конфигурация (модели GPU, сеть, охлаждение) обсуждается на демо, как и у остальных станций «под заказ».</p>
+        </section>
+
         <!-- Таблица-сравнение -->
         <h3 class="dev-secH" data-i18n="dev.tblH">Сравнение станций</h3>
         <div class="dev-tblwrap">
@@ -1388,6 +1446,8 @@
               <tr><td data-i18n="dev.d3.name">Станция «Макс»</td><td>32B · 70B (кв.)</td><td data-i18n="dev.d3.equiv">GPT-4o / Sonnet, с запасом*</td><td>≤50</td><td>~15 <span data-i18n="dev.ix.wps">слов/сек</span></td><td data-i18n="dev.d3.price">от 650 000 ₽</td></tr>
               <tr><td data-i18n="dev.d4.name">Mac Studio</td><td>70B</td><td data-i18n="dev.d4.equiv">GPT-4o-класс</td><td>≤40</td><td>~6 <span data-i18n="dev.ix.wps">слов/сек</span></td><td data-i18n="dev.d4.price">от 450 000 ₽</td></tr>
               <tr><td data-i18n="dev.d5.name">Сервер Multi-GPU</td><td>GLM-5 · DeepSeek V4</td><td data-i18n="dev.d5.equiv">Opus 4.5-класс</td><td>100+</td><td>~37 <span data-i18n="dev.ix.wps">слов/сек</span></td><td data-i18n="dev.d5.price">от 1,5 млн ₽</td></tr>
+              <tr><td data-i18n="dev.d6.name">NVIDIA DGX Spark</td><td>Qwen / Llama до 200B</td><td data-i18n="dev.d6.equiv">Держит огромные модели, не самый быстрый*</td><td>≤35</td><td>~9 <span data-i18n="dev.ix.wps">слов/сек</span></td><td data-i18n="dev.d6.price">от 400 000 ₽</td></tr>
+              <tr><td data-i18n="dev.d7.name">NVIDIA DGX Station</td><td>GLM-5 · DeepSeek V4</td><td data-i18n="dev.d7.equiv">До 1 трлн параметров</td><td>150+</td><td>~41 <span data-i18n="dev.ix.wps">слов/сек</span></td><td data-i18n="dev.d7.price">под заказ, от 8 млн ₽</td></tr>
             </tbody>
           </table>
         </div>
