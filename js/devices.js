@@ -145,6 +145,14 @@
     if (grid) grid.addEventListener('click', function (e) {
       var c = e.target.closest ? e.target.closest('.dev-card') : null;
       if (!c) return;
+      /* клик по фото — увеличить, не выбирать станцию (два разных действия) */
+      var shot = e.target.closest ? e.target.closest('.dev-card__shot') : null;
+      if (shot && window.Lightbox) {
+        var img = shot.querySelector('img');
+        var nm = c.querySelector('.dev-card__name');
+        if (img && img.src) window.Lightbox.open(img.currentSrc || img.src, nm ? nm.textContent : '');
+        return;
+      }
       var id = c.getAttribute('data-station');
       if (!META[id]) return;
       state.station = id;

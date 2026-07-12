@@ -366,6 +366,7 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 
 /* SPRINGBOARD (мобильный лаунчер) */
 .springboard{display:none}
+.sb-pitch{display:none}
 
 /* Пейджер приложения↔виджеты — только мобильный (на десктопе обёртки прозрачны:
    без position/transform, чтобы .widgets позиционировался относительно .stage) */
@@ -650,6 +651,15 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 .points li::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;
   border-radius:2px;background:var(--text-dim)}
 
+/* Как проходит внедрение — пошаговая раскадровка (win-how) */
+.hiw-steps{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:16px}
+.hiw-steps__i{display:flex;gap:12px;align-items:flex-start}
+.hiw-steps__n{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--red);
+  color:#fff;font-family:var(--mono);font-weight:700;font-size:12.5px;
+  display:flex;align-items:center;justify-content:center;margin-top:1px}
+.hiw-steps__i h4{font-size:14.5px;font-weight:650;margin:0 0 4px}
+.hiw-steps__i p{font-size:13px;color:var(--text-mid);line-height:1.48;margin:0}
+
 /* отрасли / тарифы — карточки */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
 .mini{background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
@@ -731,6 +741,10 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 .finder__meta{font-family:var(--mono);font-size:11px;color:var(--text-dim);flex:0 0 auto}
 .finder__date{font-family:var(--mono);font-size:11px;color:var(--text-dim);flex:0 0 auto;
   min-width:78px;text-align:right}
+.finder__badge{flex:0 0 auto;font-family:var(--mono);font-size:9.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;color:var(--text-dim);
+  padding:2px 7px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--ring)}
+.finder__badge--demo{color:#fff;background:var(--red);box-shadow:none}
 
 /* корзина-пасхалка */
 .trash-egg{display:flex;flex-direction:column;align-items:center;text-align:center;
@@ -772,9 +786,14 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
   text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim)}
 .svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .svc-card{background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
-  border-radius:var(--r-8);overflow:hidden;display:flex;flex-direction:column}
-.svc-card__ill{display:block;line-height:0;background:#efece8}
-.svc-card__ill img{width:100%;height:104px;object-fit:cover;display:block}
+  border-radius:var(--r-8);overflow:hidden;display:flex;flex-direction:column;
+  transition:box-shadow .15s var(--ease),transform .15s var(--ease),background .15s var(--ease)}
+.svc-card:hover{background:var(--surface-hover);transform:translateY(-1px);
+  box-shadow:inset 0 0 0 1px var(--ring-strong)}
+.svc-card__ill{display:block;line-height:0;background:#efece8;overflow:hidden;cursor:zoom-in}
+.svc-card__ill img{width:100%;height:104px;object-fit:cover;display:block;
+  transition:transform .3s var(--ease)}
+.svc-card__ill:hover img{transform:scale(1.06)}
 .svc-card__in{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1;min-width:0}
 .svc-card h4{font-size:15px;font-weight:600;margin:0 0 3px}
 .svc-card p{font-size:13px;color:var(--text-dim);margin:0 0 11px;line-height:1.4}
@@ -806,8 +825,11 @@ button.widget:focus-visible{outline:2px solid var(--ring-strong);outline-offset:
 .dev-card.is-active{box-shadow:inset 0 0 0 2px var(--red),0 6px 18px -8px rgba(243,53,12,.5);
   background:rgba(243,53,12,.06)}
 .dev-card--wide{grid-column:1 / -1}
-.dev-card__shot{display:block;line-height:0;background:#efece8;border-bottom:1px solid var(--ring)}
-.dev-card__shot img{width:100%;height:118px;object-fit:cover;display:block}
+.dev-card__shot{display:block;line-height:0;background:#efece8;border-bottom:1px solid var(--ring);
+  overflow:hidden;cursor:zoom-in}
+.dev-card__shot img{width:100%;height:118px;object-fit:cover;display:block;
+  transition:transform .3s var(--ease)}
+.dev-card__shot:hover img{transform:scale(1.06)}
 .dev-card--wide .dev-card__shot img{height:132px}
 .dev-card__body{display:flex;flex-direction:column;padding:13px 15px 15px;min-width:0;flex:1}
 .dev-card__name{font-size:16px;font-weight:600;margin:0 0 2px;letter-spacing:-.01em}
@@ -989,6 +1011,19 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
 .case-card__name{font-size:14.5px;font-weight:600;margin:12px 14px 4px;letter-spacing:-.01em;line-height:1.25}
 .case-card__res{font-size:12.5px;color:var(--text-dim);margin:0 14px 14px;line-height:1.4;flex:1}
 .case-card--nolink{opacity:.9}
+
+.case-illus{background:var(--surface-soft);box-shadow:inset 0 0 0 1px var(--ring);
+  border-radius:var(--r-8);padding:18px 20px;margin-bottom:6px}
+.case-illus__badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;color:#fff;background:var(--red);
+  padding:3px 9px;border-radius:999px;margin-bottom:10px}
+.case-illus__h{font-size:16px;font-weight:650;margin:0 0 12px;letter-spacing:-.01em}
+.case-illus__cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.case-illus__cols h5{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--text-dim);margin:0 0 6px}
+.case-illus__cols p{font-size:13px;line-height:1.5;color:var(--text-mid);margin:0}
+.case-illus__note{font-size:11.5px;line-height:1.5;color:var(--text-dim);margin:14px 0 0;font-style:italic}
+@media(max-width:640px){.case-illus__cols{grid-template-columns:1fr}}
 
 /* ================= КАЛЬКУЛЯТОР ПРОЕКТА (win-calc, D2) ================= */
 .win--calc{max-width:460px}
@@ -1282,6 +1317,23 @@ a.case-card:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2p
   /* десктоп-иконки прячем — вместо них springboard.
      Размеры сняты с iPhone: иконка 60px, шаг ряда ~26px, подпись 12px белая. */
   .desk-icons{display:none}
+  /* Ценностное предложение над сеткой иконок: на телефоне это первый экран,
+     а README (реальный питч) — просто одна из 22 иконок среди прочих. Не
+     нарушая метафору «домашний экран», кладём короткую честную карточку
+     сверху — «что мы вообще делаем», прежде чем пользователь листает
+     иконки. Тап открывает README целиком. */
+  .sb-pitch{display:flex;flex-direction:column;gap:5px;text-align:left;
+    width:100%;box-sizing:border-box;margin:0 0 22px;padding:14px 16px;
+    border-radius:16px;border:0;cursor:pointer;font:inherit;
+    background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);
+    box-shadow:inset 0 0 0 .5px var(--ring-strong);color:inherit;
+    transition:transform .12s var(--ease),opacity .12s var(--ease)}
+  .sb-pitch:active{transform:scale(.98);opacity:.9}
+  .sb-pitch:focus-visible{outline:2px solid var(--ios-bar);outline-offset:2px}
+  .sb-pitch__eb{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
+    letter-spacing:.05em;color:var(--red)}
+  .sb-pitch__h{font-size:15px;font-weight:650;line-height:1.32;color:var(--sb-label);text-shadow:var(--sb-label-shadow)}
+  .sb-pitch__more{font-size:12.5px;font-weight:600;color:var(--red)}
   .springboard{
     display:grid;grid-template-columns:repeat(4,60px);
     justify-content:space-between;
@@ -2772,3 +2824,24 @@ html.is-locked, html.is-locked body{overflow:hidden}
 .dvx-showrec{margin-top:6px;appearance:none;border:0;cursor:pointer;font:inherit;font-size:12px;font-weight:600;
   color:#0a84ff;background:transparent;padding:4px 0;text-decoration:underline;text-underline-offset:2px}
 .dvx-showrec:hover{color:#409cff}
+
+/* --- Лайтбокс: увеличение фото оборудования/услуг --- */
+.lbx{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;
+  padding:24px;opacity:0;transition:opacity .18s var(--ease)}
+.lbx.is-in{opacity:1}
+.lbx__backdrop{position:absolute;inset:0;background:rgba(6,7,10,.86);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.lbx__frame{position:relative;margin:0;max-width:min(860px,92vw);max-height:88vh;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  transform:scale(.97);transition:transform .18s var(--ease)}
+.lbx.is-in .lbx__frame{transform:scale(1)}
+.lbx__img{max-width:100%;max-height:78vh;border-radius:14px;object-fit:contain;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+.lbx__cap{font-size:13px;color:rgba(255,255,255,.8);text-align:center}
+.lbx__cap[hidden]{display:none}
+.lbx__close{position:absolute;top:-14px;right:-14px;width:36px;height:36px;border-radius:50%;
+  border:0;cursor:pointer;background:#fff;color:#111;font-size:15px;
+  display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.lbx__close:hover{background:#f0f0f0}
+.lbx__close:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+@media(max-width:640px){.lbx__close{top:-46px;right:0}}

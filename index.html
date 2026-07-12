@@ -643,6 +643,16 @@
           <li data-i18n="how.p3">Доступы по ролям: каждый сотрудник видит ответы только по документам своего уровня.</li>
           <li data-i18n="how.p4">Железо подбираем под задачу: от одной рабочей станции до сервера. Поставляем легально, с документами и гарантией — только под проект.</li>
         </ul>
+
+        <h3 class="svc-h3" data-i18n="how.steps.h">Как проходит внедрение</h3>
+        <p class="lead" data-i18n="how.steps.lead">Внедрение занимает от 3 до 6 недель — без магии и без «универсального ИИ из коробки». Каждый шаг решает конкретную задачу: понять процесс, обучить агента на ваших данных, проверить на реальной работе и передать в эксплуатацию.</p>
+        <ol class="hiw-steps">
+          <li class="hiw-steps__i"><span class="hiw-steps__n">1</span><div><h4 data-i18n="how.step1.h">Аудит процесса и регламентов</h4><p data-i18n="how.step1.p">Инженер изучает, как задача решается сейчас: какие документы использует сотрудник, какие вопросы задают клиенты, где узкие места. Фиксируем регламенты и договариваемся о критериях успеха пилота.</p></div></li>
+          <li class="hiw-steps__i"><span class="hiw-steps__n">2</span><div><h4 data-i18n="how.step2.h">Сборка базы знаний</h4><p data-i18n="how.step2.p">Загружаем внутренние документы, инструкции, историю переписок и FAQ в закрытую базу на вашей стороне. Ничего не уходит в облако — агент учится на данных, которые физически остаются у вас.</p></div></li>
+          <li class="hiw-steps__i"><span class="hiw-steps__n">3</span><div><h4 data-i18n="how.step3.h">Настройка агента на вашем сервере</h4><p data-i18n="how.step3.p">Разворачиваем модель (Qwen, GLM или DeepSeek — по задаче) на локальном сервере или GPU-станции клиента. Настраиваем сценарии, права доступа и интеграции с вашими системами: CRM, почтой, мессенджерами.</p></div></li>
+          <li class="hiw-steps__i"><span class="hiw-steps__n">4</span><div><h4 data-i18n="how.step4.h">Пилот — 2 недели в реальной работе</h4><p data-i18n="how.step4.p">Агент подключается к живым задачам параллельно с сотрудником, а не вместо него. Мы вместе смотрим на реальные диалоги, замеряем точность и донастраиваем поведение до нужного уровня.</p></div></li>
+          <li class="hiw-steps__i"><span class="hiw-steps__n">5</span><div><h4 data-i18n="how.step5.h">Продакшн: работа 24/7 и поддержка</h4><p data-i18n="how.step5.p">После пилота агент переходит в полную эксплуатацию. Поддержка от 15 000 ₽/мес включает мониторинг, обновление базы знаний и донастройку под меняющиеся регламенты — сервер и данные остаются на вашей стороне.</p></div></li>
+        </ol>
       </div>
     </article>
 
@@ -653,10 +663,11 @@
       <div class="win__body">
         <h2 data-i18n="who.h1">Сделано для тех, кому нельзя в облако</h2>
         <div class="grid2">
-          <div class="mini"><h4 data-i18n="who.m1.h">Юристам и бухгалтерии</h4><p data-i18n="who.m1.p">Договоры, регламенты, практика — ассистент по внутренней базе и проверка договоров.</p><p class="mini__q" data-i18n="who.m1.q">«Какая неустойка в нашем типовом договоре поставки?»</p></div>
-          <div class="mini"><h4 data-i18n="who.m2.h">Клиникам</h4><p data-i18n="who.m2.p">Протоколы, стандарты, ПДн пациентов не покидают клинику.</p><p class="mini__q" data-i18n="who.m2.q">«Что входит в осмотр перед вакцинацией по стандарту?»</p></div>
-          <div class="mini"><h4 data-i18n="who.m3.h">Производству</h4><p data-i18n="who.m3.p">Техдокументация и нормативка — ответы для инженеров и рабочих.</p><p class="mini__q" data-i18n="who.m3.q">«Какой момент затяжки для узла М12 по техкарте?»</p></div>
+          <div class="mini"><h4 data-i18n="who.m1.h">Юристам и бухгалтерии</h4><p data-i18n="who.m1.p">Юристы и бухгалтеры тратят часы на рутинную проверку договоров и первички — ИИ-сотрудник сверяет документ с шаблоном за секунды, подсвечивает риски и готовит черновик заключения. Все данные остаются на сервере фирмы.</p><p class="mini__q" data-i18n="who.m1.q">«Какая неустойка в нашем типовом договоре поставки?»</p></div>
+          <div class="mini"><h4 data-i18n="who.m2.h">Клиникам и финансовым организациям</h4><p data-i18n="who.m2.p">Персональные данные пациентов и клиентов — зона риска: облачное решение создаёт вопросы к 152-ФЗ. ИИ-сотрудник работает строго на вашем сервере — данные физически не покидают контур, а агент ведёт первичную коммуникацию и готовит сводки.</p><p class="mini__q" data-i18n="who.m2.q">«Что входит в осмотр перед вакцинацией по стандарту?»</p></div>
+          <div class="mini"><h4 data-i18n="who.m3.h">Производству</h4><p data-i18n="who.m3.p">Инструкции и регламенты сложно держать в голове, а найти нужный пункт в толстом талмуде на линии — минуты простоя. ИИ-сотрудник знает все регламенты и отвечает за секунды прямо с планшета в цеху.</p><p class="mini__q" data-i18n="who.m3.q">«Какой момент затяжки для узла М12 по техкарте?»</p></div>
           <div class="mini"><h4 data-i18n="who.m4.h">Логистике и ВЭД</h4><p data-i18n="who.m4.p">Обработка заявок, документов, переписки.</p><p class="mini__q" data-i18n="who.m4.q">«Какие документы нужны для растаможки груза из Китая?»</p></div>
+          <div class="mini"><h4 data-i18n="who.m5.h">Оптовой торговле и дистрибуции</h4><p data-i18n="who.m5.p">Документооборот растёт быстрее штата, а клиенты пишут одни и те же вопросы про остатки и статус заказа. ИИ-сотрудник разбирает документы и отвечает клиентам 24/7, передавая менеджеру только нестандартные случаи.</p><p class="mini__q" data-i18n="who.m5.q">«Есть ли на складе 40 мешков цемента М500 и когда будет готов заказ №1204?»</p></div>
         </div>
       </div>
     </article>
@@ -996,17 +1007,18 @@
       <span class="win__grab" aria-hidden="true"></span>
       <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть" data-i18n-aria="ui.close"></button><button class="tl__min" data-act="min" aria-label="Свернуть" data-i18n-aria="ui.minimize"></button><button class="tl__max" data-act="max" aria-label="Развернуть" data-i18n-aria="ui.maximize"></button></span><span class="win__title" data-i18n="reg.title">Регламенты</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
       <div class="win__body">
-        <h2 style="font-size:20px" data-i18n="reg.title">Регламенты</h2>
+        <h2 style="font-size:20px" data-i18n="reg.h1full">Регламенты — по каким правилам работает ваш будущий ИИ-сотрудник</h2>
+        <p class="lead" data-i18n="reg.intro">ИИ-сотрудник — не чёрный ящик: он действует по писаным правилам, которые вы утверждаете. Ниже — образцы типовых регламентов, на основе которых мы настраиваем поведение агента под ваш бизнес.</p>
         <div class="finder">
           <div class="finder__bar"><span data-i18n="finder.name">Имя</span><span data-i18n="finder.meta">Размер · Дата</span></div>
           <div class="finder__list">
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f1">Регламент договорной работы.pdf</span><span class="finder__meta" data-i18n="reg.s1">240&nbsp;КБ</span><span class="finder__date">12.05.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f2">Положение о персональных данных.pdf</span><span class="finder__meta" data-i18n="reg.s2">180&nbsp;КБ</span><span class="finder__date">03.04.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f3">Регламент согласования закупок.pdf</span><span class="finder__meta" data-i18n="reg.s3">96&nbsp;КБ</span><span class="finder__date">28.03.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f4">Инструкция по документообороту.pdf</span><span class="finder__meta" data-i18n="reg.s4">312&nbsp;КБ</span><span class="finder__date">19.02.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f1">Регламент договорной работы.pdf</span><span class="finder__badge" data-i18n="reg.badge">ОБРАЗЕЦ</span><span class="finder__meta" data-i18n="reg.s1">240&nbsp;КБ</span><span class="finder__date">12.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f2">Положение о персональных данных.pdf</span><span class="finder__badge" data-i18n="reg.badge">ОБРАЗЕЦ</span><span class="finder__meta" data-i18n="reg.s2">180&nbsp;КБ</span><span class="finder__date">03.04.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f3">Регламент согласования закупок.pdf</span><span class="finder__badge" data-i18n="reg.badge">ОБРАЗЕЦ</span><span class="finder__meta" data-i18n="reg.s3">96&nbsp;КБ</span><span class="finder__date">28.03.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="reg.f4">Инструкция по документообороту.pdf</span><span class="finder__badge" data-i18n="reg.badge">ОБРАЗЕЦ</span><span class="finder__meta" data-i18n="reg.s4">312&nbsp;КБ</span><span class="finder__date">19.02.2026</span></div>
           </div>
         </div>
-        <p class="note" data-i18n="reg.note">На пилоте здесь будут ваши документы — ассистент отвечает только по ним.</p>
+        <p class="note" data-i18n="reg.note2">Это образцы уровня «так это выглядит». Реальные регламенты пишутся вместе с вами под ваши процессы — на пилоте здесь будут ваши документы.</p>
       </div>
     </article>
 
@@ -1015,14 +1027,15 @@
       <span class="win__grab" aria-hidden="true"></span>
       <div class="win__bar"><span class="tl"><button class="tl__close" data-act="close" aria-label="Закрыть" data-i18n-aria="ui.close"></button><button class="tl__min" data-act="min" aria-label="Свернуть" data-i18n-aria="ui.minimize"></button><button class="tl__max" data-act="max" aria-label="Развернуть" data-i18n-aria="ui.maximize"></button></span><span class="win__title" data-i18n="kb.title">База знаний</span><button class="win-back" data-act="close" data-i18n="ui.back">‹ Назад</button></div>
       <div class="win__body">
-        <h2 style="font-size:20px" data-i18n="kb.title">База знаний</h2>
+        <h2 style="font-size:20px" data-i18n="kb.h1full">База знаний — живой поиск по документам компании</h2>
+        <p class="lead" data-i18n="kb.intro">Это демо того, как ИИ-сотрудник находит ответ в документах вашей компании за секунды — без интернета, на вашем сервере. Ниже — примерные файлы; на пилоте здесь будут ваши реальные регламенты, прайсы и инструкции.</p>
         <div class="finder">
           <div class="finder__bar"><span data-i18n="finder.name">Имя</span><span data-i18n="finder.meta">Размер · Дата</span></div>
           <div class="finder__list">
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f1">Типовые договоры.pdf</span><span class="finder__meta" data-i18n="kb.s1">1.2&nbsp;МБ</span><span class="finder__date">07.06.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f2">Чек-листы проверки.pdf</span><span class="finder__meta" data-i18n="kb.s2">88&nbsp;КБ</span><span class="finder__date">21.05.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f3">Шаблоны писем и претензий.pdf</span><span class="finder__meta" data-i18n="kb.s3">54&nbsp;КБ</span><span class="finder__date">14.05.2026</span></div>
-            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f4">Внутренние стандарты.pdf</span><span class="finder__meta" data-i18n="kb.s4">420&nbsp;КБ</span><span class="finder__date">30.04.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f1">Типовые договоры.pdf</span><span class="finder__badge finder__badge--demo" data-i18n="kb.badge">ДЕМО</span><span class="finder__meta" data-i18n="kb.s1">1.2&nbsp;МБ</span><span class="finder__date">07.06.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f2">Чек-листы проверки.pdf</span><span class="finder__badge finder__badge--demo" data-i18n="kb.badge">ДЕМО</span><span class="finder__meta" data-i18n="kb.s2">88&nbsp;КБ</span><span class="finder__date">21.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f3">Шаблоны писем и претензий.pdf</span><span class="finder__badge finder__badge--demo" data-i18n="kb.badge">ДЕМО</span><span class="finder__meta" data-i18n="kb.s3">54&nbsp;КБ</span><span class="finder__date">14.05.2026</span></div>
+            <div class="finder__row"><picture><source srcset="icons/file-pdf.webp" type="image/webp"><img class="finder__ic" src="icons/file-pdf.png" alt="" width="20" height="24" loading="lazy" decoding="async"></picture><span class="finder__name" data-i18n="kb.f4">Внутренние стандарты.pdf</span><span class="finder__badge finder__badge--demo" data-i18n="kb.badge">ДЕМО</span><span class="finder__meta" data-i18n="kb.s4">420&nbsp;КБ</span><span class="finder__date">30.04.2026</span></div>
           </div>
         </div>
         <p class="note" data-i18n="kb.note">На пилоте здесь будут ваши документы — векторный индекс строится локально.</p>
@@ -1054,10 +1067,27 @@
           </span>
         </button>
 
+        <h3 class="svc-h3" data-i18n="svc.cmp.h">Свой ИИ на сервере vs Облачный ИИ</h3>
+        <p class="lead" data-i18n="svc.cmp.lead">Одно и то же ИИ-решение можно развернуть двумя способами: локально, без передачи данных наружу — либо через облачный API стороннего провайдера. Разница не в «уме» модели, а в том, кто контролирует данные, расходы и доступность.</p>
+        <div class="dev-tblwrap">
+          <table class="dev-tbl">
+            <thead><tr><th data-i18n="svc.cmp.col0">Критерий</th><th data-i18n="svc.cmp.col1">Свой ИИ на сервере</th><th data-i18n="svc.cmp.col2">Облачный ИИ</th></tr></thead>
+            <tbody>
+              <tr><td data-i18n="svc.cmp.r1.k">Данные и переписка с клиентами</td><td data-i18n="svc.cmp.r1.own">Остаются на сервере внутри компании и никуда не передаются</td><td data-i18n="svc.cmp.r1.cloud">Уходят на серверы стороннего провайдера, зачастую за рубежом</td></tr>
+              <tr><td data-i18n="svc.cmp.r2.k">Соответствие 152-ФЗ</td><td data-i18n="svc.cmp.r2.own">Данные физически не покидают периметр компании</td><td data-i18n="svc.cmp.r2.cloud">Риск штрафа при трансграничной передаче персональных данных</td></tr>
+              <tr><td data-i18n="svc.cmp.r3.k">Стоимость</td><td data-i18n="svc.cmp.r3.own">Разовая покупка станции + электричество, далее фиксированная поддержка</td><td data-i18n="svc.cmp.r3.cloud">Абонплата за токены, растёт вместе с объёмом обращений</td></tr>
+              <tr><td data-i18n="svc.cmp.r4.k">Работа без интернета</td><td data-i18n="svc.cmp.r4.own">Работает офлайн, не зависит от связи</td><td data-i18n="svc.cmp.r4.cloud">Требует стабильного интернета и доступности внешнего API</td></tr>
+              <tr><td data-i18n="svc.cmp.r5.k">Кастомизация под регламенты</td><td data-i18n="svc.cmp.r5.own">Полная — модель дообучается под ваши процессы и тон</td><td data-i18n="svc.cmp.r5.cloud">Ограниченная — только настройки, разрешённые провайдером</td></tr>
+              <tr><td data-i18n="svc.cmp.r6.k">Скорость ответа</td><td data-i18n="svc.cmp.r6.own">Сравнима с облаком на типовых задачах</td><td data-i18n="svc.cmp.r6.cloud">Сравнима, но зависит от нагрузки провайдера</td></tr>
+              <tr><td data-i18n="svc.cmp.r7.k">Зависимость от поставщика</td><td data-i18n="svc.cmp.r7.own">Инфраструктура принадлежит компании</td><td data-i18n="svc.cmp.r7.cloud">Провайдер может изменить условия, цены или доступ</td></tr>
+            </tbody>
+          </table>
+        </div>
+
         <h3 class="svc-h3" data-i18n="svc.dir">Направления</h3>
         <div class="svc-grid">
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/websites.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/websites.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s1.h">Сайты под ключ</h4><p data-i18n="svc.s1.p">Лендинги, корпоративные, e-commerce</p>
               <dl class="svc-why">
@@ -1069,7 +1099,7 @@
             </div>
           </article>
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/bots.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/bots.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s2.h">AI-боты и агенты</h4><p data-i18n="svc.s2.p">Telegram, WhatsApp, RAG, голос</p>
               <dl class="svc-why">
@@ -1081,7 +1111,7 @@
             </div>
           </article>
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/support.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/support.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s3.h">Чат-боты поддержки 24/7</h4><p data-i18n="svc.s3.p">На базе знаний клиента</p>
               <dl class="svc-why">
@@ -1093,7 +1123,7 @@
             </div>
           </article>
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/voice.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/voice.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s4.h">Голосовые ассистенты</h4><p data-i18n="svc.s4.p">Колл-центры, ресепшены</p>
               <dl class="svc-why">
@@ -1105,7 +1135,7 @@
             </div>
           </article>
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/automation.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/automation.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s5.h">Автоматизация бизнеса</h4><p data-i18n="svc.s5.p">1С, Битрикс, AmoCRM, n8n</p>
               <dl class="svc-why">
@@ -1117,7 +1147,7 @@
             </div>
           </article>
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/integrations.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/integrations.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s6.h">AI-интеграции</h4><p data-i18n="svc.s6.p">LLM в ваши продукты, fine-tuning</p>
               <dl class="svc-why">
@@ -1129,7 +1159,7 @@
             </div>
           </article>
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/video.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/video.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s7.h">AI-видео</h4><p data-i18n="svc.s7.p">Реклама, аватары</p>
               <dl class="svc-why">
@@ -1141,7 +1171,7 @@
             </div>
           </article>
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/content.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/content.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s8.h">Контент-фабрика</h4><p data-i18n="svc.s8.p">Статьи, SEO, соцсети</p>
               <dl class="svc-why">
@@ -1153,7 +1183,7 @@
             </div>
           </article>
           <article class="svc-card">
-            <span class="svc-card__ill" aria-hidden="true"><img data-src="services/analytics.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="svc-card__ill" aria-hidden="true"><img data-src="images/services/analytics.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <div class="svc-card__in">
               <h4 data-i18n="svc.s9.h">ИИ-аналитика и дашборды</h4><p data-i18n="svc.s9.p">Панель руководителя: 1С, CRM, телефония</p>
               <dl class="svc-why">
@@ -1185,7 +1215,7 @@
 
         <div class="dev-grid" id="devGrid">
           <button type="button" class="dev-card" data-station="start" aria-pressed="false">
-            <span class="dev-card__shot" aria-hidden="true"><img data-src="devices/start.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="dev-card__shot" aria-hidden="true"><img data-src="images/devices/start.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <span class="dev-card__body">
               <span class="dev-card__name" data-i18n="dev.d1.name">Станция «Старт»</span>
               <span class="dev-card__spec" data-i18n="dev.d1.spec">RTX 4060 Ti 16 ГБ · 64 ГБ ОЗУ</span>
@@ -1199,7 +1229,7 @@
             <span class="dev-card__pick" data-i18n="dev.ix.picked" aria-hidden="true">Выбрано ↓</span>
           </button>
           <button type="button" class="dev-card" data-station="pro" aria-pressed="false">
-            <span class="dev-card__shot" aria-hidden="true"><img data-src="devices/pro.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="dev-card__shot" aria-hidden="true"><img data-src="images/devices/pro.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <span class="dev-card__body">
               <span class="dev-card__name" data-i18n="dev.d2.name">Станция «Про»</span>
               <span class="dev-card__spec" data-i18n="dev.d2.spec">RTX 4090 24 ГБ · 128 ГБ ОЗУ</span>
@@ -1213,7 +1243,7 @@
             <span class="dev-card__pick" data-i18n="dev.ix.picked" aria-hidden="true">Выбрано ↓</span>
           </button>
           <button type="button" class="dev-card" data-station="max" aria-pressed="false">
-            <span class="dev-card__shot" aria-hidden="true"><img data-src="devices/max.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="dev-card__shot" aria-hidden="true"><img data-src="images/devices/max.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <span class="dev-card__body">
               <span class="dev-card__name" data-i18n="dev.d3.name">Станция «Макс»</span>
               <span class="dev-card__spec" data-i18n="dev.d3.spec">RTX 5090 32 ГБ</span>
@@ -1228,7 +1258,7 @@
           </button>
           <button type="button" class="dev-card" data-station="mac" aria-pressed="false">
             <span class="dev-card__badge" data-i18n="dev.d4.badge">Тихая альтернатива</span>
-            <span class="dev-card__shot" aria-hidden="true"><img data-src="devices/mac.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="dev-card__shot" aria-hidden="true"><img data-src="images/devices/mac.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <span class="dev-card__body">
               <span class="dev-card__name" data-i18n="dev.d4.name">Mac Studio</span>
               <span class="dev-card__spec" data-i18n="dev.d4.spec">M4 Max · 64–128 ГБ</span>
@@ -1242,7 +1272,7 @@
             <span class="dev-card__pick" data-i18n="dev.ix.picked" aria-hidden="true">Выбрано ↓</span>
           </button>
           <button type="button" class="dev-card dev-card--wide" data-station="server" aria-pressed="false">
-            <span class="dev-card__shot" aria-hidden="true"><img data-src="devices/server.svg" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
+            <span class="dev-card__shot" aria-hidden="true"><img data-src="images/devices/server.webp" alt="" width="400" height="200" loading="lazy" decoding="async"></span>
             <span class="dev-card__body">
               <span class="dev-card__name" data-i18n="dev.d5.name">Сервер Multi-GPU</span>
               <span class="dev-card__spec" data-i18n="dev.d5.spec">2–8 × GPU · кластеры</span>
@@ -1398,6 +1428,16 @@
       <div class="win__body">
         <h2 data-i18n="port.h1">Что мы уже сделали</h2>
         <p class="lead" data-i18n="port.lead">Сайты, ИИ-сомелье, боты и системы регистрации — вживую. Откройте любой кейс в новой вкладке.</p>
+
+        <div class="case-illus">
+          <span class="case-illus__badge" data-i18n="case.illus.badge">Иллюстрация — не реальный клиент</span>
+          <h3 class="case-illus__h" data-i18n="case.illus.h">Как выглядит внедрение ИИ-сотрудников в оптовой компании</h3>
+          <div class="case-illus__cols">
+            <div><h5 data-i18n="case.illus.beforeH">Было</h5><p data-i18n="case.illus.before">Оптовая база стройматериалов, 24 сотрудника. Заявки клиентов и поставщиков приходили в почту, WhatsApp и на бумаге вперемешку — менеджер по закупкам тратил 3–4 часа в день на ручную разборку счетов и накладных. На телефоне сидела одна секретарь, в пиковые часы звонок мог ждать ответа 2–3 минуты.</p></div>
+            <div><h5 data-i18n="case.illus.afterH">Стало</h5><p data-i18n="case.illus.after">После внедрения ИИ-документоведа и ИИ-секретаря на собственном сервере компании документы распознаются и находятся за секунды. ИИ-секретарь отвечает на звонки в среднем за ~2 секунды. Это освободило порядка 60–70 часов ручной работы в месяц на двух сотрудниках — при внедрении около 180 000 ₽ вложения окупились примерно за 3 месяца.</p></div>
+          </div>
+          <p class="case-illus__note" data-i18n="case.illus.note">Это иллюстративный, гипотетический пример — не отзыв реального клиента. Цифры показывают ориентировочный масштаб эффекта и согласованы с реальными характеристиками решения.</p>
+        </div>
 
         <h3 class="port-sec" data-i18n="port.sec.urartu">Кейсы Urartu</h3>
         <div class="port-grid">
@@ -1928,7 +1968,13 @@
 
     <!-- ЭКРАН 1: SPRINGBOARD (мобильный лаунчер) -->
     <section class="page page--apps">
+  <button class="sb-pitch" type="button" data-win="win-readme">
+    <span class="sb-pitch__eb" data-i18n="readme.tag">Локальное развёртывание · 152-ФЗ</span>
+    <span class="sb-pitch__h" data-i18n="readme.h1">Локальные ИИ-сотрудники. Работают 24/7. Данные не покидают компанию.</span>
+    <span class="sb-pitch__more" data-i18n="sb.pitch.more">Подробнее →</span>
+  </button>
   <nav class="springboard" aria-label="Приложения">
+    <button class="sb-icon" data-win="win-readme"><picture><source srcset="icons/file-txt.webp" type="image/webp"><img src="icons/file-txt.png" alt="" width="128" height="128" decoding="async"></picture><span>README.txt</span></button>
     <button class="sb-icon" data-win="win-assistant"><picture><source srcset="icons/assistant.webp" type="image/webp"><img src="icons/assistant.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="sb.assistant">Ассистент</span></button>
     <button class="sb-icon" data-win="win-staff"><picture><source srcset="icons/staff.webp" type="image/webp"><img src="icons/staff.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="staff.title">Сотрудники</span></button>
     <button class="sb-icon sb-icon--scan" data-win="win-scan"><span class="sb-tile" aria-hidden="true"><svg width="60" height="60" viewBox="0 0 60 60" fill="none"><defs><radialGradient id="scanLens" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#5b6472"/><stop offset="55%" stop-color="#2b3140"/><stop offset="100%" stop-color="#12151d"/></radialGradient></defs><path d="M8 20a5 5 0 0 1 5-5h4l2.4-3.6A2 2 0 0 1 21 10.5h18a2 2 0 0 1 1.7.9L43 15h4a5 5 0 0 1 5 5v20a5 5 0 0 1-5 5H13a5 5 0 0 1-5-5z" fill="#e9edf2"/><path d="M8 20a5 5 0 0 1 5-5h4l2.4-3.6A2 2 0 0 1 21 10.5h18a2 2 0 0 1 1.7.9L43 15h4a5 5 0 0 1 5 5v3H8z" fill="#f6f8fb"/><circle cx="30" cy="31" r="12" fill="url(#scanLens)"/><circle cx="30" cy="31" r="12" fill="none" stroke="#0c0e14" stroke-width="1.4"/><circle cx="30" cy="31" r="7" fill="none" stroke="#7f8ba0" stroke-width="1.6"/><circle cx="26" cy="27" r="2.6" fill="#aeb9cc" opacity=".85"/><circle cx="46" cy="21.5" r="1.8" fill="#8a94a6"/></svg></span><span data-i18n="sb.scan">Сканер</span></button>
@@ -1953,7 +1999,6 @@
     <button class="sb-icon" data-win="win-reg"><picture><source srcset="icons/folder.webp" type="image/webp"><img src="icons/folder.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="reg.title">Регламенты</span></button>
     <button class="sb-icon" data-win="win-kb"><picture><source srcset="icons/folder.webp" type="image/webp"><img src="icons/folder.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="kb.title">База знаний</span></button>
     <button class="sb-icon" data-win="win-trash"><picture><source srcset="icons/trash.webp" type="image/webp"><img src="icons/trash.png" alt="" width="128" height="128" decoding="async"></picture><span data-i18n="trash.title">Корзина</span></button>
-    <button class="sb-icon" data-win="win-readme"><picture><source srcset="icons/file-txt.webp" type="image/webp"><img src="icons/file-txt.png" alt="" width="128" height="128" decoding="async"></picture><span>README.txt</span></button>
   </nav>
     </section>
 
@@ -2227,6 +2272,7 @@
 
 <script src="js/i18n.js" defer></script>
 <script src="js/boot.js" defer></script>
+<script src="js/lightbox.js" defer></script>
 <!-- Умный голосовой агент (kie.ai LLM + edge-tts) — опциональный бэкенд; при недоступности сайт работает локально -->
 <script src="js/agentapi.js" defer></script>
 <!-- js/localai.js (41 КБ) грузится лениво из os.js при первом открытии окна с агентом (Сообщения / Звонок / Фабрика) -->
