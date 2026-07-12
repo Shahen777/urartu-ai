@@ -68,17 +68,29 @@
     return Promise.resolve(false);
   }
 
-  function reply(agent, message, history, voice) {
+  function reply(agent, message, history, voice, extSignal) {
     if (base === null) return Promise.reject('no-api');
     var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var t = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 55000) : 0;
+    /* extSignal — необязательный внешний сигнал отмены (напр. диспетчер
+       агентов хочет реально прервать fetch, когда его локальный таймаут
+       выигрывает гонку, а не просто игнорировать результат впустую тратя
+       платный запрос к kie.ai) — компонуем вручную (без AbortSignal.any,
+       не везде поддерживается) поверх внутреннего 55с-таймера. */
+    var onExtAbort = null;
+    if (ctrl && extSignal) {
+      if (extSignal.aborted) { try { ctrl.abort(); } catch (e) {} }
+      else { onExtAbort = function () { try { ctrl.abort(); } catch (e) {} }; extSignal.addEventListener('abort', onExtAbort); }
+    }
+    function cleanup() { if (t) clearTimeout(t); if (onExtAbort) { try { extSignal.removeEventListener('abort', onExtAbort); } catch (e) {} } }
     return fetch(base + '/api/voice', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl && ctrl.signal,
       body: JSON.stringify({
         agent: agent || 'secretary', message: message || '', history: (history || []).slice(-10),
         voice: voice !== false, lang: (window.__lang === 'en') ? 'en' : 'ru'
       })
-    }).then(function (r) { if (t) clearTimeout(t); if (!r.ok) throw r.status; return r.json(); });
+    }).then(function (r) { cleanup(); if (!r.ok) throw r.status; return r.json(); },
+            function (err) { cleanup(); throw err; });
   }
 
   function tts(text, voice) {

@@ -158,6 +158,18 @@
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     box.appendChild(renderer.domElement);
     renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;touch-action:pan-y';
+    /* редкий сбой на мобильных при нехватке памяти: браузер отбирает GPU-
+       контекст. Останавливаем рендер-цикл и переиспользуем существующий
+       ленивый dispose()+ensure() для пересборки, а не пишем новую логику. */
+    renderer.domElement.addEventListener('webglcontextlost', function (e) {
+      e.preventDefault();
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    }, false);
+    renderer.domElement.addEventListener('webglcontextrestored', function () {
+      var el = box, ros = ROS;
+      dispose();
+      ensure(el, ros);
+    }, false);
 
     scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x0a0c14, 10, 22);
@@ -265,10 +277,10 @@
 
   function ensure(el, roster) {
     box = el; ROS = roster || ROS;
+    disposed = false; /* явный запрос на монтирование снимает флаг */
     if (mounted) { onResize(); return Promise.resolve(); }
-    if (disposed) return Promise.resolve();
     return import(new URL('vendor/three/three.module.min.js', document.baseURI).href).then(function (mod) {
-      THREE = mod; if (mounted) return; build(); mounted = true;
+      THREE = mod; if (mounted || disposed) return; build(); mounted = true; /* disposed проверяем ПОСЛЕ await — ловит dispose() посреди загрузки three.js */
       if (window.ResizeObserver) { var ro = new ResizeObserver(function () { onResize(); }); ro.observe(box); }
       window.addEventListener('resize', onResize);
     }).catch(function (e) { if (box) box.classList.add('is-failed'); });
@@ -276,7 +288,7 @@
   function dispose() {
     if (raf) cancelAnimationFrame(raf);
     if (renderer) { renderer.dispose && renderer.dispose(); if (renderer.domElement && renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement); }
-    mounted = false; disposed = false;
+    mounted = false; disposed = true; /* было disposed = false — мёртвый guard, никогда не срабатывал */
   }
 
   window.Office3D = { ensure: ensure, assign: assign, done: done, reset: reset, dispose: dispose, ready: function () { return mounted; } };

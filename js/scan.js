@@ -138,6 +138,7 @@
     r.innerHTML =
       '<div class="scan__res">' +
         '<div class="scan__reshead"><img class="scan__resthumb" src="' + url + '" alt=""><div><h2 class="scan__h2">' + esc(L('Готово — вот что увидел ИИ', 'Done — here’s what the AI saw')) + '</h2><p class="scan__ressub">' + esc(L('Разобрано за 2 секунды, на вашем устройстве', 'Parsed in 2 seconds, on your device')) + '</p></div></div>' +
+        '<p class="note scan__demo-note">' + esc(tr('scan.demo.disclaimer')) + '</p>' +
         '<div class="scan__card scan__card--doc">' +
           '<div class="scan__cardh"><img src="' + (window.Avatars ? window.Avatars.src('documoved', 'real') : 'avatars/documoved-real.webp') + '" alt=""><div><b>' + esc(docName) + '</b><span>' + esc(L('распознал документ', 'recognised the document')) + '</span></div></div>' +
           '<div class="scan__ex">' + exHtml + '</div>' +

@@ -458,10 +458,19 @@
     return row;
   }
 
+  /* busy-состояние обоих полей ввода (2D и 3D-панели используют общий
+     dispatchAll()/dispatching) — раньше повторный клик молча не срабатывал
+     без какой-либо визуальной обратной связи */
+  function setBusyUI(busy) {
+    ['leadInp', 'o3dInp'].forEach(function (id) { var e = document.getElementById(id); if (e) e.disabled = busy; });
+    ['leadSend', 'o3dSend'].forEach(function (id) { var b = document.getElementById(id); if (b) { b.disabled = busy; b.classList.toggle('is-busy', busy); } });
+  }
+
   /* Единый движок: синхронно управляет 2D-диаграммой и 3D-сценой + оба лога */
   function dispatchAll(text) {
     if (dispatching || !text) return;
     dispatching = true;
+    setBusyUI(true);
     var picks = route(text);
     var office = document.querySelector('#agpOfficeScene .office');   // 2D (может отсутствовать)
     var log = document.getElementById('leadLog');
@@ -494,14 +503,16 @@
           'Задача от руководителя: «' + text + '». Одним предложением, в прошедшем времени, конкретно опиши, что именно ты только что сделал(а) по этой задаче.',
           'Task from the lead: "' + text + '". In one sentence, past tense, describe specifically what you just did about this task.'
         );
-        /* локальный таймаут 9с — не даём панели «висеть» дольше на медленном
-           бэкенде; серверный abort в agentapi.js (55с) остаётся отдельной
-           защитой от реально зависшего соединения */
-        var reqP = window.AgentAPI.reply(pk.id, prompt, [], false).then(
+        /* локальный таймаут 16с — не даём панели «висеть» дольше на медленном
+           бэкенде (Gemini через kie.ai обычно отвечает за ~10-12с даже без TTS).
+           Раньше «проигравший» запрос просто игнорировался и дожигал платный
+           API-вызов впустую — теперь таймаут реально абортит fetch. */
+        var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        var reqP = window.AgentAPI.reply(pk.id, prompt, [], false, ctrl && ctrl.signal).then(
           function (r) { return (r && r.text) ? r.text : pk.res; },
           function () { return pk.res; }
         );
-        var timeoutP = new Promise(function (res) { setTimeout(function () { res(pk.res); }, 16000); }); // Gemini через kie.ai обычно отвечает за ~10-12с даже без TTS
+        var timeoutP = new Promise(function (res) { setTimeout(function () { if (ctrl) { try { ctrl.abort(); } catch (e) {} } res(pk.res); }, 16000); });
         return Promise.race([reqP, timeoutP]);
       }, function () { return pk.res; });
     });
@@ -529,6 +540,7 @@
       logBoth('lead', esc(L('Готово. Свёл результат — можно проверить и подтвердить.', 'Done. I combined the result — review and confirm.')), null, true);
       if (office) office.classList.remove('is-dispatch');
       dispatching = false;
+      setBusyUI(false);
     });
   }
   var runDispatch = dispatchAll;

@@ -2594,6 +2594,9 @@ html.is-locked, html.is-locked body{overflow:hidden}
 .lead__send:hover{filter:brightness(1.08)}
 .lead__send:active{transform:scale(.95)}
 .lead__send:focus-visible{outline:2px solid var(--ring-strong);outline-offset:2px}
+.lead__inp:disabled{opacity:.6}
+.lead__send:disabled{opacity:.45;cursor:default}
+.lead__send.is-busy svg{animation:agSpin .8s linear infinite}
 .lead__ex{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .lead__chip{appearance:none;border:0;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;color:var(--text-mid);
   min-height:36px;padding:6px 13px;border-radius:999px;background:var(--glass);box-shadow:inset 0 0 0 .5px var(--ring);
