@@ -18,7 +18,9 @@
        модели, но не самый быстрый; Station — реальный ~$85-100тыс, только через
        OEM-партнёров (Dell/ASUS/Supermicro), энтерпрайз-класс, не для типового МСБ. */
     dgxspark:   { kp: 'd6', model: 'Qwen/Llama до 200B (FP4)',        tps: 12, wps: 9,  resp: 10, rub: 400000,  usd: 4000,  empMax: 35,  rep: 25,  ladder: false, altKey: 'dev.ix.sparkAlt' },
-    dgxstation: { kp: 'd7', model: 'GLM-5 · DeepSeek V4 (до 1 трлн)', tps: 55, wps: 41, resp: 3,  rub: 8000000, usd: 80000, empMax: 150, rep: 120, ladder: false, altKey: 'dev.ix.stationAlt' }
+    /* rep ≤ 0.8·empMax, иначе выбор карточки сразу показывал бы «впритык —
+       присмотритесь к следующей», хотя следующей за Station уже нет */
+    dgxstation: { kp: 'd7', model: 'GLM-5 · DeepSeek V4 (до 1 трлн)', tps: 55, wps: 41, resp: 3,  rub: 8000000, usd: 80000, empMax: 150, rep: 100, ladder: false, altKey: 'dev.ix.stationAlt' }
   };
   var ORDER = ['start', 'pro', 'max', 'mac', 'server', 'dgxspark', 'dgxstation'];
 
