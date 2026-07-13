@@ -33,6 +33,17 @@
   var sameOriginTried = false;
   var pendingProbe = null;    // in-flight промис — гасит параллельные дубли /api/health
 
+  /* Статический хостинг (GitHub Pages) — бэкенда рядом заведомо нет: искать его
+     бессмысленно, а 404 всё равно попадёт в консоль (fetch логирует его до
+     нашего .catch). Сразу идём в fallback на локальную модель. */
+  function staticHost() { return /(^|\.)github\.io$/i.test(location.hostname); }
+
+  /* Адрес агента «рядом» — от папки сайта, а не от корня домена: сайт может
+     жить в подпути (/urartu-ai/), и тогда агент публикуется там же. */
+  function sameOriginBase() {
+    return norm(location.origin + location.pathname.replace(/[^/]*$/, ''));
+  }
+
   function probe(b) {
     var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var t = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 7000) : 0;
@@ -55,11 +66,12 @@
     /* без явного адреса: если сайт и агент опубликованы на одном хосте
        (напр. сайт-ОС и агент развёрнуты вместе на VPS), находим агента
        рядом — на том же домене, без ручной настройки. */
-    if (!sameOriginTried) {
+    if (!sameOriginTried && !staticHost()) {
       sameOriginTried = true;
-      pendingProbe = probe('').then(function (ok) {
+      var origin = sameOriginBase();
+      pendingProbe = probe(origin).then(function (ok) {
         healthy = ok; checkedAt = Date.now(); pendingProbe = null;
-        if (ok) base = '';
+        if (ok) base = origin;
         return ok;
       });
       return pendingProbe;
